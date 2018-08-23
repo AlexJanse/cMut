@@ -1,0 +1,15 @@
+Package: myfirstRpackage
+Type: Package
+Title: Identify and annotate clustal DNMs 
+Version: 0.1.0
+Authors@R: person("Alex", "Janse", email = "alex.janse@radboudumc.nl", role = c("aut", "cre"))
+Description: Identify and annotate clustal de novo mutations (DNMs) from a data.frame.
+Depends: R (>= 3.5.1)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.0
+Imports: AnnotationHub ,
+         GenomeRanges ,
+         tidyverse
+Suggests: testthat
