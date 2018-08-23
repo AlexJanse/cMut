@@ -5,4 +5,5 @@
 #' @example
 #' voorbeeld
 #' @export
-identifyClusters <- function()
+
+identifyClusters <- function(x){}

@@ -5,4 +5,16 @@
 #' @example
 #' voorbeeld
 #' @export
-identifyAndAnnotateClusters <- function()
+identifyAndAnnotateClusters <- function(x,
+                                        chromHeader = "Chr",
+                                        sampleIdHeader = "sampleID",
+                                        positionHeader = "Pos") {
+
+
+  # Sort data ---------------------------------------------------------------
+  arrange(x, x$chromHeader, x$sampleIdHeader, x$positionHeader)
+
+
+
+}
+
