@@ -9,7 +9,7 @@ addDistance(ranges, maxDistance)
 \arguments{
 \item{ranges}{A GRange object which were created during identifyAndAnnotateClusters function}
 
-\item{maxDistance}{A integer; The maximum distance between DNMs that count as clustered.}
+\item{maxDistance}{A number; The maximum distance between DNMs that count as clustered.}
 }
 \value{
 A GRange with added distance and a logical column as metadata

@@ -18,7 +18,6 @@ identifyAndAnnotateClusters <- function(x,
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))
-  stopifnot(is.numeric(x[1,positionHeader]))
 
   # Sort data ---------------------------------------------------------------
   x <- arrange(x,

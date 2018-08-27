@@ -11,7 +11,7 @@ identifyAndAnnotateClusters(x, maxDistance, chromHeader = "Chr",
 \item{x}{A tibble that contains at least chromosome nr., sampleID and position information.
 The data cannot contain any NA.}
 
-\item{maxDistance}{A integer; The maximum distance between DNMs that count as clustered.}
+\item{maxDistance}{A number; The maximum distance between DNMs that count as clustered.}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 

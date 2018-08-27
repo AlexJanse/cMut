@@ -4,19 +4,17 @@
 \alias{generateRandomDNMs}
 \title{GenrateRandomDNMs}
 \usage{
-generateRandomDNMs(nSamples = 2, nChrom = 2, nDNM = 10)
+generateRandomDNMs(nDNM = 100, sampleName = "testSample")
 }
 \arguments{
-\item{nSamples}{integer; number of samples}
+\item{nDNM}{number of mutations that needed to be generated}
 
-\item{nChrom}{integer; number of chromosomes per sample}
-
-\item{nDNM}{integer; number of mutations per chromosome}
+\item{sampleName}{A name for the test sample}
 }
 \value{
 A tibble with DNM information
 }
 \description{
-Function to generate random tibble with DNM information.
+Function to generate random data in a tibble with DNM information.
 For explanation of the columns use cat(comment(<returned object>))
 }
