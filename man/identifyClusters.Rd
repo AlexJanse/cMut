@@ -13,6 +13,8 @@ The data cannot contain any NA.}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 
+\item{sampleIdHeader}{A string; The name of the column with the sample ID.}
+
 \item{positionHeader}{A string; The name of the column with the position nr.}
 }
 \value{

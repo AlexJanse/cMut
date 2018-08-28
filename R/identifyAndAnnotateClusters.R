@@ -4,7 +4,7 @@
 #' The data cannot contain any NA.
 #' @param maxDistance A number; The maximum distance between DNA mutations that count as clustered.
 #' @param chromHeader A string; The name of the column with the chromosome nr.
-#' @param sampleIDHeader A string; The name of the column with the sample ID.
+#' @param sampleIdHeader A string; The name of the column with the sample ID.
 #' @param positionHeader A string; The name of the column with the position nr.
 #' @return The tibble that was sent as an argument for this fuction with extra columns:
 #' clusterId, is.clustered and distance till nearest mutation below the maximum distance.
