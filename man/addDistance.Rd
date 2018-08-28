@@ -9,11 +9,11 @@ addDistance(ranges, maxDistance)
 \arguments{
 \item{ranges}{A GRange object which were created during identifyAndAnnotateClusters function}
 
-\item{maxDistance}{A number; The maximum distance between DNMs that count as clustered.}
+\item{maxDistance}{A number; The maximum distance between DNA mutations that count as clustered.}
 }
 \value{
 A GRange with added distance and a logical column as metadata
 }
 \description{
-A function that adds distances to nearest DNM to the tibble of the identifyAndAnnotateClusters function
+A function that adds distances to nearest mutation to the tibble of the identifyAndAnnotateClusters function
 }

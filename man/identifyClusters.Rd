@@ -21,6 +21,6 @@ contains per index the chromosoom nr, sample naam
 and any cluster ID's. For example: Chr1 15-15-15 c(10,50,100)
 }
 \description{
-A function that is able to search for clusters in DNM table (as explained by argument x)
+A function that is able to search for clusters in DNA mutation table (as explained by argument x)
 in a single chromosoom for a single sample.
 }

@@ -1,5 +1,5 @@
 #' identifyClusters
-#' @description A function that is able to search for clusters in DNM table (as explained by argument x)
+#' @description A function that is able to search for clusters in DNA mutation table (as explained by argument x)
 #' in a single chromosoom for a single sample.
 #' @inheritParams identifyAndAnnotateClusters
 #' @return A atomic character vector;

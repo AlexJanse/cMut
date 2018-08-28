@@ -2,7 +2,7 @@
 #' @description A function that finds and annotate clusters in a genomic data tibble.
 #' @param x A tibble that contains at least chromosome nr., sampleID and position information.
 #' The data cannot contain any NA.
-#' @param maxDistance A number; The maximum distance between DNMs that count as clustered.
+#' @param maxDistance A number; The maximum distance between DNA mutations that count as clustered.
 #' @param chromHeader A string; The name of the column with the chromosome nr.
 #' @param sampleIDHeader A string; The name of the column with the sample ID.
 #' @param positionHeader A string; The name of the column with the position nr.
@@ -72,7 +72,7 @@ identifyAndAnnotateClusters <- function(x,
 
 #-----------------------------------------------------------------------------------------------
 #' addDistance
-#' @description A function that adds distances to nearest DNM to the tibble of the identifyAndAnnotateClusters function
+#' @description A function that adds distances to nearest mutation to the tibble of the identifyAndAnnotateClusters function
 #' @inheritParams identifyAndAnnotateClusters
 #' @param ranges A GRange object which were created during identifyAndAnnotateClusters function
 #' @return A GRange with added distance and a logical column as metadata

@@ -1,14 +1,14 @@
-#' GenrateRandomDNMs
-#' @description Function to generate random data in a tibble with DNM information.
+#' GenerateRandomMutations
+#' @description Function to generate random data in a tibble with DNA mutation information.
 #' For explanation of the columns use cat(comment(<returned object>))
-#' @param nDNM number of mutations that needed to be generated
+#' @param nMut number of mutations that needed to be generated
 #' @param sampleName A name for the test sample
-#' @return A tibble with DNM information
+#' @return A tibble with mutation information
 #' @export
-generateRandomDNMs <- function(nDNM = 100, sampleName = "testSample"){
+generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
 
   # Check arguments ---------------------------------------------------------
-  stopifnot(nDNM > 1)
+  stopifnot(nMut > 1)
 
   # Human chromosomes information -------------------------------------------
   nucleotides <- c("A","C","G","T")
@@ -28,12 +28,12 @@ generateRandomDNMs <- function(nDNM = 100, sampleName = "testSample"){
   probability <- lenChrom/sum(lenChrom)*100
 
   # Create random data ------------------------------------------------------
-  randomTable <- data.frame(chrom = sample(nameChrom, nDNM, replace = T, prob = probability),
-             stringsAsFactors = F) %>%
+  randomTable <- data.frame(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
+                            stringsAsFactors = F) %>%
     mutate(chromLen = lenChrom[chrom]) %>%
     mutate(start = map_int(chromLen, ~sample(., 1))) %>%
     mutate(stop = start) %>%
-    mutate(ref = sample(nucleotides, nDNM, replace = T)) %>%
+    mutate(ref = sample(nucleotides, nMut, replace = T)) %>%
     mutate(alt = map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
     mutate(sampleIDs = sampleName) %>%
     mutate(surrounding = map_chr(sampleIDs,
@@ -43,17 +43,16 @@ generateRandomDNMs <- function(nDNM = 100, sampleName = "testSample"){
 
   randomTable$chromLen <- NULL
 
-
   randomTable <- as.tibble(randomTable)
   comment(randomTable) <-
     " A random generated tibble with the following information
-    chrom : Name of the chromosome
-    start : start position of the mutation,
-    (random generated but with the borders of the human reference genome)
-    stop : stop position of the mutation
-    ref : the nucleotide on the reference (also random generated)
-    alt : the nucleotife that the sample has
-    sampleName : name of the random sample
-    surrounding : the direct linked nucleotides surrounding the mutation"
+  chrom : Name of the chromosome
+  start : start position of the mutation,
+  (random generated but with the borders of the human reference genome)
+  stop : stop position of the mutation
+  ref : the nucleotide on the reference (also random generated)
+  alt : the nucleotife that the sample has
+  sampleName : name of the random sample
+  surrounding : the direct linked nucleotides surrounding the mutation"
   return(randomTable)
 }
