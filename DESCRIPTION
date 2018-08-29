@@ -1,9 +1,9 @@
-Package: clusteredMutations
+Package: cMut
 Type: Package
-Title: Identify and annotate clustal DNMs 
+Title: Identify and annotate clustal mutations 
 Version: 0.1.0
 Authors@R: person("Alex", "Janse", email = "alex.janse@radboudumc.nl", role = c("aut", "cre"))
-Description: Identify and annotate clustal de novo mutations (DNMs) from a data.frame.
+Description: Identify and annotate clustered mutations from a data.frame.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true

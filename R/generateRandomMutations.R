@@ -19,12 +19,12 @@ generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
                  "chr13","chr14","chr15","chr16",
                  "chr17","chr18","chr19","chr20",
                  "chr21","chr22","chrX","chrY")
-  lenChrom <- c(248956422,	242193527,	198295559,	190214555,
-                181538259,	170805979,	159345973,	145138636,
-                138394717,	133797422,	135086622,	133275309,
-                114364328,	107043718,	101991189,	90338345,
-                83257441, 80373285,	58617616,	 64444167,
-                46709983,	50818468, 156040895,	57227415)
+  lenChrom <- c(249250621, 243199373, 198022430, 191154276,
+                180915260, 171115067, 159138663, 146364022,
+                141213431, 135534747, 135006516, 133851895,
+                115169878, 107349540, 102531392, 90354753,
+                81195210, 78077248, 59128983, 63025520,
+                48129895, 51304566, 155270560, 59373566)
   names(lenChrom) <- nameChrom
   probability <- lenChrom/sum(lenChrom)*100
 
@@ -38,10 +38,10 @@ generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
     plyr::mutate(ref = purrr::map_chr(irange, ~getRef(.))) %>%
     plyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
     plyr::mutate(sampleIDs = sampleName) %>%
-    plyr::mutate(surrounding = purrr::map_chr(sampleIDs,
-                                 ~paste(sample(nucleotides,1),
-                                        sample(nucleotides,1),
-                                        sep = ".")))
+    plyr::mutate(surrounding = paste(purrr::map2_chr(chrom,start-1,getSurrounding, table = .),
+                                     purrr::map2_chr(chrom,start+1,getSurrounding, table = .),
+                                     sep = "."))
+
   randomTable$irange <- NULL
   randomTable$chromLen <- NULL
 
@@ -70,4 +70,17 @@ getRef <- function(x){
   stop <- as.numeric(data[3])
   range <- GenomicRanges::GRanges(chr,IRanges::IRanges(start,stop))
   return(as.character(BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19,range)))
+}
+
+getSurrounding <- function(chr,loc,table){
+  sameLoc <- table[table$start == loc,]
+  if(nrow(sameLoc) > 0){
+    altSurr <- sameLoc[sameLoc$chrom == chr,]
+
+    if(nrow(altSurr) > 0){
+      stopifnot(nrow(altSurr) == 1)
+      return(altSurr[1,"alt"])
+    }
+  }
+  return(getRef(paste(chr,loc,loc,sep = "-")))
 }
