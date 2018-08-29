@@ -3,3 +3,4 @@
 export(generateRandomMutations)
 export(identifyAndAnnotateClusters)
 export(identifyClusters)
+import(magrittr)

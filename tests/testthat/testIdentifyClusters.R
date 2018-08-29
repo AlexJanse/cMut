@@ -1,6 +1,6 @@
 context("Identify clusters")
 
-testData = as.tibble(
+testData = tibble::as.tibble(
   dget("extdata/expectedResultsRandom.txt", keep.source = FALSE)) # Tibble containing filter test data
 
 test_that("A vector with sample names and cluster IDs",

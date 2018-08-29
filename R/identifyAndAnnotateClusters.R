@@ -9,6 +9,7 @@
 #' @return The tibble that was sent as an argument for this fuction with extra columns:
 #' clusterId, is.clustered and distance till nearest mutation below the maximum distance.
 #' @export
+#' @import magrittr
 identifyAndAnnotateClusters <- function(x,
                                         maxDistance,
                                         chromHeader = "Chr",
@@ -16,25 +17,25 @@ identifyAndAnnotateClusters <- function(x,
                                         positionHeader = "Pos") {
 
   # Check if arguments are correct ------------------------------------------
-  stopifnot(!any(is.na(select(x,chromHeader,sampleIdHeader, positionHeader))))
+  stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))
 
   # Sort data ---------------------------------------------------------------
-  x <- arrange(x,
-          pull(x, chromHeader),
-          pull(x, sampleIdHeader),
-          pull(x,positionHeader)) # Used pulled function because we want the
+  x <- dplyr::arrange(x,
+          dplyr::pull(x, chromHeader),
+          dplyr::pull(x, sampleIdHeader),
+          dplyr::pull(x,positionHeader)) # Used pulled function because we want the
                                   # string inside the variable and not the
                                   # variable name itself as column name.
 
   # Create GRange object ----------------------------------------------------
   ranges <- x %>%
-    with(GRanges(seqnames = paste(
-                   pull(x, chromHeader),
-                   pull(x, sampleIdHeader)),
-                 ranges = IRanges(
-                   pull(x,positionHeader),
-                   pull(x,positionHeader))
+    with(GenomicRanges::GRanges(seqnames = paste(
+                   dplyr::pull(x, chromHeader),
+                   dplyr::pull(x, sampleIdHeader)),
+                 ranges = IRanges::IRanges(
+                   dplyr::pull(x,positionHeader),
+                   dplyr::pull(x,positionHeader))
                  )
          ) # TODO Make the function able to handle CNVs
 
@@ -45,12 +46,12 @@ identifyAndAnnotateClusters <- function(x,
   # Get clusterIDs ----------------------------------------------------------
   clusterIds <- by(x,
                    factor(
-                     paste(pull(x, chromHeader),
-                           pull(x, sampleIdHeader)),
+                     paste(dplyr::pull(x, chromHeader),
+                           dplyr::pull(x, sampleIdHeader)),
                      levels = unique(
                                 paste(
-                                  pull(x, chromHeader),
-                                  pull(x, sampleIdHeader))),
+                                  dplyr::pull(x, chromHeader),
+                                  dplyr::pull(x, sampleIdHeader))),
                                 ordered = TRUE),
                    identifyClusters,
                    round(maxDistance), # Just to be sure that the max is a rounded number
@@ -61,10 +62,10 @@ identifyAndAnnotateClusters <- function(x,
   # Add the cluster information to the x tibble ------------------------------
   ranges$clusterId <- unlist(clusterIds)
   x %>%
-    arrange(pull(x, chromHeader),
-            pull(x, sampleIdHeader),
-            pull(x,positionHeader)) %>%
-    mutate(clusterId = ranges$clusterId,
+    dplyr::arrange(dplyr::pull(x, chromHeader),
+                  dplyr::pull(x, sampleIdHeader),
+                  dplyr::pull(x,positionHeader)) %>%
+    dplyr::mutate(clusterId = ranges$clusterId,
            is.clustered = ranges$is.clustered,
            distance = ranges$distance) %>%
     return()
@@ -78,9 +79,9 @@ identifyAndAnnotateClusters <- function(x,
 #' @return A GRange with added distance and a logical column as metadata
 addDistance <- function(ranges, maxDistance) {
 
-  hits <- distanceToNearest(ranges)
+  hits <- GenomicRanges::distanceToNearest(ranges)
   ranges$distance <- NA
-  ranges$distance[queryHits(hits)] <- elementMetadata(hits)$distance
+  ranges$distance[S4Vectors::queryHits(hits)] <- S4Vectors::elementMetadata(hits)$distance
 
   ranges$is.clustered <- (ranges$distance <= maxDistance & ! is.na(ranges$distance))
 

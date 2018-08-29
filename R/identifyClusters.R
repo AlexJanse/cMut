@@ -22,13 +22,13 @@ identifyClusters <- function(x,
   proxDistMatrix[proxDistMatrix <= 1/(maximumDistance+2)] <- 0
 
   # Create graph from the matrix --------------------------------------------
-  graph <- graph_from_adjacency_matrix(proxDistMatrix,
+  graph <- igraph::graph_from_adjacency_matrix(proxDistMatrix,
                                        weighted = TRUE,
                                        mode="undirected",
                                        diag=FALSE)
 
   # Create cluster IDs ------------------------------------------------------
-  clusterNo <- clusters(graph)$membership
+  clusterNo <- igraph::clusters(graph)$membership
   clusterId <- paste(x[1,chromHeader],
                      x[1,sampleIdHeader],
                      clusterNo)

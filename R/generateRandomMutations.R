@@ -5,6 +5,7 @@
 #' @param sampleName A name for the test sample
 #' @return A tibble with mutation information
 #' @export
+#' @import magrittr
 generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
 
   # Check arguments ---------------------------------------------------------
@@ -30,20 +31,21 @@ generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
   # Create random data ------------------------------------------------------
   randomTable <- data.frame(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
                             stringsAsFactors = F) %>%
-    mutate(chromLen = lenChrom[chrom]) %>%
-    mutate(start = map_int(chromLen, ~sample(., 1))) %>%
-    mutate(stop = start) %>%
-    mutate(ref = sample(nucleotides, nMut, replace = T)) %>%
-    mutate(alt = map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
-    mutate(sampleIDs = sampleName) %>%
-    mutate(surrounding = map_chr(sampleIDs,
+    plyr::mutate(chromLen = lenChrom[chrom]) %>%
+    plyr::mutate(start = purrr::map_int(chromLen, ~sample(., 1))) %>%
+    plyr::mutate(stop = start) %>%
+    plyr::mutate(irange = paste(chrom,start,stop,sep = "-")) %>%
+    plyr::mutate(ref = purrr::map_chr(irange, ~getRef(.))) %>%
+    plyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
+    plyr::mutate(sampleIDs = sampleName) %>%
+    plyr::mutate(surrounding = purrr::map_chr(sampleIDs,
                                  ~paste(sample(nucleotides,1),
                                         sample(nucleotides,1),
                                         sep = ".")))
-
+  randomTable$irange <- NULL
   randomTable$chromLen <- NULL
 
-  randomTable <- as.tibble(randomTable)
+  randomTable <- tibble::as.tibble(randomTable)
   comment(randomTable) <-
     " A random generated tibble with the following information
   chrom : Name of the chromosome
@@ -55,4 +57,17 @@ generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
   sampleName : name of the random sample
   surrounding : the direct linked nucleotides surrounding the mutation"
   return(randomTable)
+}
+
+
+#' getRef
+#' @description A function to get the reference nucleotide
+#' @param x string that contains the chromosome name, start and stop location and is seperated by "-"
+getRef <- function(x){
+  data <- unlist(strsplit(x,"\\-"))
+  chr <- as.character(data[1])
+  start <- as.numeric(data[2])
+  stop <- as.numeric(data[3])
+  range <- GenomicRanges::GRanges(chr,IRanges::IRanges(start,stop))
+  return(as.character(BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19,range)))
 }

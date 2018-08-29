@@ -1,4 +1,4 @@
-Package: myfirstRpackage
+Package: clusteredMutations
 Type: Package
 Title: Identify and annotate clustal DNMs 
 Version: 0.1.0
@@ -8,9 +8,10 @@ License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.0
-Depends: R (>= 3.5.1) ,
-         AnnotationHub ,
+Depends: R (>= 3.5.1) 
+imports: AnnotationHub ,
          GenomicRanges ,
          igraph ,
-         tidyverse
+         tidyverse ,
+         BSgenome.Hsapiens.UCSC.hg19
 Suggests: testthat
