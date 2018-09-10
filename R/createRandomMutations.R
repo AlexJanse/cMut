@@ -1,4 +1,4 @@
-#' GenerateRandomMutations
+#' createRandomMutations
 #' @description Function to generate random data in a tibble with DNA mutation information.
 #' For explanation of the columns use cat(comment(<returned object>))
 #' @param nMut number of mutations that needed to be generated
@@ -6,7 +6,7 @@
 #' @return A tibble with mutation information
 #' @export
 #' @import magrittr
-generateRandomMutations <- function(nMut = 500, sampleName = "testSample"){
+createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
 
   # Check arguments ---------------------------------------------------------
   stopifnot(nMut > 1)

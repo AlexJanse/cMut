@@ -13,5 +13,7 @@ imports: AnnotationHub ,
          GenomicRanges ,
          igraph ,
          tidyverse ,
-         BSgenome.Hsapiens.UCSC.hg19
+         BSgenome.Hsapiens.UCSC.hg19 ,
+         VariantAnnotation ,
+         foreach
 Suggests: testthat
