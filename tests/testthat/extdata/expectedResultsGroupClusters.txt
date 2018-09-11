@@ -1,0 +1,55 @@
+structure(list(clusterId = c("chr1 testSample 104", "chr1 testSample 354", 
+"chr1 testSample 449", "chr15 testSample 302", "chr21 testSample 128", 
+"chr4 testSample 308", "chr9 testSample 17", "chrX testSample 209"
+), cDNMs = list(structure(list(chrom = c("chr1", "chr1"), start = c(27927395L, 
+27927584L), stop = c(27927395L, 27927584L), ref = c("A", "T"), 
+    alt = c("T", "G"), sampleIDs = c("testSample", "testSample"
+    ), surrounding = c("A.A", "T.A"), is.clustered = c(TRUE, 
+    TRUE), distance = c(188L, 188L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chr1", "chr1"
+), start = c(104089204L, 104089370L), stop = c(104089204L, 104089370L
+), ref = c("G", "C"), alt = c("T", "T"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("A.G", "C.T"), is.clustered = c(TRUE, 
+TRUE), distance = c(165L, 165L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chr1", "chr1"
+), start = c(134137096L, 134137272L), stop = c(134137096L, 134137272L
+), ref = c("N", "N"), alt = c("G", "T"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("N.N", "N.N"), is.clustered = c(TRUE, 
+TRUE), distance = c(175L, 175L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chr15", "chr15"
+), start = c(101347170L, 101347246L), stop = c(101347170L, 101347246L
+), ref = c("A", "A"), alt = c("G", "C"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("A.G", "A.T"), is.clustered = c(TRUE, 
+TRUE), distance = c(75L, 75L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chr21", "chr21"
+), start = c(38644314L, 38644423L), stop = c(38644314L, 38644423L
+), ref = c("T", "G"), alt = c("A", "A"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("T.G", "T.T"), is.clustered = c(TRUE, 
+TRUE), distance = c(108L, 108L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chr4", "chr4"
+), start = c(93162797L, 93162861L), stop = c(93162797L, 93162861L
+), ref = c("C", "A"), alt = c("G", "T"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("A.A", "G.A"), is.clustered = c(TRUE, 
+TRUE), distance = c(63L, 63L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chr9", "chr9"
+), start = c(4047986L, 4048090L), stop = c(4047986L, 4048090L
+), ref = c("A", "A"), alt = c("G", "C"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("A.T", "A.C"), is.clustered = c(TRUE, 
+TRUE), distance = c(103L, 103L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame")), structure(list(chrom = c("chrX", "chrX"
+), start = c(61822353L, 61822392L), stop = c(61822353L, 61822392L
+), ref = c("T", "T"), alt = c("A", "C"), sampleIDs = c("testSample", 
+"testSample"), surrounding = c("T.T", "C.G"), is.clustered = c(TRUE, 
+TRUE), distance = c(38L, 38L)), row.names = c(NA, -2L), class = c("tbl_df", 
+"tbl", "data.frame"))), refs = list(c("A", "T"), c("G", "C"), 
+    c("N", "N"), c("A", "A"), c("T", "G"), c("C", "A"), c("A", 
+    "A"), c("T", "T")), alts = list(c("T", "G"), c("T", "T"), 
+    c("G", "T"), c("G", "C"), c("A", "A"), c("G", "T"), c("G", 
+    "C"), c("A", "C")), plusStrand = c("A>T T>G", "G>T C>T", 
+"N>G N>T", "A>G A>C", "T>A G>A", "C>G A>T", "A>G A>C", "T>A T>C"
+), minusStrand = c("A>C T>A", "G>A C>A", "N>A N>C", "T>G T>C", 
+"C>T A>T", "T>A G>C", "T>G T>C", "A>G A>T"), clusterType = c("A>C T>A / A>T T>G", 
+"G>A C>A / G>T C>T", "N>A N>C / N>G N>T", "A>G A>C / T>G T>C", 
+"C>T A>T / T>A G>A", "C>G A>T / T>A G>C", "A>G A>C / T>G T>C", 
+"A>G A>T / T>A T>C")), class = c("tbl_df", "tbl", "data.frame"
+), row.names = c(NA, -8L))

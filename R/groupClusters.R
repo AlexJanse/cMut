@@ -12,16 +12,17 @@
 #' test <- createRandomMutations()
 #' test <- identifyAndAnnotateClusters(test, 20000, chromHeader = "chrom",
 #'                                     sampleIdHeader = "sampleIDs",positionHeader = "start")
-groupClusters <- function(table, clustIdHeader = "clusterId", refHeader = "ref", altHeader = "alt"){
+groupClusters <- function(table, clusterIdHeader = "clusterId", refHeader = "ref", altHeader = "alt"){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)
+  stopifnot(!any(is.na(dplyr::select(table,clusterIdHeader,refHeader, altHeader))))
   stopifnot(is.character(table[[1,refHeader]]))
   stopifnot(is.character(table[[1,altHeader]]))
 
   # Build table -------------------------------------------------------------------------------------------
   table <- table %>%
-    dplyr::group_by_(clustIdHeader) %>%
+    dplyr::group_by_(clusterIdHeader) %>%
     tidyr::nest(.key = "cDNMs") %>%
     dplyr::filter(clusterId!="") %>%
     dplyr::mutate(refs = purrr::map(cDNMs, ~as.character(dplyr::pull(., refHeader))),

@@ -12,9 +12,9 @@
 #' @import magrittr
 identifyAndAnnotateClusters <- function(x,
                                         maxDistance,
-                                        chromHeader = "Chr",
-                                        sampleIdHeader = "sampleID",
-                                        positionHeader = "Pos") {
+                                        chromHeader = "chrom",
+                                        sampleIdHeader = "sampleIDs",
+                                        positionHeader = "start") {
 
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
