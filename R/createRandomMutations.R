@@ -1,19 +1,3 @@
-# Human chromosomes information -------------------------------------------
-nucleotides <- c("A","C","G","T")
-nameChrom <- c("chr1","chr2","chr3","chr4",
-               "chr5","chr6","chr7","chr8",
-               "chr9","chr10","chr11","chr12",
-               "chr13","chr14","chr15","chr16",
-               "chr17","chr18","chr19","chr20",
-               "chr21","chr22","chrX","chrY")
-lenChrom <- c(249250621, 243199373, 198022430, 191154276,
-              180915260, 171115067, 159138663, 146364022,
-              141213431, 135534747, 135006516, 133851895,
-              115169878, 107349540, 102531392, 90354753,
-              81195210, 78077248, 59128983, 63025520,
-              48129895, 51304566, 155270560, 59373566)
-names(lenChrom) <- nameChrom
-
 #' createRandomMutations
 #' @description Function to generate random data in a tibble with DNA mutation information.
 #' For explanation of the columns use cat(comment(<returned object>))
@@ -23,26 +7,42 @@ names(lenChrom) <- nameChrom
 #' @export
 #' @import magrittr
 createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
+  # Human chromosomes information -------------------------------------------
+  nucleotides <- c("A","C","G","T")
+  nameChrom <- c("chr1","chr2","chr3","chr4",
+                 "chr5","chr6","chr7","chr8",
+                 "chr9","chr10","chr11","chr12",
+                 "chr13","chr14","chr15","chr16",
+                 "chr17","chr18","chr19","chr20",
+                 "chr21","chr22","chrX","chrY")
+  lenChrom <- c(249250621, 243199373, 198022430, 191154276,
+                180915260, 171115067, 159138663, 146364022,
+                141213431, 135534747, 135006516, 133851895,
+                115169878, 107349540, 102531392, 90354753,
+                81195210, 78077248, 59128983, 63025520,
+                48129895, 51304566, 155270560, 59373566)
+  names(lenChrom) <- nameChrom
 
   # Check arguments ---------------------------------------------------------
   stopifnot(nMut > 1)
 
   probability <- lenChrom/sum(lenChrom)*100
 
+  lenChromEnquo <- dplyr::enquo(lenChrom)
   # Create random data ------------------------------------------------------
   randomTable <- data.frame(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
                             stringsAsFactors = F) %>%
-    plyr::mutate(chromLen = lenChrom[chrom]) %>%
-    plyr::mutate(start = purrr::map_int(chromLen, ~sample(., 1))) %>%
-    plyr::mutate(stop = start) %>%
-    plyr::mutate(irange = paste(chrom,start,stop,sep = "-")) %>%
-    plyr::mutate(ref = purrr::map_chr(irange, ~getRef(.))) %>%
-    plyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
-    plyr::mutate(sampleIDs = sampleName) %>%
-    plyr::mutate(surrounding = paste(paste0(purrr::map2_chr(chrom,start-2,getSurrounding, table = .),
-                                            purrr::map2_chr(chrom,start-1,getSurrounding, table = .)),
-                                     paste0(purrr::map2_chr(chrom,start+1,getSurrounding, table = .),
-                                                   purrr::map2_chr(chrom,start+2,getSurrounding, table = .)),
+    dplyr::mutate(chromLen = lenChrom[chrom]) %>%
+    dplyr::mutate(start = purrr::map_int(chromLen, ~sample(., 1))) %>%
+    dplyr::mutate(stop = start) %>%
+    dplyr::mutate(irange = paste(chrom,start,stop,sep = "-")) %>%
+    dplyr::mutate(ref = purrr::map_chr(irange, ~getRef(., lenChrom))) %>%
+    dplyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
+    dplyr::mutate(sampleIDs = sampleName) %>%
+    dplyr::mutate(surrounding = paste(paste0(purrr::map2_chr(chrom,start-2,getSurrounding, table = ., lenChrom = !!lenChromEnquo),
+                                            purrr::map2_chr(chrom,start-1,getSurrounding, table = ., lenChrom = !!lenChromEnquo)),
+                                     paste0(purrr::map2_chr(chrom,start+1,getSurrounding, table = ., lenChrom = !!lenChromEnquo),
+                                                   purrr::map2_chr(chrom,start+2,getSurrounding, table = ., lenChrom = !!lenChromEnquo)),
                                      sep = "."))
 
   randomTable$irange <- NULL
@@ -66,7 +66,7 @@ createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
 #' getRef
 #' @description A function to get the reference nucleotide
 #' @param x string that contains the chromosome name, start and stop location and is seperated by "-"
-getRef <- function(x){
+getRef <- function(x,lenChrom){
   data <- unlist(strsplit(x,"\\-"))
   chr <- as.character(data[1])
   start <- as.numeric(data[2])
@@ -80,7 +80,8 @@ getRef <- function(x){
 
 #' getSurrounding
 #' @description Function to get the surrounding of a mutation
-getSurrounding <- function(chr,loc,table){
+getSurrounding <- function(chr,loc,table,lenChrom){
+  lenChrom <- rlang::get_expr(lenChrom)
   sameLoc <- table[table$start == loc,]
   if(nrow(sameLoc) > 0){
     altSurr <- sameLoc[sameLoc$chrom == chr,]
@@ -90,5 +91,5 @@ getSurrounding <- function(chr,loc,table){
       return(altSurr[1,"alt"])
     }
   }
-  return(getRef(paste(chr,loc,loc,sep = "-")))
+  return(getRef(paste(chr,loc,loc,sep = "-"),lenChrom))
 }
