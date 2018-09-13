@@ -4,6 +4,7 @@
 #' @param clusterIdHeader Contains the name of the column with the cluster IDs
 #' @param refHeader Contains the name of the column with the reference nucleotides
 #' @param altHeader Contains the name of the column with the alternative nucleotides
+#' @param groupPatterns Boolean if the table contains patterns and these needed to be processed aswell
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -12,24 +13,30 @@
 #' test <- createRandomMutations()
 #' test <- identifyAndAnnotateClusters(test, 20000, chromHeader = "chrom",
 #'                                     sampleIdHeader = "sampleIDs",positionHeader = "start")
-groupClusters <- function(table, clusterIdHeader = "clusterId", refHeader = "ref", altHeader = "alt"){
+groupClusters <- function(table, clusterIdHeader = "clusterId",
+                          refHeader = "ref", altHeader = "alt",
+                          patterns = FALSE, patternHeader = "linkedPatterns"){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)
   stopifnot(!any(is.na(dplyr::select(table,clusterIdHeader,refHeader, altHeader))))
-  stopifnot(is.character(table[[1,refHeader]]))
-  stopifnot(is.character(table[[1,altHeader]]))
 
   # Build table -------------------------------------------------------------------------------------------
   table <- table %>%
     dplyr::group_by_(clusterIdHeader) %>%
-    tidyr::nest(.key = "cDNMs") %>%
+    tidyr::nest(.key = "cMuts") %>%
     dplyr::filter(clusterId!="") %>%
-    dplyr::mutate(refs = purrr::map(cDNMs, ~as.character(dplyr::pull(., refHeader))),
-           alts = purrr::map(cDNMs, ~as.character(dplyr::pull(., altHeader)))) %>%
+    dplyr::mutate(refs = purrr::map(cMuts, ~as.character(dplyr::pull(., refHeader))),
+           alts = purrr::map(cMuts, ~as.character(dplyr::pull(., altHeader)))) %>%
     dplyr::mutate(plusStrand = purrr::map2_chr(refs, alts, formatClusterMutations),
            minusStrand = purrr::map2_chr(refs, alts, formatClusterMutations, convert=TRUE)) %>%
     dplyr::mutate(clusterType = purrr::map2_chr(plusStrand, minusStrand, getClusterType))
+
+  if(patterns){
+    patternHeader <- dplyr::enquo(patternHeader)
+    table <- table %>%
+      dplyr::mutate(patternInternsect = purrr::map(cMuts,groupPatterns,!!patternHeader))
+  }
 
   if(nrow(table) == 0){
     warning("No rows found. Please make sure the cluster IDs are present and try again.")
@@ -88,4 +95,16 @@ getClusterType <- function(plusStrand, minusStrand) {
   stringr::str_glue("{s[1]} / {s[2]}")
 }
 
+# TODO: controleer of het de juiste gegevens uithaalt en wat er gebeurt bij lege patronen resultaten
+groupPatterns <- function(clusterList,patternHeader){
+  patternHeader <- rlang::get_expr(patternHeader)
 
+  allPatterns <-
+    foreach::foreach(index = 1:nrow(clusterList),
+                     .combine = c) %do% {
+                       patterns <- clusterList[index,patternHeader][[1]]
+
+                     }
+  print(allPatterns)
+  readline(prompt = "")
+}

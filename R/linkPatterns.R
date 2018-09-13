@@ -11,12 +11,15 @@
 #' @param searchContextHeader A string with the column name of the context nucleotide of the searchPatterns table
 #' @param searchSource A string with the column name of the ID of the known mutations
 #' @param searchReverseComplement A boolean to also search in the reverse complement of the searchPatterns tibble
+#' @param patternsAsList A boolean to tell if the return value needs to be in a list or not
+#' @return list or string with the matched patterns.
 #' @export
 #' @import magrittr
 linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplement = FALSE,
                          searchPatterns = NULL, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
-                         searchIdHeader = "proces", searchReverseComplement = TRUE){
+                         searchIdHeader = "proces", searchReverseComplement = TRUE,
+                         patternsAsList = TRUE){
 
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
@@ -67,7 +70,17 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
     dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaAlphabet)) %>%
     dplyr::filter(match == T)
 
-  return(dplyr::pull(results,searchIdHeader))
+  matchedPatterns <- dplyr::pull(results,searchIdHeader)
+  if(!patternsAsList){
+    if(length(matchedPatterns) > 0){
+      matchedPatterns <- paste(matchedPatterns,collapse = "; ")
+    } else {
+      matchedPatterns <- NULL
+    }
+  } else if (length(matchedPatterns) == 0){
+    matchedPatterns <- ""
+  }
+  return(matchedPatterns)
 }
 
 #' compare

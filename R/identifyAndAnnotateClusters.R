@@ -1,7 +1,7 @@
 #' identifyAndAnnotateClusters
 #' @description A function that finds and annotate clusters in a genomic data tibble.
 #' @param x A tibble that contains at least chromosome nr., sampleID and position information.
-#' The data cannot contain any NA.
+#' The data cannot contain any NA. For an example use createRandomMutations function.
 #' @param maxDistance A number; The maximum distance between DNA mutations that count as clustered.
 #' @param chromHeader A string; The name of the column with the chromosome nr.
 #' @param sampleIdHeader A string; The name of the column with the sample ID.
@@ -15,11 +15,12 @@
 #' @import magrittr
 identifyAndAnnotateClusters <- function(x, maxDistance,
                                         chromHeader = "chrom", sampleIdHeader = "sampleIDs",
-                                        positionHeader = "start", linkPatterns = FALSE,
+                                        positionHeader = "start", refHeader = "ref",
+                                        altHeader = "alt", contextHeader = "surrounding",
+                                        mutationSymbol = ".", linkPatterns = FALSE,
                                         reverseComplement = FALSE, searchPatterns = NULL,
                                         searchRefHeader = "ref", searchAltHeader = "alt", searchContextHeader = "surrounding",
-                                        searchIdHeader = "proces", searchReverseComplement = TRUE,
-                                        refHeader = "ref", altHeader = "alt", contextHeader = "surrounding", mutationSymbol = ".") {
+                                        searchIdHeader = "proces", searchReverseComplement = TRUE) {
 
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
@@ -71,36 +72,41 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
                   dplyr::pull(x, sampleIdHeader),
                   dplyr::pull(x, positionHeader)) %>%
     dplyr::mutate(clusterId = ranges$clusterId,
-           is.clustered = ranges$is.clustered,
-           distance = ranges$distance)
+           is.clusteredTemp = ranges$is.clustered) %>%
+    dplyr::mutate(is.clustered = purrr::map2_lgl(is.clusteredTemp, !!rlang::sym(refHeader), function(x,y){ifelse(x & y != "N",return(TRUE),return(FALSE))})) %>%
+    dplyr::mutate(distance = ranges$distance)
 
+  x$is.clusteredTemp <- NULL
+
+  # Add information about if the mutation can be linked to a certain pattern ------
   if(linkPatterns){
-    reverseComplement <- dplyr::enquo(reverseComplement)
-    searchPatterns <- dplyr::enquo(searchPatterns)
-    searchRefHeader <- dplyr::enquo(searchRefHeader)
-    searchAltHeader <- dplyr::enquo(searchAltHeader)
-    searchContextHeader <- dplyr::enquo(searchContextHeader)
-    searchIdHeader <- dplyr::enquo(searchIdHeader)
-    searchReverseComplement <- dplyr::enquo(searchReverseComplement)
-    mutationSymbol <- dplyr::enquo(mutationSymbol)
-
+    linkVariables <- list(mutationSymbol, reverseComplement,
+                       searchPatterns, searchRefHeader,
+                       searchAltHeader,  searchContextHeader,
+                       searchIdHeader, searchReverseComplement) # Variables are put in a list to reduce the amount of code
+    # linkVariables <- dplyr::enquo(linkVariables)
 
     x <- x %>%
       dplyr::mutate(tempMutColumn = paste(!!rlang::sym(refHeader),
                                           !!rlang::sym(altHeader),
                                           !!rlang::sym(contextHeader),
-                                          sep = "$")) %>%
-      dplyr::mutate(linkedPatterns = purrr::map(tempMutColumn,
-                                                callLinkPatterns,reverseComplement,
-                                                searchPatterns, searchRefHeader,
-                                                searchAltHeader,  searchContextHeader,
-                                                searchIdHeader, searchReverseComplement,
-                                                mutationSymbol))
+                                          sep = "!")) %>%
+      dplyr::mutate(linkedPatterns = purrr::map2(tempMutColumn,
+                                                 is.clustered,
+                                                 function(x,y){
+                                                   ifelse(y,callLinkPatterns(x,linkVariables),"NA")
+                                                   })) %>%
+      dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
+                                               function(x){
+                                                 dplyr::if_else(x[[1]] != "" && x[[1]] != "NA",
+                                                                TRUE, FALSE)
+                                                 }))
+
     x$tempMutColumn <- NULL
-    return(x)
-    } else {
-    return(x)
-  }
+
+    }
+  return(tibble::as.tibble(x))
+
 }
 
 #-----------------------------------------------------------------------------------------------
@@ -120,24 +126,11 @@ addDistance <- function(ranges, maxDistance) {
   return(ranges)
 }
 
-callLinkPatterns <- function(x,reverseComplement,
-                             searchPatterns, searchRefHeader,
-                             searchAltHeader,  searchContextHeader,
-                             searchIdHeader, searchReverseComplement,
-                             mutationSymbol){
-
-  reverseComplement <- dplyr::get_expr(reverseComplement)
-  searchPatterns <- dplyr::get_expr(searchPatterns)
-  searchRefHeader <- dplyr::get_expr(searchRefHeader)
-  searchAltHeader <- dplyr::get_expr(searchAltHeader)
-  searchContextHeader <- dplyr::get_expr(searchContextHeader)
-  searchIdHeader <- dplyr::get_expr(searchIdHeader)
-  searchReverseComplement <- dplyr::get_expr(searchReverseComplement)
-  mutationSymbol <- dplyr::get_expr(mutationSymbol)
-  mutation <- strsplit(x,"$")
-
-  return(linkPatterns(mutation[1],mutation[2],mutation[3], mutationSymbol,
-                      reverseComplement, searchPatterns, searchRefHeader,
-                      searchAltHeader,  searchContextHeader,
-                      searchIdHeader, searchReverseComplement))
+callLinkPatterns <- function(x,linkedVariables){
+  # linkedVariables <- rlang::get_expr(linkedVariables)
+  mutation <- strsplit(x,"!")
+  return(linkPatterns(mutation[[1]][1],mutation[[1]][2],mutation[[1]][3], linkedVariables[[1]],
+                      linkedVariables[[2]], linkedVariables[[3]], linkedVariables[[4]],
+                      linkedVariables[[5]], linkedVariables[[6]],
+                      linkedVariables[[7]], linkedVariables[[8]]))
 }

@@ -16,4 +16,7 @@ imports: AnnotationHub ,
          BSgenome.Hsapiens.UCSC.hg19 ,
          VariantAnnotation ,
          foreach
-Suggests: testthat
+Suggests: testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
