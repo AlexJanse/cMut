@@ -4,10 +4,12 @@
 \alias{getRef}
 \title{getRef}
 \usage{
-getRef(x)
+getRef(x, lenChrom)
 }
 \arguments{
-\item{x}{string that contains the chromosome name, start and stop location and is seperated by "-"}
+\item{x}{A string that contains the chromosome name, start and stop location and is seperated by "-"}
+
+\item{lenChrom}{A vector with chromosomes length}
 }
 \description{
 A function to get the reference nucleotide

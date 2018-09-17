@@ -9,7 +9,7 @@ identifyClusters(x, maximumDistance, chromHeader = "Chr",
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome nr., sampleID and position information.
-The data cannot contain any NA.}
+The data cannot contain any NA. For an example use createRandomMutations function.}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 

@@ -1,6 +1,6 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Find and annotate mutational clusters."
+author: "Alex Janse"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -15,6 +15,32 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+
+The cMut package provide functions to find and annotate clustered mutations.
+In the following examples, the functions will be explained and used.
+
+
+## createRandomMutations
+The `cMut::createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package). 
+
+When determine the surrounding nucleotides, the function will take into account that there might be mutations in the table that correspond with the surrounding locations. In this case the mutated nucleotide will be added to the surrounding instead of the reference.
+```{r include=TRUE}
+randomData <- cMut::createRandomMutations(nMut = 1000)
+randomData
+```
+If a tibble is inconvenience, use the `tibble = FALSE` parameter.
+```{r}
+cMut::createRandomMutations(nMut = 10, tibble = FALSE)
+```
+
+
+## identifyAndAnnotateClusters
+The `cMut::identifyAndAnnotateClusters()` function is the place where most functions of `cMut` comes together. It applies the `cMut::identifyClusters()` and if wanted the `cMut::linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results.
+
+```{r include = TRUE}
+cMut::identifyAndAnnotateClusters(x = randomData, maxDistance = 20000)
+```
+
 
 Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
 
@@ -36,7 +62,7 @@ The `html_vignette` template includes a basic CSS theme. To override this theme 
 
 ## Figures
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+The figure sizes have been customized so that you can easily put two images side-by-side. 
 
 ```{r, fig.show='hold'}
 plot(1:10)

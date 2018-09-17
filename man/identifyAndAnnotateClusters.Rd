@@ -4,12 +4,18 @@
 \alias{identifyAndAnnotateClusters}
 \title{identifyAndAnnotateClusters}
 \usage{
-identifyAndAnnotateClusters(x, maxDistance, chromHeader = "Chr",
-  sampleIdHeader = "sampleID", positionHeader = "Pos")
+identifyAndAnnotateClusters(x, maxDistance, chromHeader = "chrom",
+  sampleIdHeader = "sampleIDs", positionHeader = "start",
+  refHeader = "ref", altHeader = "alt",
+  contextHeader = "surrounding", mutationSymbol = ".",
+  linkPatterns = FALSE, reverseComplement = FALSE,
+  searchPatterns = NULL, searchRefHeader = "ref",
+  searchAltHeader = "alt", searchContextHeader = "surrounding",
+  searchIdHeader = "proces", searchReverseComplement = TRUE)
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome nr., sampleID and position information.
-The data cannot contain any NA.}
+The data cannot contain any NA. For an example use createRandomMutations function.}
 
 \item{maxDistance}{A number; The maximum distance between DNA mutations that count as clustered.}
 
@@ -18,6 +24,26 @@ The data cannot contain any NA.}
 \item{sampleIdHeader}{A string; The name of the column with the sample ID.}
 
 \item{positionHeader}{A string; The name of the column with the position nr.}
+
+\item{refHeader}{Contains the name of the column with the reference nucleotides..}
+
+\item{altHeader}{Contains the name of the column with the alternative nucleotides.}
+
+\item{contextHeader}{A String; The name of the column with the context.}
+
+\item{mutationSymbol}{A string with the symbol that stands for the mutated nucleotide location (e.g. "." in G.C)}
+
+\item{reverseComplement}{A boolean to tell if the ref, alt and context needed to be searched with the reverse complement}
+
+\item{searchPatterns}{A tibble with the known mutation patterns. See data/mutationPatterns.rds for an example}
+
+\item{searchRefHeader}{A string with the column name of the reference nucleotide of the searchPatterns table}
+
+\item{searchAltHeader}{A string with the column name of the alternative nucleotide of the searchPatterns table}
+
+\item{searchContextHeader}{A string with the column name of the context nucleotide of the searchPatterns table}
+
+\item{searchReverseComplement}{A boolean to also search in the reverse complement of the searchPatterns tibble}
 }
 \value{
 The tibble that was sent as an argument for this fuction with extra columns:

@@ -1,10 +1,17 @@
 #' groupClusters
-#' @description A function that will group the clusters and give the mutation consensus back
-#' @param table A table with columns containing cluster ID's, reference and alternative nucleotide
-#' @param clusterIdHeader Contains the name of the column with the cluster IDs
-#' @param refHeader Contains the name of the column with the reference nucleotides
-#' @param altHeader Contains the name of the column with the alternative nucleotides
-#' @param groupPatterns Boolean if the table contains patterns and these needed to be processed aswell
+#' @description A function that will group the clusters and give the mutation
+#'   consensus back.
+#' @param table A table with columns containing cluster ID's, reference and
+#'   alternative nucleotide.
+#' @param clusterIdHeader Contains the name of the column with the cluster IDs.
+#' @param refHeader Contains the name of the column with the reference
+#'   nucleotides..
+#' @param altHeader Contains the name of the column with the alternative
+#'   nucleotides.
+#' @param patternIntersect Boolean if the table contains patterns and these
+#'   needed to be processed aswell.
+#' @param patternHeader A string with the column name of the patterns. Only in
+#'   use when patternIntersect is TRUE.
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -15,7 +22,7 @@
 #'                                     sampleIdHeader = "sampleIDs",positionHeader = "start")
 groupClusters <- function(table, clusterIdHeader = "clusterId",
                           refHeader = "ref", altHeader = "alt",
-                          patterns = FALSE, patternHeader = "linkedPatterns"){
+                          patternIntersect = FALSE, patternHeader = "linkedPatterns"){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)
@@ -32,12 +39,15 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
            minusStrand = purrr::map2_chr(refs, alts, formatClusterMutations, convert=TRUE)) %>%
     dplyr::mutate(clusterType = purrr::map2_chr(plusStrand, minusStrand, getClusterType))
 
-  if(patterns){
+  # Find the pattern intersect if needed --------------------------------------------------------
+  if(patternIntersect){
     patternHeader <- dplyr::enquo(patternHeader)
     table <- table %>%
-      dplyr::mutate(patternInternsect = purrr::map(cMuts,groupPatterns,!!patternHeader))
+      dplyr::mutate(patternIntersect = purrr::map(cMuts,getPatternIntersect,!!patternHeader)) %>%
+      dplyr::mutate(has.intersect = purrr::map_lgl(patternIntersect, function(x){ifelse(length(x) > 0 && x[[1]] != "",TRUE,FALSE)}))
   }
 
+  # Let know if no rows are found ---------------------------------------------------------------
   if(nrow(table) == 0){
     warning("No rows found. Please make sure the cluster IDs are present and try again.")
   }
@@ -47,7 +57,7 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
 }
 
 #' convertLetter
-#' @description Function to get the reverse complement nucleotides
+#' @description Function to get the reverse complement nucleotides.
 #' @param chars List with nucleotides
 convertLetter <- function(chars){
 
@@ -59,11 +69,12 @@ convertLetter <- function(chars){
 }
 
 #' formatClusterMutations
-#' @description Function to make a mutation description symbol (e.g. G>C)
-#' @param refs A list containing the reference nucleotides
-#' @param alts A list containing the alternative nucleotides
-#' @param convert A boolean that tells if the nucleotides need to be converted to the reverse complement
+#' @description Function to make a mutation description symbol (e.g. G>C).
+#' @param refs A list containing the reference nucleotides.
+#' @param alts A list containing the alternative nucleotides.
+#' @param convert A boolean that tells if the nucleotides need to be converted to the reverse complement.
 formatClusterMutations <- function(refs, alts, convert=FALSE) {
+
   # Check parameters -----------------------------------------------------------------
   stopifnot(length(refs) == length(alts))
   stopifnot(is.logical(convert))
@@ -87,24 +98,32 @@ formatClusterMutations <- function(refs, alts, convert=FALSE) {
 }
 
 #' getClusterType
-#' @description Function to sort and create a cluster type (e.g. C>G C>G / G>C G>C)
-#' @param plusstrand A string with the plusStrand mutation description
-#' @param minusStrand A string with the minusStrand mutation description
+#' @description Function to sort and create a cluster type (e.g. C>G C>G / G>C G>C).
+#' @param plusstrand A string with the plusStrand mutation description.
+#' @param minusStrand A string with the minusStrand mutation description.
 getClusterType <- function(plusStrand, minusStrand) {
   s <- sort(c(plusStrand, minusStrand))
   stringr::str_glue("{s[1]} / {s[2]}")
 }
 
-# TODO: controleer of het de juiste gegevens uithaalt en wat er gebeurt bij lege patronen resultaten
-groupPatterns <- function(clusterList,patternHeader){
+#' getPatternIntersect
+#' @description A function to find the intersect of patterns between mutations.
+#' @param clusterList A tibble with the mutations information.
+#' @param patternHeader A string with the column header of the patterns.
+getPatternIntersect <- function(clusterList,patternHeader){
   patternHeader <- rlang::get_expr(patternHeader)
 
+  patterns <- c()
+  counter <- 0
   allPatterns <-
     foreach::foreach(index = 1:nrow(clusterList),
                      .combine = c) %do% {
-                       patterns <- clusterList[index,patternHeader][[1]]
-
+                       if(counter == 0){
+                         patterns <- clusterList[index,patternHeader][[1]]
+                       }
+                       patterns <- intersect(patterns, clusterList[index,patternHeader][[1]])
+                       counter <- counter+1
                      }
-  print(allPatterns)
-  readline(prompt = "")
+
+  return(patterns)
 }

@@ -1,13 +1,17 @@
 #' createRandomMutations
-#' @description Function to generate random data in a tibble with DNA mutation information.
-#' For explanation of the columns use cat(comment(<returned object>))
+#' @description Function to generate random data in a tibble with DNA mutation
+#'   information. For explanation of the columns use cat(comment(<returned
+#'   object>))
 #' @param nMut number of mutations that needed to be generated
 #' @param sampleName A name for the test sample
+#' @param tibble A boolean if the table has to be a tibble
 #' @return A tibble with mutation information
 #' @export
 #' @import magrittr
-createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
-  # Human chromosomes information -------------------------------------------
+createRandomMutations <- function(nMut = 500,
+                                  sampleName = "testSample",
+                                  tibble = TRUE){ # TODO: Option to decide how many nucleotides the surrounding has
+  # Human chromosomes information (GRCh37/hg19) ------------------------------
   nucleotides <- c("A","C","G","T")
   nameChrom <- c("chr1","chr2","chr3","chr4",
                  "chr5","chr6","chr7","chr8",
@@ -23,13 +27,13 @@ createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
                 48129895, 51304566, 155270560, 59373566)
   names(lenChrom) <- nameChrom
 
-  # Check arguments ---------------------------------------------------------
+  # Check argument ----------------------------------------------------------
   stopifnot(nMut > 1)
 
-  probability <- lenChrom/sum(lenChrom)*100
-
-  lenChromEnquo <- dplyr::enquo(lenChrom)
   # Create random data ------------------------------------------------------
+  probability <- lenChrom/sum(lenChrom)*100
+  lenChromEnquo <- dplyr::enquo(lenChrom)
+
   randomTable <- data.frame(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
                             stringsAsFactors = F) %>%
     dplyr::mutate(chromLen = lenChrom[chrom]) %>%
@@ -48,7 +52,10 @@ createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
   randomTable$irange <- NULL
   randomTable$chromLen <- NULL
 
-  randomTable <- tibble::as.tibble(randomTable)
+  if(tibble){
+    randomTable <- tibble::as.tibble(randomTable)
+  }
+
   comment(randomTable) <-
     " A random generated tibble with the following information
   chrom : Name of the chromosome
@@ -59,13 +66,15 @@ createRandomMutations <- function(nMut = 500, sampleName = "testSample"){
   alt : the nucleotife that the sample has
   sampleName : name of the random sample
   surrounding : the direct linked nucleotides surrounding the mutation"
+
   return(randomTable)
 }
 
 
 #' getRef
 #' @description A function to get the reference nucleotide
-#' @param x string that contains the chromosome name, start and stop location and is seperated by "-"
+#' @param x A string that contains the chromosome name, start and stop location and is seperated by "-"
+#' @param lenChrom A vector with chromosomes length
 getRef <- function(x,lenChrom){
   data <- unlist(strsplit(x,"\\-"))
   chr <- as.character(data[1])
@@ -80,6 +89,10 @@ getRef <- function(x,lenChrom){
 
 #' getSurrounding
 #' @description Function to get the surrounding of a mutation
+#' @param chr A string with the chromosome name
+#' @param loc A number with the mutation location
+#' @param table A table containing the mutation information
+#' @inherit getRef
 getSurrounding <- function(chr,loc,table,lenChrom){
   lenChrom <- rlang::get_expr(lenChrom)
   sameLoc <- table[table$start == loc,]

@@ -10,5 +10,5 @@ convertLetter(chars)
 \item{chars}{List with nucleotides}
 }
 \description{
-Function to get the reverse complement nucleotides
+Function to get the reverse complement nucleotides.
 }

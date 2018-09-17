@@ -1,18 +1,30 @@
 #' identifyAndAnnotateClusters
-#' @description A function that finds and annotate clusters in a genomic data tibble.
-#' @param x A tibble that contains at least chromosome nr., sampleID and position information.
-#' The data cannot contain any NA. For an example use createRandomMutations function.
-#' @param maxDistance A number; The maximum distance between DNA mutations that count as clustered.
+#' @description A function that finds and annotate clusters in a genomic data
+#'   tibble.
+#' @param x A tibble that contains at least chromosome nr., sampleID and
+#'   position information. The data cannot contain any NA. For an example use
+#'   createRandomMutations function.
+#' @param maxDistance A number; The maximum distance between DNA mutations that
+#'   count as clustered.
 #' @param chromHeader A string; The name of the column with the chromosome nr.
 #' @param sampleIdHeader A string; The name of the column with the sample ID.
 #' @param positionHeader A string; The name of the column with the position nr.
+#' @param linkPatterns A boolean to tell if patterns are needed to be found.
 #' @inheritParams linkPatterns
 #' @inheritParams groupClusters
 #' @param contextHeader A String; The name of the column with the context.
-#' @return The tibble that was sent as an argument for this fuction with extra columns:
-#' clusterId, is.clustered and distance till nearest mutation below the maximum distance.
+#' @return The tibble that was sent as an argument for this fuction with extra
+#'   columns: clusterId, is.clustered and distance till nearest mutation below
+#'   the maximum distance.
 #' @export
 #' @import magrittr
+#' @examples
+#' data <- createRandomMutations(1000)
+#' results <- identifyAndAnnotateClusters(x = data,
+#'                                        maxDistance = 20000)
+#' resultsWithPatterns <- identifyAndAnnotateClusters(x = data,
+#'                                                    maxDistance = 20000,
+#'                                                    linkPatterns = TRUE)
 identifyAndAnnotateClusters <- function(x, maxDistance,
                                         chromHeader = "chrom", sampleIdHeader = "sampleIDs",
                                         positionHeader = "start", refHeader = "ref",
@@ -21,7 +33,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
                                         reverseComplement = FALSE, searchPatterns = NULL,
                                         searchRefHeader = "ref", searchAltHeader = "alt", searchContextHeader = "surrounding",
                                         searchIdHeader = "proces", searchReverseComplement = TRUE) {
-
+  # TODO: Make the functions CNV friendly
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))
@@ -43,7 +55,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
                    dplyr::pull(x,positionHeader),
                    dplyr::pull(x,positionHeader))
                  )
-         ) # TODO Make the function able to handle CNVs
+         )
 
 
   # Add distance to nearest mutation information to the GRange object -------
@@ -84,7 +96,6 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
                        searchPatterns, searchRefHeader,
                        searchAltHeader,  searchContextHeader,
                        searchIdHeader, searchReverseComplement) # Variables are put in a list to reduce the amount of code
-    # linkVariables <- dplyr::enquo(linkVariables)
 
     x <- x %>%
       dplyr::mutate(tempMutColumn = paste(!!rlang::sym(refHeader),
@@ -102,6 +113,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
                                                                 TRUE, FALSE)
                                                  }))
 
+
     x$tempMutColumn <- NULL
 
     }
@@ -114,6 +126,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
 #' @description A function that adds distances to nearest mutation to the tibble of the identifyAndAnnotateClusters function
 #' @inheritParams identifyAndAnnotateClusters
 #' @param ranges A GRange object which were created during identifyAndAnnotateClusters function
+#' @param maxDistance A number with the maximum distance
 #' @return A GRange with added distance and a logical column as metadata
 addDistance <- function(ranges, maxDistance) {
 
@@ -126,6 +139,8 @@ addDistance <- function(ranges, maxDistance) {
   return(ranges)
 }
 
+#' callLinkPatterns
+#' @description A function to correctly call the linkPattern function
 callLinkPatterns <- function(x,linkedVariables){
   # linkedVariables <- rlang::get_expr(linkedVariables)
   mutation <- strsplit(x,"!")

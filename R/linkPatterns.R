@@ -1,20 +1,33 @@
 #' linkPatterns
-#' @description A function that is able to find matches between a submitted unkown mutation and a known mutation table
-#' @param ref A string containing the reference nucleotide
-#' @param alt A string containing the alternative nucleotide
-#' @param context A string containing the surrounding nucleotides (e.g. G.C)
-#' @param reverseComplement A boolean to tell if the ref, alt and context needed to be searched with the reverse complement
-#' @param mutationSymbol A string with the symbol that stands for the mutated nucleotide location (e.g. "." in G.C)
-#' @param searchPatterns A tibble with the known mutation patterns. See data/mutationPatterns.rds for an example
-#' @param searchRefHeader A string with the column name of the reference nucleotide of the searchPatterns table
-#' @param searchAltHeader A string with the column name of the alternative nucleotide of the searchPatterns table
-#' @param searchContextHeader A string with the column name of the context nucleotide of the searchPatterns table
-#' @param searchSource A string with the column name of the ID of the known mutations
-#' @param searchReverseComplement A boolean to also search in the reverse complement of the searchPatterns tibble
-#' @param patternsAsList A boolean to tell if the return value needs to be in a list or not
+#' @description A function that is able to find matches between a submitted
+#'   unkown mutation and a known mutation table.
+#' @param ref A string containing the reference nucleotide.
+#' @param alt A string containing the alternative nucleotide.
+#' @param context A string containing the surrounding nucleotides (e.g. G.C).
+#' @param reverseComplement A boolean to tell if the ref, alt and context needed
+#'   to be searched with the reverse complement.
+#' @param mutationSymbol A string with the symbol that stands for the mutated
+#'   nucleotide location (e.g. "." in G.C).
+#' @param searchPatterns A tibble with the known mutation patterns. The
+#'   data/mutationPatterns.rds is the default search table.
+#' @param searchRefHeader A string with the column name of the reference
+#'   nucleotide of the searchPatterns table.
+#' @param searchAltHeader A string with the column name of the alternative
+#'   nucleotide of the searchPatterns table.
+#' @param searchContextHeader A string with the column name of the context
+#'   nucleotide of the searchPatterns table.
+#' @param searchSource A string with the column name of the ID of the known
+#'   mutations.
+#' @param searchReverseComplement A boolean to also search in the reverse
+#'   complement of the searchPatterns tibble. When matched the returned ID will
+#'   have [Rev.Com] attached to it.
+#' @param patternsAsList A boolean to tell if the return value needs to be in a
+#'   list or not.
 #' @return list or string with the matched patterns.
 #' @export
 #' @import magrittr
+#' @examples
+#' results <- linkPatterns("C","T","TA.T")
 linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplement = FALSE,
                          searchPatterns = NULL, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
@@ -35,10 +48,13 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
     stopifnot(any(grepl(searchRefHeader,names(searchPatterns))))
     stopifnot(any(grepl(searchContextHeader,names(searchPatterns))))
   }
+
+  # Add the reverse complement of the known table to the search table -----------------------------------------------
   if(searchReverseComplement){
     searchPatterns <- rbind(searchPatterns,getRevComTable(searchPatterns,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader))
   }
 
+  # Use the reverse complement of the unknown mutation ---------------------------------------------------------------
   if(reverseComplement == T){
     ref <- getReverseComplement(ref)
     alt <- getReverseComplement(alt)
@@ -75,7 +91,7 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
     if(length(matchedPatterns) > 0){
       matchedPatterns <- paste(matchedPatterns,collapse = "; ")
     } else {
-      matchedPatterns <- NULL
+      matchedPatterns <- ""
     }
   } else if (length(matchedPatterns) == 0){
     matchedPatterns <- ""
