@@ -34,6 +34,9 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
                          searchIdHeader = "proces", searchReverseComplement = TRUE,
                          patternsAsList = TRUE){
 
+  tempWd <- setwd(paste0(.libPaths(),"/cMut")) # To avoid connection issues with the required files
+  on.exit(setwd(tempWd), add = T) # Set the wd back to the orignal one
+
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
   stopifnot(is.character(ref) & is.character(alt) & is.character(context))
@@ -41,7 +44,8 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   stopifnot(!grepl("[^ACGTacgt]",alt))
 
   if(is.null(searchPatterns)){
-    searchPatterns <- tibble::as.tibble(readRDS("data/mutationPatterns.rds"))
+    searchPatterns <- tibble::as.tibble(readRDS("data/mutationPatterns.rds")) %>%
+      dplyr::mutate_all(as.character)
   } else {
     # check if the assigned headers are present in the given table
     stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
@@ -61,8 +65,10 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
     context <- getReverseComplement(context)
   }
 
-  dnaAlphabet <- tibble::as.tibble(readRDS("data/dnaAlphabet.rds"))
+
+  dnaAlphabet <- tibble::as.tibble(readRDS("./data/dnaAlphabet.rds"))
   dnaAlphabet <- dplyr::enquo(dnaAlphabet)
+
 
   ref <- casefold(ref,upper = T)
   ref <- dplyr::enquo(ref)
@@ -86,21 +92,27 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
     dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaAlphabet)) %>%
     dplyr::filter(match == T)
 
-  matchedPatterns <- dplyr::pull(results,searchIdHeader)
+  if(nrow(results) > 0){
+    matchedPatterns <- list(dplyr::pull(results,searchIdHeader))
+  } else {
+    return(list(""))
+  }
   if(!patternsAsList){
     if(length(matchedPatterns) > 0){
       matchedPatterns <- paste(matchedPatterns,collapse = "; ")
     } else {
-      matchedPatterns <- ""
+      matchedPatterns <- list("")
     }
   } else if (length(matchedPatterns) == 0){
-    matchedPatterns <- ""
+    matchedPatterns <- list("")
   }
+
   return(matchedPatterns)
 }
 
 #' compare
-#' @description A function to see if the nucleotide is present in the symbol data frame
+#' @description A function to see if the nucleotide is present in the symbol
+#'   data frame
 #' @param nucleotide A string with a single nucleotide
 #' @param symbols A data frame with the symbols to match with the nucleotide
 compare <- function(nucleotide,symbols){
@@ -115,10 +127,11 @@ compare <- function(nucleotide,symbols){
 
 #' compareContext
 #' @description Function to compare nucleotides context
-#' @param context2 A string with a context (e.g. C.G)
-#' This one will act as the known mutation context for linkPatterns function.
+#' @param context2 A string with a context (e.g. C.G) This one will act as the
+#'   known mutation context for linkPatterns function.
 #' @param context1 A string with a context (e.g.  C.C)
-#' @param mutationSymbol A character that stands for the mutation nucleotide (e.g. "." for C.G)
+#' @param mutationSymbol A character that stands for the mutation nucleotide
+#'   (e.g. "." for C.G)
 #' @param alphabet A tibble with the nucleotides and their symbols
 #' @return Boolean if the contexts match or not
 compareContext <- function(context2, context1, mutationSymbol, alphabet){

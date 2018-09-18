@@ -12,7 +12,7 @@
 
 <meta name="author" content="Alex Janse" />
 
-<meta name="date" content="2018-09-17" />
+<meta name="date" content="2018-09-18" />
 
 <title>Find and annotate mutational clusters.</title>
 
@@ -70,249 +70,175 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 
 <h1 class="title toc-ignore">Find and annotate mutational clusters.</h1>
 <h4 class="author"><em>Alex Janse</em></h4>
-<h4 class="date"><em>2018-09-17</em></h4>
+<h4 class="date"><em>2018-09-18</em></h4>
 
 
 
 <p>The cMut package provide functions to find and annotate clustered mutations. In the following examples, the functions will be explained and used.</p>
 <div id="createrandommutations" class="section level2">
 <h2>createRandomMutations</h2>
-<p>The <code>cMut::createRandomMutation()</code> function will create random SNV mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package).</p>
+<p>The <code>cMut::createRandomMutation()</code> function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package).</p>
 <p>When determine the surrounding nucleotides, the function will take into account that there might be mutations in the table that correspond with the surrounding locations. In this case the mutated nucleotide will be added to the surrounding instead of the reference.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cMut<span class="op">::</span><span class="kw">createRandomMutations</span>(<span class="dt">nMut =</span> <span class="dv">10</span>)
-<span class="co">#&gt; # A tibble: 10 x 7</span>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">randomData &lt;-<span class="st"> </span>cMut<span class="op">::</span><span class="kw">createRandomMutations</span>(<span class="dt">nMut =</span> <span class="dv">1000</span>)
+randomData
+<span class="co">#&gt; # A tibble: 1,000 x 7</span>
 <span class="co">#&gt;    chrom     start      stop ref   alt   sampleIDs  surrounding</span>
 <span class="co">#&gt;    &lt;chr&gt;     &lt;int&gt;     &lt;int&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      &lt;chr&gt;      </span>
-<span class="co">#&gt;  1 chr21  27070467  27070467 T     C     testSample AG.GA      </span>
-<span class="co">#&gt;  2 chr9  131795991 131795991 C     G     testSample CA.CA      </span>
-<span class="co">#&gt;  3 chr4  176455855 176455855 C     G     testSample CA.TA      </span>
-<span class="co">#&gt;  4 chr16  11186133  11186133 C     G     testSample GT.AA      </span>
-<span class="co">#&gt;  5 chr4   95173693  95173693 A     T     testSample TT.AG      </span>
-<span class="co">#&gt;  6 chrX  102542181 102542181 A     C     testSample GT.AC      </span>
-<span class="co">#&gt;  7 chr15  64448245  64448245 G     C     testSample GG.CT      </span>
-<span class="co">#&gt;  8 chrY   54653070  54653070 N     A     testSample NN.NN      </span>
-<span class="co">#&gt;  9 chr6  157447180 157447180 A     T     testSample AA.TA      </span>
-<span class="co">#&gt; 10 chr7   94050865  94050865 A     C     testSample AA.GA</span></code></pre></div>
-<p>If a tibble is inconvenience, use the <code>tibble = FALSE</code> parameter.</p>
+<span class="co">#&gt;  1 chr8   12927902  12927902 G     T     testSample TG.AG      </span>
+<span class="co">#&gt;  2 chr14  23885661  23885661 A     T     testSample AG.GA      </span>
+<span class="co">#&gt;  3 chr13  63288397  63288397 A     C     testSample AC.AA      </span>
+<span class="co">#&gt;  4 chr2   54663337  54663337 G     A     testSample AA.AA      </span>
+<span class="co">#&gt;  5 chr7  129426308 129426308 T     G     testSample GG.TT      </span>
+<span class="co">#&gt;  6 chr5   18236170  18236170 G     A     testSample GA.TG      </span>
+<span class="co">#&gt;  7 chrX   27246983  27246983 A     C     testSample CA.AT      </span>
+<span class="co">#&gt;  8 chr14  77287293  77287293 T     C     testSample CA.GA      </span>
+<span class="co">#&gt;  9 chr10  18472221  18472221 A     T     testSample GT.AC      </span>
+<span class="co">#&gt; 10 chr2  183014749 183014749 A     T     testSample AA.GG      </span>
+<span class="co">#&gt; # ... with 990 more rows</span></code></pre></div>
+<p>If a tibble is inconvenience, use the <code>tibble = FALSE</code> parameter to get a data frame.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cMut<span class="op">::</span><span class="kw">createRandomMutations</span>(<span class="dt">nMut =</span> <span class="dv">10</span>, <span class="dt">tibble =</span> <span class="ot">FALSE</span>)
 <span class="co">#&gt;    chrom     start      stop ref alt  sampleIDs surrounding</span>
-<span class="co">#&gt; 1   chr4 186433458 186433458   A   G testSample       CG.AC</span>
-<span class="co">#&gt; 2   chrX  39004556  39004556   G   C testSample       TA.TT</span>
-<span class="co">#&gt; 3   chr7  13823033  13823033   C   A testSample       TA.TC</span>
-<span class="co">#&gt; 4   chr5 101851874 101851874   T   C testSample       TT.GG</span>
-<span class="co">#&gt; 5   chr2 242850635 242850635   A   G testSample       TA.GT</span>
-<span class="co">#&gt; 6  chr15  68294476  68294476   T   A testSample       CC.AA</span>
-<span class="co">#&gt; 7   chr8  77366769  77366769   G   T testSample       AT.AT</span>
-<span class="co">#&gt; 8   chr1 164918537 164918537   G   T testSample       TT.GG</span>
-<span class="co">#&gt; 9   chr4 125463002 125463002   C   A testSample       CA.GA</span>
-<span class="co">#&gt; 10 chr13 108263420 108263420   A   T testSample       GA.AC</span></code></pre></div>
+<span class="co">#&gt; 1   chr7  99679889  99679889   G   C testSample       GT.TA</span>
+<span class="co">#&gt; 2   chr7 147665962 147665962   G   A testSample       TG.GC</span>
+<span class="co">#&gt; 3  chr16   2327955   2327955   G   T testSample       CC.CA</span>
+<span class="co">#&gt; 4   chrX  80593817  80593817   G   T testSample       CT.GC</span>
+<span class="co">#&gt; 5   chr3 194280109 194280109   G   T testSample       GT.TA</span>
+<span class="co">#&gt; 6   chr2  41735573  41735573   T   C testSample       TA.TG</span>
+<span class="co">#&gt; 7   chr5  57381196  57381196   A   C testSample       AG.AA</span>
+<span class="co">#&gt; 8  chr10 119039850 119039850   A   T testSample       AA.AA</span>
+<span class="co">#&gt; 9   chrX 106186940 106186940   T   C testSample       AT.CT</span>
+<span class="co">#&gt; 10  chr8  44593110  44593110   N   G testSample       NN.NN</span></code></pre></div>
 </div>
 <div id="identifyandannotateclusters" class="section level2">
 <h2>identifyAndAnnotateClusters</h2>
-<p>The <code>cmut::identifyAndAnnotateClusters()</code> function</p>
-<p>Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The <code>html_vignette</code> output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The <code>html_vignette</code> format:</p>
-<ul>
-<li>Never uses retina figures</li>
-<li>Has a smaller default figure size</li>
-<li>Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style</li>
-</ul>
+<p>The <code>cMut::identifyAndAnnotateClusters()</code> applies the <code>cMut::identifyClusters()</code> and if wanted the <code>cMut::linkPatterns()</code> to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default parameters for column names correspond with the column headers of the sent table and change if needed.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span>cMut<span class="op">::</span><span class="kw">identifyAndAnnotateClusters</span>(<span class="dt">x =</span> randomData, 
+                                             <span class="dt">maxDistance =</span> <span class="dv">20000</span>,
+                                             <span class="dt">tibble =</span> <span class="ot">FALSE</span>)
+results[results<span class="op">$</span>is.clustered <span class="op">==</span><span class="st"> </span>T,]
+<span class="co">#&gt;     chrom     start      stop ref alt  sampleIDs surrounding</span>
+<span class="co">#&gt; 83  chr10   8651049   8651049   T   C testSample       CA.TC</span>
+<span class="co">#&gt; 84  chr10   8655796   8655796   G   A testSample       TA.TC</span>
+<span class="co">#&gt; 322 chr17  39148935  39148935   C   A testSample       CT.TT</span>
+<span class="co">#&gt; 323 chr17  39157038  39157038   G   C testSample       AT.CA</span>
+<span class="co">#&gt; 401  chr2  63230363  63230363   A   G testSample       CA.TG</span>
+<span class="co">#&gt; 402  chr2  63247795  63247795   T   C testSample       TG.TT</span>
+<span class="co">#&gt; 712  chr5 171442753 171442753   T   A testSample       CT.GG</span>
+<span class="co">#&gt; 713  chr5 171444816 171444816   T   A testSample       TG.AG</span>
+<span class="co">#&gt; 772  chr7  43429898  43429898   G   T testSample       GG.AG</span>
+<span class="co">#&gt; 773  chr7  43445104  43445104   G   T testSample       CA.CG</span>
+<span class="co">#&gt; 917  chr9 126792383 126792383   G   A testSample       CA.CA</span>
+<span class="co">#&gt; 918  chr9 126806597 126806597   A   T testSample       AT.CA</span>
+<span class="co">#&gt;               clusterId is.clustered distance</span>
+<span class="co">#&gt; 83   chr10 testSample 6         TRUE     4746</span>
+<span class="co">#&gt; 84   chr10 testSample 6         TRUE     4746</span>
+<span class="co">#&gt; 322 chr17 testSample 12         TRUE     8102</span>
+<span class="co">#&gt; 323 chr17 testSample 12         TRUE     8102</span>
+<span class="co">#&gt; 401  chr2 testSample 27         TRUE    17431</span>
+<span class="co">#&gt; 402  chr2 testSample 27         TRUE    17431</span>
+<span class="co">#&gt; 712  chr5 testSample 55         TRUE     2062</span>
+<span class="co">#&gt; 713  chr5 testSample 55         TRUE     2062</span>
+<span class="co">#&gt; 772  chr7 testSample 13         TRUE    15205</span>
+<span class="co">#&gt; 773  chr7 testSample 13         TRUE    15205</span>
+<span class="co">#&gt; 917  chr9 testSample 48         TRUE    14213</span>
+<span class="co">#&gt; 918  chr9 testSample 48         TRUE    14213</span></code></pre></div>
+<p>If the <code>cMut::linkPatterns()</code> is needed, use the <code>linkPatterns = TRUE</code> parameter. See the <code>cMut::linkPatterns()</code> paragraph for more information</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">results &lt;-<span class="st"> </span>cMut<span class="op">::</span><span class="kw">identifyAndAnnotateClusters</span>(<span class="dt">x =</span> randomData, 
+                                             <span class="dt">maxDistance =</span> <span class="dv">20000</span>,
+                                             <span class="dt">tibble =</span> <span class="ot">FALSE</span>,
+                                             <span class="dt">linkPatterns =</span> <span class="ot">TRUE</span>)
+results[results<span class="op">$</span>is.linked <span class="op">==</span><span class="st"> </span>T,]
+<span class="co">#&gt;     chrom     start      stop ref alt  sampleIDs surrounding</span>
+<span class="co">#&gt; 83  chr10   8651049   8651049   T   C testSample       CA.TC</span>
+<span class="co">#&gt; 322 chr17  39148935  39148935   C   A testSample       CT.TT</span>
+<span class="co">#&gt; 323 chr17  39157038  39157038   G   C testSample       AT.CA</span>
+<span class="co">#&gt; 401  chr2  63230363  63230363   A   G testSample       CA.TG</span>
+<span class="co">#&gt; 402  chr2  63247795  63247795   T   C testSample       TG.TT</span>
+<span class="co">#&gt; 713  chr5 171444816 171444816   T   A testSample       TG.AG</span>
+<span class="co">#&gt; 772  chr7  43429898  43429898   G   T testSample       GG.AG</span>
+<span class="co">#&gt; 917  chr9 126792383 126792383   G   A testSample       CA.CA</span>
+<span class="co">#&gt; 918  chr9 126806597 126806597   A   T testSample       AT.CA</span>
+<span class="co">#&gt;               clusterId is.clustered distance   linkedPatterns is.linked</span>
+<span class="co">#&gt; 83   chr10 testSample 6         TRUE     4746              MMR      TRUE</span>
+<span class="co">#&gt; 322 chr17 testSample 12         TRUE     8102           A3G/A1      TRUE</span>
+<span class="co">#&gt; 323 chr17 testSample 12         TRUE     8102    AID[Rev.Com.]      TRUE</span>
+<span class="co">#&gt; 401  chr2 testSample 27         TRUE    17431              MMR      TRUE</span>
+<span class="co">#&gt; 402  chr2 testSample 27         TRUE    17431              MMR      TRUE</span>
+<span class="co">#&gt; 713  chr5 testSample 55         TRUE     2062              MMR      TRUE</span>
+<span class="co">#&gt; 772  chr7 testSample 13         TRUE    15205 A3G/A1[Rev.Com.]      TRUE</span>
+<span class="co">#&gt; 917  chr9 testSample 48         TRUE    14213    AID[Rev.Com.]      TRUE</span>
+<span class="co">#&gt; 918  chr9 testSample 48         TRUE    14213              MMR      TRUE</span></code></pre></div>
 </div>
-<div id="vignette-info" class="section level2">
-<h2>Vignette Info</h2>
-<p>Note the various macros within the <code>vignette</code> section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the <code>title</code> field and the <code>\VignetteIndexEntry</code> to match the title of your vignette.</p>
+<div id="identifyclusters.r" class="section level2">
+<h2>identifyClusters.R</h2>
+<p>The <code>cMut::identifyCluster()</code> function finds clusters in a table and returns a vector with cluster IDs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">resultVector &lt;-<span class="st"> </span>cMut<span class="op">::</span><span class="kw">identifyClusters</span>(<span class="dt">x =</span> randomData,
+                 <span class="dt">maxDistance =</span> <span class="dv">20000</span>,
+                 <span class="dt">chromHeader =</span> <span class="st">&quot;chrom&quot;</span>,
+                 <span class="dt">positionHeader =</span> <span class="st">&quot;start&quot;</span>,
+                 <span class="dt">sampleIdHeader =</span> <span class="st">&quot;sampleIDs&quot;</span>)
+<span class="kw">head</span>(resultVector)
+<span class="co">#&gt; [1] &quot;chr8 testSample 1&quot; &quot;chr8 testSample 2&quot; &quot;chr8 testSample 3&quot;</span>
+<span class="co">#&gt; [4] &quot;&quot;                  &quot;&quot;                  &quot;&quot;</span></code></pre></div>
 </div>
-<div id="styles" class="section level2">
-<h2>Styles</h2>
-<p>The <code>html_vignette</code> template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:</p>
-<pre><code>output: 
-  rmarkdown::html_vignette:
-    css: mystyles.css</code></pre>
+<div id="linkpatterns" class="section level2">
+<h2>linkPatterns</h2>
+<p>The <code>cMut::linkPatterns()</code> function can check if the provided mutation can be matched with known mutation patterns in a table and returns the ID of the match. If no table is sent the default table is used:</p>
+<pre><code>#&gt; [1] &quot;DEFAULT TABLE:&quot;
+#&gt; # A tibble: 9 x 4
+#&gt;   proces            ref   alt   surrounding
+#&gt;   &lt;chr&gt;             &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;      
+#&gt; 1 AID               C     D     WR.        
+#&gt; 2 AID(hotspot)      C     D     WR.Y       
+#&gt; 3 AID(pref.hotspot) C     D     AG.T       
+#&gt; 4 MMR               A     B     W.         
+#&gt; 5 MMR               T     V     .W         
+#&gt; 6 A3G/A1            C     D     T.         
+#&gt; 7 A3F               C     D     C.         
+#&gt; 8 A3A               C     T     YT.A       
+#&gt; 9 A3B               C     T     RT.A</code></pre>
+<p>A proper way of using this function with the default table:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cMut<span class="op">::</span><span class="kw">linkPatterns</span>(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;T&quot;</span>,<span class="st">&quot;TA.T&quot;</span>)
+<span class="co">#&gt; [1] &quot;AID&quot;          &quot;AID(hotspot)&quot;</span></code></pre></div>
+<p>As visible in the default table, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cMut<span class="op">::</span><span class="kw">linkPatterns</span>(<span class="st">&quot;C&quot;</span>,<span class="st">&quot;D&quot;</span>,<span class="st">&quot;A.A&quot;</span>)
+<span class="co">#&gt; Error in cMut::linkPatterns(&quot;C&quot;, &quot;D&quot;, &quot;A.A&quot;): !grepl(&quot;[^ACGTacgt]&quot;, alt) is not TRUE</span></code></pre></div>
 </div>
-<div id="figures" class="section level2">
-<h2>Figures</h2>
-<p>The figure sizes have been customized so that you can easily put two images side-by-side.</p>
-<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">plot</span>(<span class="dv">1</span><span class="op">:</span><span class="dv">10</span>)
-<span class="kw">plot</span>(<span class="dv">10</span><span class="op">:</span><span class="dv">1</span>)</code></pre></div>
-<p><img src="data:image/png;base64,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" /><img src="data:image/png;base64,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" /></p>
-<p>You can enable figure captions by <code>fig_caption: yes</code> in YAML:</p>
-<pre><code>output:
-  rmarkdown::html_vignette:
-    fig_caption: yes</code></pre>
-<p>Then you can use the chunk option <code>fig.cap = &quot;Your figure caption.&quot;</code> in <strong>knitr</strong>.</p>
+<div id="groupclusters" class="section level2">
+<h2>groupClusters</h2>
+<p>The <code>cMut::groupClusters()</code> function is best used as an optional followup function for <code>cMut::identifyAndAnnotateClusters()</code>. This function will group the data based on the cluster IDs.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">groups &lt;-<span class="st"> </span>cMut<span class="op">::</span><span class="kw">groupClusters</span>(<span class="dt">table =</span> results,
+                    <span class="dt">tibble =</span> <span class="ot">FALSE</span>)
+<span class="co"># The cMuts column contains lists of mutations that belong to the cluster.</span>
+<span class="co"># It's excluded because it messed up the format.</span>
+groups[,<span class="op">-</span><span class="kw">which</span>(<span class="kw">names</span>(groups) <span class="op">==</span><span class="st"> &quot;cMuts&quot;</span>)] 
+<span class="co">#&gt;             clusterId refs alts plusStrand minusStrand       clusterType</span>
+<span class="co">#&gt; 1  chr10 testSample 6 T, G C, A    T&gt;C G&gt;A     C&gt;T A&gt;G C&gt;T A&gt;G / T&gt;C G&gt;A</span>
+<span class="co">#&gt; 2 chr17 testSample 12 C, G A, C    C&gt;A G&gt;C     C&gt;G G&gt;T C&gt;A G&gt;C / C&gt;G G&gt;T</span>
+<span class="co">#&gt; 3  chr2 testSample 27 A, T G, C    A&gt;G T&gt;C     A&gt;G T&gt;C A&gt;G T&gt;C / A&gt;G T&gt;C</span>
+<span class="co">#&gt; 4  chr5 testSample 55 T, T A, A    T&gt;A T&gt;A     A&gt;T A&gt;T A&gt;T A&gt;T / T&gt;A T&gt;A</span>
+<span class="co">#&gt; 5  chr7 testSample 13 G, G T, T    G&gt;T G&gt;T     C&gt;A C&gt;A C&gt;A C&gt;A / G&gt;T G&gt;T</span>
+<span class="co">#&gt; 6  chr9 testSample 48 G, A A, T    G&gt;A A&gt;T     T&gt;A C&gt;T G&gt;A A&gt;T / T&gt;A C&gt;T</span></code></pre></div>
+<p>If the <code>linkPatterns = TRUE</code> parameter is used during the <code>cMut::identifyAndAnnotateClusters()</code> function or the custom table have a similar column then it is possible to use the <code>patternIntersect = TRUE</code> parameter in the <code>cMut::groupClusters()</code> to add a column with the intersection of the patterns per cluster.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">groups &lt;-<span class="st"> </span>cMut<span class="op">::</span><span class="kw">groupClusters</span>(<span class="dt">table =</span> results,
+                    <span class="dt">patternIntersect =</span> <span class="ot">TRUE</span>)
+<span class="co"># The cMuts column contains lists of mutations that belong to the cluster.</span>
+<span class="co"># It's excluded because it messed up the format.</span>
+groups[,<span class="op">-</span><span class="kw">which</span>(<span class="kw">names</span>(groups) <span class="op">==</span><span class="st"> &quot;cMuts&quot;</span>)] 
+<span class="co">#&gt; # A tibble: 6 x 8</span>
+<span class="co">#&gt;   clusterId refs  alts  plusStrand minusStrand clusterType patternIntersect</span>
+<span class="co">#&gt;   &lt;chr&gt;     &lt;lis&gt; &lt;lis&gt; &lt;chr&gt;      &lt;chr&gt;       &lt;chr&gt;       &lt;list&gt;          </span>
+<span class="co">#&gt; 1 chr10 te~ &lt;chr~ &lt;chr~ T&gt;C G&gt;A    C&gt;T A&gt;G     C&gt;T A&gt;G / ~ &lt;list [0]&gt;      </span>
+<span class="co">#&gt; 2 chr17 te~ &lt;chr~ &lt;chr~ C&gt;A G&gt;C    C&gt;G G&gt;T     C&gt;A G&gt;C / ~ &lt;list [0]&gt;      </span>
+<span class="co">#&gt; 3 chr2 tes~ &lt;chr~ &lt;chr~ A&gt;G T&gt;C    A&gt;G T&gt;C     A&gt;G T&gt;C / ~ &lt;list [1]&gt;      </span>
+<span class="co">#&gt; 4 chr5 tes~ &lt;chr~ &lt;chr~ T&gt;A T&gt;A    A&gt;T A&gt;T     A&gt;T A&gt;T / ~ &lt;list [0]&gt;      </span>
+<span class="co">#&gt; 5 chr7 tes~ &lt;chr~ &lt;chr~ G&gt;T G&gt;T    C&gt;A C&gt;A     C&gt;A C&gt;A / ~ &lt;list [0]&gt;      </span>
+<span class="co">#&gt; 6 chr9 tes~ &lt;chr~ &lt;chr~ G&gt;A A&gt;T    T&gt;A C&gt;T     G&gt;A A&gt;T / ~ &lt;list [0]&gt;      </span>
+<span class="co">#&gt; # ... with 1 more variable: has.intersect &lt;lgl&gt;</span></code></pre></div>
+<div id="bugs-questions-suggestions" class="section level3">
+<h3>Bugs, questions, suggestions?</h3>
+<p>Feel free to the contact the creator! (^__^) See info in the DESCRIPTION file.</p>
 </div>
-<div id="more-examples" class="section level2">
-<h2>More Examples</h2>
-<p>You can write math expressions, e.g. <span class="math inline">\(Y = X\beta + \epsilon\)</span>, footnotes<a href="#fn1" class="footnoteRef" id="fnref1"><sup>1</sup></a>, and tables, e.g. using <code>knitr::kable()</code>.</p>
-<table>
-<thead>
-<tr class="header">
-<th></th>
-<th align="right">mpg</th>
-<th align="right">cyl</th>
-<th align="right">disp</th>
-<th align="right">hp</th>
-<th align="right">drat</th>
-<th align="right">wt</th>
-<th align="right">qsec</th>
-<th align="right">vs</th>
-<th align="right">am</th>
-<th align="right">gear</th>
-<th align="right">carb</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Mazda RX4</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160.0</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.620</td>
-<td align="right">16.46</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td>Mazda RX4 Wag</td>
-<td align="right">21.0</td>
-<td align="right">6</td>
-<td align="right">160.0</td>
-<td align="right">110</td>
-<td align="right">3.90</td>
-<td align="right">2.875</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-<tr class="odd">
-<td>Datsun 710</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">108.0</td>
-<td align="right">93</td>
-<td align="right">3.85</td>
-<td align="right">2.320</td>
-<td align="right">18.61</td>
-<td align="right">1</td>
-<td align="right">1</td>
-<td align="right">4</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td>Hornet 4 Drive</td>
-<td align="right">21.4</td>
-<td align="right">6</td>
-<td align="right">258.0</td>
-<td align="right">110</td>
-<td align="right">3.08</td>
-<td align="right">3.215</td>
-<td align="right">19.44</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td>Hornet Sportabout</td>
-<td align="right">18.7</td>
-<td align="right">8</td>
-<td align="right">360.0</td>
-<td align="right">175</td>
-<td align="right">3.15</td>
-<td align="right">3.440</td>
-<td align="right">17.02</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td>Valiant</td>
-<td align="right">18.1</td>
-<td align="right">6</td>
-<td align="right">225.0</td>
-<td align="right">105</td>
-<td align="right">2.76</td>
-<td align="right">3.460</td>
-<td align="right">20.22</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td>Duster 360</td>
-<td align="right">14.3</td>
-<td align="right">8</td>
-<td align="right">360.0</td>
-<td align="right">245</td>
-<td align="right">3.21</td>
-<td align="right">3.570</td>
-<td align="right">15.84</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="right">3</td>
-<td align="right">4</td>
-</tr>
-<tr class="even">
-<td>Merc 240D</td>
-<td align="right">24.4</td>
-<td align="right">4</td>
-<td align="right">146.7</td>
-<td align="right">62</td>
-<td align="right">3.69</td>
-<td align="right">3.190</td>
-<td align="right">20.00</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-</tr>
-<tr class="odd">
-<td>Merc 230</td>
-<td align="right">22.8</td>
-<td align="right">4</td>
-<td align="right">140.8</td>
-<td align="right">95</td>
-<td align="right">3.92</td>
-<td align="right">3.150</td>
-<td align="right">22.90</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">2</td>
-</tr>
-<tr class="even">
-<td>Merc 280</td>
-<td align="right">19.2</td>
-<td align="right">6</td>
-<td align="right">167.6</td>
-<td align="right">123</td>
-<td align="right">3.92</td>
-<td align="right">3.440</td>
-<td align="right">18.30</td>
-<td align="right">1</td>
-<td align="right">0</td>
-<td align="right">4</td>
-<td align="right">4</td>
-</tr>
-</tbody>
-</table>
-<p>Also a quote using <code>&gt;</code>:</p>
-<blockquote>
-<p>“He who gives up [code] safety for [code] speed deserves neither.” (<a href="https://twitter.com/hadleywickham/status/504368538874703872">via</a>)</p>
-</blockquote>
-</div>
-<div class="footnotes">
-<hr />
-<ol>
-<li id="fn1"><p>A footnote here.<a href="#fnref1">↩</a></p></li>
-</ol>
 </div>
 
 

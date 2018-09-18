@@ -6,6 +6,7 @@
 #'   createRandomMutations function.
 #' @param maxDistance A number; The maximum distance between DNA mutations that
 #'   count as clustered.
+#' @param tibble A boolean if the table has to be a tibble
 #' @param chromHeader A string; The name of the column with the chromosome nr.
 #' @param sampleIdHeader A string; The name of the column with the sample ID.
 #' @param positionHeader A string; The name of the column with the position nr.
@@ -25,7 +26,7 @@
 #' resultsWithPatterns <- identifyAndAnnotateClusters(x = data,
 #'                                                    maxDistance = 20000,
 #'                                                    linkPatterns = TRUE)
-identifyAndAnnotateClusters <- function(x, maxDistance,
+identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
                                         chromHeader = "chrom", sampleIdHeader = "sampleIDs",
                                         positionHeader = "start", refHeader = "ref",
                                         altHeader = "alt", contextHeader = "surrounding",
@@ -105,7 +106,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
       dplyr::mutate(linkedPatterns = purrr::map2(tempMutColumn,
                                                  is.clustered,
                                                  function(x,y){
-                                                   ifelse(y,callLinkPatterns(x,linkVariables),"NA")
+                                                   ifelse(y,callLinkPatterns(x,linkVariables),list("NA"))
                                                    })) %>%
       dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
                                                function(x){
@@ -116,8 +117,13 @@ identifyAndAnnotateClusters <- function(x, maxDistance,
 
     x$tempMutColumn <- NULL
 
-    }
-  return(tibble::as.tibble(x))
+  }
+  if(tibble){
+    x <- tibble::as.tibble(x)
+  } else {
+    x <- as.data.frame(x)
+  }
+  return(x)
 
 }
 

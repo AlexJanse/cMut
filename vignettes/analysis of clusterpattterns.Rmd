@@ -15,7 +15,10 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-
+```{r global_options, include = FALSE}
+old <- options(tibble.width = Inf)
+on.exit(options(old), add = TRUE)
+```
 The cMut package provide functions to find and annotate clustered mutations.
 In the following examples, the functions will be explained and used.
 
@@ -28,64 +31,88 @@ When determine the surrounding nucleotides, the function will take into account 
 randomData <- cMut::createRandomMutations(nMut = 1000)
 randomData
 ```
-If a tibble is inconvenience, use the `tibble = FALSE` parameter.
+
+If a tibble is inconvenience, use the `tibble = FALSE` parameter to get a data frame.
 ```{r}
 cMut::createRandomMutations(nMut = 10, tibble = FALSE)
 ```
 
 
 ## identifyAndAnnotateClusters
-The `cMut::identifyAndAnnotateClusters()` function is the place where most functions of `cMut` comes together. It applies the `cMut::identifyClusters()` and if wanted the `cMut::linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results.
+The `cMut::identifyAndAnnotateClusters()` applies the `cMut::identifyClusters()` and if wanted the `cMut::linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default parameters for column names correspond with the column headers of the sent table and change if needed.
 
 ```{r include = TRUE}
-cMut::identifyAndAnnotateClusters(x = randomData, maxDistance = 20000)
+results <- cMut::identifyAndAnnotateClusters(x = randomData, 
+                                             maxDistance = 20000,
+                                             tibble = FALSE)
+results[results$is.clustered == T,]
+```
+
+If the `cMut::linkPatterns()` is needed, use the `linkPatterns = TRUE` parameter. See the `cMut::linkPatterns()` paragraph for more information
+```{r include = TRUE}
+results <- cMut::identifyAndAnnotateClusters(x = randomData, 
+                                             maxDistance = 20000,
+                                             tibble = FALSE,
+                                             linkPatterns = TRUE)
+results[results$is.linked == T,]
+```
+
+## identifyClusters.R
+The `cMut::identifyCluster()` function finds clusters in a table and returns a vector with cluster IDs.
+
+```{r include = TRUE}
+resultVector <- cMut::identifyClusters(x = randomData,
+                 maxDistance = 20000,
+                 chromHeader = "chrom",
+                 positionHeader = "start",
+                 sampleIdHeader = "sampleIDs")
+head(resultVector)
+```
+
+## linkPatterns
+The `cMut::linkPatterns()` function can check if the provided mutation can be matched with known mutation patterns in a table and returns the ID of the match.
+If no table is sent the default table is used:
+
+```{r echo = FALSE}
+getData <- function(){
+  tempWd <- setwd(paste0(.libPaths(),"/cMut")) 
+  on.exit(setwd(tempWd), add = T)
+  return(tibble::as.tibble(readRDS("data/mutationPatterns.rds")))
+}
+print("DEFAULT TABLE:")
+getData()
+```
+
+A proper way of using this function with the default table:
+```{r include = TRUE}
+cMut::linkPatterns("C","T","TA.T")
+```
+
+As visible in the default table, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation:
+```{r include = TRUE, error = TRUE}
+cMut::linkPatterns("C","D","A.A")
 ```
 
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
-
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customized so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+## groupClusters
+The `cMut::groupClusters()` function is best used as an optional followup function for `cMut::identifyAndAnnotateClusters()`. This function will group the data based on the cluster IDs. 
+```{r include = TRUE}
+groups <- cMut::groupClusters(table = results,
+                    tibble = FALSE)
+# The cMuts column contains lists of mutations that belong to the cluster.
+# It's excluded because it messed up the format.
+groups[,-which(names(groups) == "cMuts")] 
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+If the `linkPatterns = TRUE` parameter is used during the `cMut::identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` parameter in the `cMut::groupClusters()` to add a column with the intersection of the patterns per cluster.
+```{r include = TRUE}
+groups <- cMut::groupClusters(table = results,
+                    patternIntersect = TRUE)
+# The cMuts column contains lists of mutations that belong to the cluster.
+# It's excluded because it messed up the format.
+groups[,-which(names(groups) == "cMuts")] 
 ```
 
-Also a quote using `>`:
-
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+### Bugs, questions, suggestions?
+Feel free to the contact the creator! (^__^)
+See info in the DESCRIPTION file.

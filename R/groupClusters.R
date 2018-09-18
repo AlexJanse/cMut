@@ -21,7 +21,7 @@
 #' test <- identifyAndAnnotateClusters(test, 20000, chromHeader = "chrom",
 #'                                     sampleIdHeader = "sampleIDs",positionHeader = "start")
 groupClusters <- function(table, clusterIdHeader = "clusterId",
-                          refHeader = "ref", altHeader = "alt",
+                          refHeader = "ref", altHeader = "alt", tibble = TRUE,
                           patternIntersect = FALSE, patternHeader = "linkedPatterns"){
 
   # Check data --------------------------------------------------------------------------------------------
@@ -52,7 +52,12 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
     warning("No rows found. Please make sure the cluster IDs are present and try again.")
   }
 
-  return(table)
+  if(tibble){
+    return(tibble::as.tibble(table))
+  } else {
+    return(as.data.frame(table))
+  }
+
 
 }
 
@@ -112,16 +117,15 @@ getClusterType <- function(plusStrand, minusStrand) {
 #' @param patternHeader A string with the column header of the patterns.
 getPatternIntersect <- function(clusterList,patternHeader){
   patternHeader <- rlang::get_expr(patternHeader)
-
   patterns <- c()
   counter <- 0
   allPatterns <-
     foreach::foreach(index = 1:nrow(clusterList),
                      .combine = c) %do% {
                        if(counter == 0){
-                         patterns <- clusterList[index,patternHeader][[1]]
+                         patterns <- clusterList[index,patternHeader][[1]][[1]][[1]]
                        }
-                       patterns <- intersect(patterns, clusterList[index,patternHeader][[1]])
+                       patterns <- intersect(patterns, clusterList[index,patternHeader][[1]][[1]][[1]])
                        counter <- counter+1
                      }
 

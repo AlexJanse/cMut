@@ -9,9 +9,9 @@
 #' @examples
 #' data <- createRandomMutations()
 #' dataClusters <- identifyClusters(x = data,
-#'                                  maximumDistance = 20000)
+#'                                  maxDistance = 20000)
 identifyClusters <- function(x,
-                             maximumDistance,
+                             maxDistance,
                              chromHeader="Chr",
                              sampleIdHeader="sampleID",
                              positionHeader="Pos"){
@@ -23,7 +23,7 @@ identifyClusters <- function(x,
   # Create proximal distance matrix -----------------------------------------
   proxDistMatrix <- 1/as.matrix(dist(x[,positionHeader]))
 
-  proxDistMatrix[proxDistMatrix <= 1/(maximumDistance+2)] <- 0
+  proxDistMatrix[proxDistMatrix <= 1/(maxDistance+2)] <- 0
 
   # Create graph from the matrix --------------------------------------------
   graph <- igraph::graph_from_adjacency_matrix(proxDistMatrix,
