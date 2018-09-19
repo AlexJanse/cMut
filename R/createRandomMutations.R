@@ -5,12 +5,18 @@
 #' @param nMut number of mutations that needed to be generated
 #' @param sampleName A name for the test sample
 #' @param tibble A boolean if the table has to be a tibble
+#' @param sizeSur A number with the ammount of nucleotides left and right of the
+#'   mutation. (e.g. sizeSur = 2; CC.GT)
 #' @return A tibble with mutation information
 #' @export
 #' @import magrittr
 createRandomMutations <- function(nMut = 500,
                                   sampleName = "testSample",
-                                  tibble = TRUE){ # TODO: Option to decide how many nucleotides the surrounding has
+                                  tibble = TRUE,
+                                  sizeSur = 2){
+
+  stopifnot(sizeSur > 1)
+
   # Human chromosomes information (GRCh37/hg19) ------------------------------
   nucleotides <- c("A","C","G","T")
   nameChrom <- c("chr1","chr2","chr3","chr4",
@@ -33,6 +39,7 @@ createRandomMutations <- function(nMut = 500,
   # Create random data ------------------------------------------------------
   probability <- lenChrom/sum(lenChrom)*100
   lenChromEnquo <- dplyr::enquo(lenChrom)
+  sizeSur <- dplyr::enquo(sizeSur)
 
   randomTable <- data.frame(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
                             stringsAsFactors = F) %>%
@@ -43,10 +50,8 @@ createRandomMutations <- function(nMut = 500,
     dplyr::mutate(ref = purrr::map_chr(irange, ~getRef(., lenChrom))) %>%
     dplyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
     dplyr::mutate(sampleIDs = sampleName) %>%
-    dplyr::mutate(surrounding = paste(paste0(purrr::map2_chr(chrom,start-2,getSurrounding, table = ., lenChrom = !!lenChromEnquo),
-                                            purrr::map2_chr(chrom,start-1,getSurrounding, table = ., lenChrom = !!lenChromEnquo)),
-                                     paste0(purrr::map2_chr(chrom,start+1,getSurrounding, table = ., lenChrom = !!lenChromEnquo),
-                                                   purrr::map2_chr(chrom,start+2,getSurrounding, table = ., lenChrom = !!lenChromEnquo)),
+    dplyr::mutate(surrounding = paste(purrr::map2_chr(chrom,start,function(x,y){getSurrounding(x,y-!!sizeSur,y-1,table = ., lenChrom = !!lenChromEnquo)}),
+                                      purrr::map2_chr(chrom,start,function(x,y){getSurrounding(x,y+1,y+!!sizeSur,table = ., lenChrom = !!lenChromEnquo)}),
                                      sep = "."))
 
   randomTable$irange <- NULL
@@ -90,19 +95,11 @@ getRef <- function(x,lenChrom){
 #' getSurrounding
 #' @description Function to get the surrounding of a mutation
 #' @param chr A string with the chromosome name
-#' @param loc A number with the mutation location
+#' @param start A number with the start location
+#' @param stop A number with the stop location
 #' @param table A table containing the mutation information
 #' @inherit getRef
-getSurrounding <- function(chr,loc,table,lenChrom){
+getSurrounding <- function(chr,start,stop,table,lenChrom){
   lenChrom <- rlang::get_expr(lenChrom)
-  sameLoc <- table[table$start == loc,]
-  if(nrow(sameLoc) > 0){
-    altSurr <- sameLoc[sameLoc$chrom == chr,]
-
-    if(nrow(altSurr) > 0){
-      stopifnot(nrow(altSurr) == 1)
-      return(altSurr[1,"alt"])
-    }
-  }
-  return(getRef(paste(chr,loc,loc,sep = "-"),lenChrom))
+  return(getRef(paste(chr,start,stop,sep = "-"),lenChrom))
 }

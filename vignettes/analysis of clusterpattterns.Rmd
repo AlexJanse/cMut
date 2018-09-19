@@ -24,17 +24,18 @@ In the following examples, the functions will be explained and used.
 
 
 ## createRandomMutations
-The `cMut::createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package). 
-
-When determine the surrounding nucleotides, the function will take into account that there might be mutations in the table that correspond with the surrounding locations. In this case the mutated nucleotide will be added to the surrounding instead of the reference.
+The `cMut::createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package). The surrounding nucleotides are also from the reference genome.
 ```{r include=TRUE}
 randomData <- cMut::createRandomMutations(nMut = 1000)
 randomData
 ```
 
 If a tibble is inconvenience, use the `tibble = FALSE` parameter to get a data frame.
-```{r}
-cMut::createRandomMutations(nMut = 10, tibble = FALSE)
+It is also possible to change the number of surrounding nucleotides with the `sizeSur` parameter:
+```{r include = T}
+cMut::createRandomMutations(nMut = 10, 
+                            tibble = FALSE,
+                            sizeSur = 4)
 ```
 
 
