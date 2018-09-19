@@ -128,6 +128,8 @@ getPatternIntersect <- function(clusterList,patternHeader){
                        patterns <- intersect(patterns, clusterList[index,patternHeader][[1]][[1]][[1]])
                        counter <- counter+1
                      }
-
+  if(length(patterns) == 0){
+    return(c(""))
+  }
   return(patterns)
 }

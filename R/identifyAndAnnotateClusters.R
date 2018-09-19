@@ -106,7 +106,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
       dplyr::mutate(linkedPatterns = purrr::map2(tempMutColumn,
                                                  is.clustered,
                                                  function(x,y){
-                                                   ifelse(y,callLinkPatterns(x,linkVariables),list("NA"))
+                                                   ifelse(y,callLinkPatterns(x,linkVariables),list(""))
                                                    })) %>%
       dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
                                                function(x){
