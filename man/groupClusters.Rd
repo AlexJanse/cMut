@@ -5,24 +5,30 @@
 \title{groupClusters}
 \usage{
 groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
-  altHeader = "alt", patternIntersect = FALSE,
+  altHeader = "alt", tibble = TRUE, patternIntersect = FALSE,
   patternHeader = "linkedPatterns")
 }
 \arguments{
-\item{table}{A table with columns containing cluster ID's, reference and alternative nucleotide.}
+\item{table}{A table with columns containing cluster ID's, reference and
+alternative nucleotide.}
 
 \item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
 
-\item{refHeader}{Contains the name of the column with the reference nucleotides..}
+\item{refHeader}{Contains the name of the column with the reference
+nucleotides..}
 
-\item{altHeader}{Contains the name of the column with the alternative nucleotides.}
+\item{altHeader}{Contains the name of the column with the alternative
+nucleotides.}
 
-\item{patternIntersect}{Boolean if the table contains patterns and these needed to be processed aswell.}
+\item{patternIntersect}{Boolean if the table contains patterns and these
+needed to be processed aswell.}
 
-\item{patternHeader}{A string with the column name of the patterns. Only in use when patternIntersect is TRUE.}
+\item{patternHeader}{A string with the column name of the patterns. Only in
+use when patternIntersect is TRUE.}
 }
 \description{
-A function that will group the clusters and give the mutation consensus back.
+A function that will group the clusters and give the mutation
+  consensus back.
 }
 \examples{
 # Example of a table containing the right columns and data

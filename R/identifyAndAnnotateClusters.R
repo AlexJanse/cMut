@@ -34,7 +34,6 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
                                         reverseComplement = FALSE, searchPatterns = NULL,
                                         searchRefHeader = "ref", searchAltHeader = "alt", searchContextHeader = "surrounding",
                                         searchIdHeader = "proces", searchReverseComplement = TRUE) {
-  # TODO: Make the functions CNV friendly
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))

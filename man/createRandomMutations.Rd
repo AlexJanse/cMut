@@ -4,17 +4,24 @@
 \alias{createRandomMutations}
 \title{createRandomMutations}
 \usage{
-createRandomMutations(nMut = 500, sampleName = "testSample")
+createRandomMutations(nMut = 500, sampleName = "testSample",
+  tibble = TRUE, sizeSur = 2)
 }
 \arguments{
 \item{nMut}{number of mutations that needed to be generated}
 
 \item{sampleName}{A name for the test sample}
+
+\item{tibble}{A boolean if the table has to be a tibble}
+
+\item{sizeSur}{A number with the ammount of nucleotides left and right of the
+mutation. (e.g. sizeSur = 2; CC.GT)}
 }
 \value{
 A tibble with mutation information
 }
 \description{
-Function to generate random data in a tibble with DNA mutation information.
-For explanation of the columns use cat(comment(<returned object>))
+Function to generate random data in a tibble with DNA mutation
+  information. For explanation of the columns use cat(comment(<returned
+  object>))
 }

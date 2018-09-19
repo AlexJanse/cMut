@@ -1,5 +1,5 @@
 ---
-title: "Find and annotate mutational clusters."
+title: "Find and annotate mutational clusters with cMut"
 author: "Alex Janse"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
@@ -30,8 +30,8 @@ randomData <- cMut::createRandomMutations(nMut = 1000)
 randomData
 ```
 
-If a tibble is inconvenience, use the `tibble = FALSE` parameter to get a data frame.
-It is also possible to change the number of surrounding nucleotides with the `sizeSur` parameter:
+If a tibble is inconvenience, use the `tibble = FALSE` argument to get a data frame.
+It is also possible to change the number of surrounding nucleotides with the `sizeSur` argument:
 ```{r include = T}
 cMut::createRandomMutations(nMut = 10, 
                             tibble = FALSE,
@@ -40,7 +40,7 @@ cMut::createRandomMutations(nMut = 10,
 
 
 ## identifyAndAnnotateClusters
-The `cMut::identifyAndAnnotateClusters()` applies the `cMut::identifyClusters()` and if wanted the `cMut::linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default parameters for column names correspond with the column headers of the sent table and change if needed.
+The `cMut::identifyAndAnnotateClusters()` applies the `cMut::identifyClusters()` and if wanted the `cMut::linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table and change if needed.
 
 ```{r include = TRUE}
 results <- cMut::identifyAndAnnotateClusters(x = randomData, 
@@ -49,7 +49,7 @@ results <- cMut::identifyAndAnnotateClusters(x = randomData,
 results[results$is.clustered == T,]
 ```
 
-If the `cMut::linkPatterns()` is needed, use the `linkPatterns = TRUE` parameter. See the `cMut::linkPatterns()` paragraph for more information
+If the `cMut::linkPatterns()` is needed, use the `linkPatterns = TRUE` argument. See the `cMut::linkPatterns()` paragraph for more information
 ```{r include = TRUE}
 results <- cMut::identifyAndAnnotateClusters(x = randomData, 
                                              maxDistance = 20000,
@@ -105,7 +105,7 @@ groups <- cMut::groupClusters(table = results,
 groups[,-which(names(groups) == "cMuts")] 
 ```
 
-If the `linkPatterns = TRUE` parameter is used during the `cMut::identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` parameter in the `cMut::groupClusters()` to add a column with the intersection of the patterns per cluster.
+If the `linkPatterns = TRUE` argument is used during the `cMut::identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` argument in the `cMut::groupClusters()` to add a column with the intersection of the patterns per cluster.
 ```{r include = TRUE}
 groups <- cMut::groupClusters(table = results,
                     patternIntersect = TRUE)

@@ -12,5 +12,6 @@ compare(nucleotide, symbols)
 \item{symbols}{A data frame with the symbols to match with the nucleotide}
 }
 \description{
-A function to see if the nucleotide is present in the symbol data frame
+A function to see if the nucleotide is present in the symbol
+  data frame
 }

@@ -11,33 +11,47 @@ linkPatterns(ref, alt, context, mutationSymbol = ".",
   searchReverseComplement = TRUE, patternsAsList = TRUE)
 }
 \arguments{
-\item{ref}{A string containing the reference nucleotide}
+\item{ref}{A string containing the reference nucleotide.}
 
-\item{alt}{A string containing the alternative nucleotide}
+\item{alt}{A string containing the alternative nucleotide.}
 
-\item{context}{A string containing the surrounding nucleotides (e.g. G.C)}
+\item{context}{A string containing the surrounding nucleotides (e.g. G.C).}
 
-\item{mutationSymbol}{A string with the symbol that stands for the mutated nucleotide location (e.g. "." in G.C)}
+\item{mutationSymbol}{A string with the symbol that stands for the mutated
+nucleotide location (e.g. "." in G.C).}
 
-\item{reverseComplement}{A boolean to tell if the ref, alt and context needed to be searched with the reverse complement}
+\item{reverseComplement}{A boolean to tell if the ref, alt and context needed
+to be searched with the reverse complement.}
 
-\item{searchPatterns}{A tibble with the known mutation patterns. See data/mutationPatterns.rds for an example}
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+data/mutationPatterns.rds is the default search table.}
 
-\item{searchRefHeader}{A string with the column name of the reference nucleotide of the searchPatterns table}
+\item{searchRefHeader}{A string with the column name of the reference
+nucleotide of the searchPatterns table.}
 
-\item{searchAltHeader}{A string with the column name of the alternative nucleotide of the searchPatterns table}
+\item{searchAltHeader}{A string with the column name of the alternative
+nucleotide of the searchPatterns table.}
 
-\item{searchContextHeader}{A string with the column name of the context nucleotide of the searchPatterns table}
+\item{searchContextHeader}{A string with the column name of the context
+nucleotide of the searchPatterns table.}
 
-\item{searchReverseComplement}{A boolean to also search in the reverse complement of the searchPatterns tibble}
+\item{searchReverseComplement}{A boolean to also search in the reverse
+complement of the searchPatterns tibble. When matched the returned ID will
+have [Rev.Com] attached to it.}
 
-\item{patternsAsList}{A boolean to tell if the return value needs to be in a list or not}
+\item{patternsAsList}{A boolean to tell if the return value needs to be in a
+list or not.}
 
-\item{searchSource}{A string with the column name of the ID of the known mutations}
+\item{searchSource}{A string with the column name of the ID of the known
+mutations.}
 }
 \value{
 list or string with the matched patterns.
 }
 \description{
-A function that is able to find matches between a submitted unkown mutation and a known mutation table
+A function that is able to find matches between a submitted
+  unkown mutation and a known mutation table.
+}
+\examples{
+results <- linkPatterns("C","T","TA.T")
 }

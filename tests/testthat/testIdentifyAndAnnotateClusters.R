@@ -6,7 +6,7 @@ testData = tibble::as.tibble(
 test_that("Check if the results are the same as the original file",
           expect_equal(
             dplyr::all_equal(
-              identifyAndAnnotateClusters(testData,200,
+              identifyAndAnnotateClusters(testData,20000,
                                           positionHeader = "start",
                                           chromHeader = "chrom",
                                           sampleIdHeader = "sampleIDs"),

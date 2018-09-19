@@ -4,9 +4,9 @@
 \alias{identifyAndAnnotateClusters}
 \title{identifyAndAnnotateClusters}
 \usage{
-identifyAndAnnotateClusters(x, maxDistance, chromHeader = "chrom",
-  sampleIdHeader = "sampleIDs", positionHeader = "start",
-  refHeader = "ref", altHeader = "alt",
+identifyAndAnnotateClusters(x, maxDistance, tibble = TRUE,
+  chromHeader = "chrom", sampleIdHeader = "sampleIDs",
+  positionHeader = "start", refHeader = "ref", altHeader = "alt",
   contextHeader = "surrounding", mutationSymbol = ".",
   linkPatterns = FALSE, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
@@ -14,10 +14,14 @@ identifyAndAnnotateClusters(x, maxDistance, chromHeader = "chrom",
   searchIdHeader = "proces", searchReverseComplement = TRUE)
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome nr., sampleID and position information.
-The data cannot contain any NA. For an example use createRandomMutations function.}
+\item{x}{A tibble that contains at least chromosome nr., sampleID and
+position information. The data cannot contain any NA. For an example use
+createRandomMutations function.}
 
-\item{maxDistance}{A number; The maximum distance between DNA mutations that count as clustered.}
+\item{maxDistance}{A number; The maximum distance between DNA mutations that
+count as clustered.}
+
+\item{tibble}{A boolean if the table has to be a tibble}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 
@@ -25,30 +29,52 @@ The data cannot contain any NA. For an example use createRandomMutations functio
 
 \item{positionHeader}{A string; The name of the column with the position nr.}
 
-\item{refHeader}{Contains the name of the column with the reference nucleotides..}
+\item{refHeader}{Contains the name of the column with the reference
+nucleotides..}
 
-\item{altHeader}{Contains the name of the column with the alternative nucleotides.}
+\item{altHeader}{Contains the name of the column with the alternative
+nucleotides.}
 
 \item{contextHeader}{A String; The name of the column with the context.}
 
-\item{mutationSymbol}{A string with the symbol that stands for the mutated nucleotide location (e.g. "." in G.C)}
+\item{mutationSymbol}{A string with the symbol that stands for the mutated
+nucleotide location (e.g. "." in G.C).}
 
-\item{reverseComplement}{A boolean to tell if the ref, alt and context needed to be searched with the reverse complement}
+\item{linkPatterns}{A boolean to tell if patterns are needed to be found.}
 
-\item{searchPatterns}{A tibble with the known mutation patterns. See data/mutationPatterns.rds for an example}
+\item{reverseComplement}{A boolean to tell if the ref, alt and context needed
+to be searched with the reverse complement.}
 
-\item{searchRefHeader}{A string with the column name of the reference nucleotide of the searchPatterns table}
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+data/mutationPatterns.rds is the default search table.}
 
-\item{searchAltHeader}{A string with the column name of the alternative nucleotide of the searchPatterns table}
+\item{searchRefHeader}{A string with the column name of the reference
+nucleotide of the searchPatterns table.}
 
-\item{searchContextHeader}{A string with the column name of the context nucleotide of the searchPatterns table}
+\item{searchAltHeader}{A string with the column name of the alternative
+nucleotide of the searchPatterns table.}
 
-\item{searchReverseComplement}{A boolean to also search in the reverse complement of the searchPatterns tibble}
+\item{searchContextHeader}{A string with the column name of the context
+nucleotide of the searchPatterns table.}
+
+\item{searchReverseComplement}{A boolean to also search in the reverse
+complement of the searchPatterns tibble. When matched the returned ID will
+have [Rev.Com] attached to it.}
 }
 \value{
-The tibble that was sent as an argument for this fuction with extra columns:
-clusterId, is.clustered and distance till nearest mutation below the maximum distance.
+The tibble that was sent as an argument for this fuction with extra
+  columns: clusterId, is.clustered and distance till nearest mutation below
+  the maximum distance.
 }
 \description{
-A function that finds and annotate clusters in a genomic data tibble.
+A function that finds and annotate clusters in a genomic data
+  tibble.
+}
+\examples{
+data <- createRandomMutations(1000)
+results <- identifyAndAnnotateClusters(x = data,
+                                       maxDistance = 20000)
+resultsWithPatterns <- identifyAndAnnotateClusters(x = data,
+                                                   maxDistance = 20000,
+                                                   linkPatterns = TRUE)
 }

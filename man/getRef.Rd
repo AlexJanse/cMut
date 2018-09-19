@@ -7,7 +7,8 @@
 getRef(x, lenChrom)
 }
 \arguments{
-\item{x}{A string that contains the chromosome name, start and stop location and is seperated by "-"}
+\item{x}{A string that contains the chromosome name, start and stop location
+and is seperated by "-"}
 
 \item{lenChrom}{A vector with chromosomes length}
 }

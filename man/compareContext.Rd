@@ -7,12 +7,13 @@
 compareContext(context2, context1, mutationSymbol, alphabet)
 }
 \arguments{
-\item{context2}{A string with a context (e.g. C.G)
-This one will act as the known mutation context for linkPatterns function.}
+\item{context2}{A string with a context (e.g. C.G) This one will act as the
+known mutation context for linkPatterns function.}
 
 \item{context1}{A string with a context (e.g.  C.C)}
 
-\item{mutationSymbol}{A character that stands for the mutation nucleotide (e.g. "." for C.G)}
+\item{mutationSymbol}{A character that stands for the mutation nucleotide
+(e.g. "." for C.G)}
 
 \item{alphabet}{A tibble with the nucleotides and their symbols}
 }

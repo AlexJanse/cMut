@@ -4,12 +4,16 @@
 \alias{identifyClusters}
 \title{identifyClusters}
 \usage{
-identifyClusters(x, maximumDistance, chromHeader = "Chr",
+identifyClusters(x, maxDistance, chromHeader = "Chr",
   sampleIdHeader = "sampleID", positionHeader = "Pos")
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome nr., sampleID and position information.
-The data cannot contain any NA. For an example use createRandomMutations function.}
+\item{x}{A tibble that contains at least chromosome nr., sampleID and
+position information. The data cannot contain any NA. For an example use
+createRandomMutations function.}
+
+\item{maxDistance}{A number; The maximum distance between DNA mutations that
+count as clustered.}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 
@@ -18,11 +22,16 @@ The data cannot contain any NA. For an example use createRandomMutations functio
 \item{positionHeader}{A string; The name of the column with the position nr.}
 }
 \value{
-A atomic character vector;
-contains per index the chromosoom nr, sample naam
-and any cluster ID's. For example: Chr1 15-15-15 c(10,50,100)
+A atomic character vector; contains per index the chromosoom nr,
+  sample naam and any cluster ID's. For example: Chr1 15-15-15 c(10,50,100)
 }
 \description{
-A function that is able to search for clusters in DNA mutation table (as explained by argument x)
-in a single chromosoom for a single sample.
+A function that is able to search for clusters in DNA mutation
+  table (as explained by argument x) in a single chromosoom for a single
+  sample.
+}
+\examples{
+data <- createRandomMutations()
+dataClusters <- identifyClusters(x = data,
+                                 maxDistance = 20000)
 }

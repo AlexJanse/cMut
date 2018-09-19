@@ -47,15 +47,17 @@ createRandomMutations <- function(nMut = 500,
     dplyr::mutate(start = purrr::map_int(chromLen, ~sample(., 1))) %>%
     dplyr::mutate(stop = start) %>%
     dplyr::mutate(irange = paste(chrom,start,stop,sep = "-")) %>%
-    dplyr::mutate(ref = purrr::map_chr(irange, ~getRef(., lenChrom))) %>%
-    dplyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1))) %>%
     dplyr::mutate(sampleIDs = sampleName) %>%
-    dplyr::mutate(surrounding = paste(purrr::map2_chr(chrom,start,function(x,y){getSurrounding(x,y-!!sizeSur,y-1,table = ., lenChrom = !!lenChromEnquo)}),
-                                      purrr::map2_chr(chrom,start,function(x,y){getSurrounding(x,y+1,y+!!sizeSur,table = ., lenChrom = !!lenChromEnquo)}),
-                                     sep = "."))
+    dplyr::mutate(refdata = purrr::map2_chr(chrom,start,function(x,y){getRefData(x,y,sizeSur, lenChrom = !!lenChromEnquo)})) %>%
+    dplyr::mutate(surrounding = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][1]})) %>%
+    dplyr::mutate(ref = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][2]})) %>%
+    dplyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1)))
 
+  randomTable$refdata <- NULL
   randomTable$irange <- NULL
   randomTable$chromLen <- NULL
+
+  randomTable <- randomTable[c("chrom","start","stop","ref","alt","sampleIDs","surrounding")]
 
   if(tibble){
     randomTable <- tibble::as.tibble(randomTable)
@@ -78,7 +80,8 @@ createRandomMutations <- function(nMut = 500,
 
 #' getRef
 #' @description A function to get the reference nucleotide
-#' @param x A string that contains the chromosome name, start and stop location and is seperated by "-"
+#' @param x A string that contains the chromosome name, start and stop location
+#'   and is seperated by "-"
 #' @param lenChrom A vector with chromosomes length
 getRef <- function(x,lenChrom){
   data <- unlist(strsplit(x,"\\-"))
@@ -92,14 +95,37 @@ getRef <- function(x,lenChrom){
   return(as.character(BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19,range)))
 }
 
-#' getSurrounding
+#' getRefData
 #' @description Function to get the surrounding of a mutation
 #' @param chr A string with the chromosome name
-#' @param start A number with the start location
-#' @param stop A number with the stop location
+#' @param pos A number with the mutation location
+#' @param sizeSur A number with the amount of nucleotides there has to be
+#'   arround the mutation.
 #' @param table A table containing the mutation information
 #' @inherit getRef
-getSurrounding <- function(chr,start,stop,table,lenChrom){
+getRefData <- function(chr,pos,sizeSur,lenChrom){
   lenChrom <- rlang::get_expr(lenChrom)
-  return(getRef(paste(chr,start,stop,sep = "-"),lenChrom))
+  sizeSur <- rlang::get_expr(sizeSur)
+  maxPos <- lenChrom[chr]
+  start <- pos-sizeSur
+  stop <- pos+sizeSur
+
+  if(start < 1){
+    start <- 1
+  }
+  if(stop > maxPos){
+    stop <- maxPos
+  }
+  context <- getRef(paste(chr,start,stop,sep = "-"),lenChrom)
+  if(pos == start){
+    mutPos <- 1
+  } else if(pos == maxPos){
+    mutpos <- nchar(context)
+  } else{
+    mutpos <- pos-start+1
+  }
+  refData <- paste(paste(substr(context,1,mutpos-1),
+                       substr(context,mutpos+1,nchar(context)),
+                       sep = "."),substr(context,mutpos,mutpos),sep = "-")
+  return(refData)
 }
