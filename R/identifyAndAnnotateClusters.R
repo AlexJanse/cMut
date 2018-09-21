@@ -42,7 +42,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
   x <- dplyr::arrange(x,
           dplyr::pull(x, chromHeader),
           dplyr::pull(x, sampleIdHeader),
-          dplyr::pull(x,positionHeader))  # Used pulled function because we want the
+          dplyr::pull(x, positionHeader))  # Used pulled function because we want the
                                           # string inside the variable and not the
                                           # variable name itself as column name.
 
@@ -92,30 +92,11 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
 
   # Add information about if the mutation can be linked to a certain pattern ------
   if(linkPatterns){
-    linkVariables <- list(mutationSymbol, reverseComplement,
-                       searchPatterns, searchRefHeader,
-                       searchAltHeader,  searchContextHeader,
-                       searchIdHeader, searchReverseComplement) # Variables are put in a list to reduce the amount of code
-
-    x <- x %>%
-      dplyr::mutate(tempMutColumn = paste(!!rlang::sym(refHeader),
-                                          !!rlang::sym(altHeader),
-                                          !!rlang::sym(contextHeader),
-                                          sep = "!")) %>%
-      dplyr::mutate(linkedPatterns = purrr::map2(tempMutColumn,
-                                                 is.clustered,
-                                                 function(x,y){
-                                                   ifelse(y,callLinkPatterns(x,linkVariables),list(""))
-                                                   })) %>%
-      dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
-                                               function(x){
-                                                 dplyr::if_else(x[[1]] != "" && x[[1]] != "NA",
-                                                                TRUE, FALSE)
-                                                 }))
-
-
-    x$tempMutColumn <- NULL
-
+    x <- addLinkPatterns(x, refHeader, altHeader, contextHeader,
+                         mutationSymbol, reverseComplement,
+                         searchPatterns, searchRefHeader,
+                         searchAltHeader,  searchContextHeader,
+                         searchIdHeader, searchReverseComplement,"is.clustered")
   }
   if(tibble){
     x <- tibble::as.tibble(x)
@@ -153,4 +134,39 @@ callLinkPatterns <- function(x,linkedVariables){
                       linkedVariables[[2]], linkedVariables[[3]], linkedVariables[[4]],
                       linkedVariables[[5]], linkedVariables[[6]],
                       linkedVariables[[7]], linkedVariables[[8]]))
+}
+
+#' addLinkPatterns
+#' @inheritParams identifyAndAnnotateClusters
+addLinkPatterns <- function(x, refHeader, altHeader, contextHeader,
+                            mutationSymbol, reverseComplement,
+                            searchPatterns, searchRefHeader,
+                            searchAltHeader,  searchContextHeader,
+                            searchIdHeader, searchReverseComplement,
+                            checkHeader){
+
+  linkVariables <- list(mutationSymbol, reverseComplement,
+                        searchPatterns, searchRefHeader,
+                        searchAltHeader,  searchContextHeader,
+                        searchIdHeader, searchReverseComplement) # Variables are put in a list to reduce the amount of code
+
+  x <- x %>%
+    dplyr::mutate(tempMutColumn = paste(!!rlang::sym(refHeader),
+                                        !!rlang::sym(altHeader),
+                                        !!rlang::sym(contextHeader),
+                                        sep = "!")) %>%
+    dplyr::mutate(linkedPatterns = purrr::map2(tempMutColumn,
+                                               !!rlang::sym(checkHeader),
+                                               function(x,y){
+                                                 ifelse(y,callLinkPatterns(x,linkVariables),list(""))
+                                               })) %>%
+    dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
+                                             function(x){
+                                               dplyr::if_else(x[[1]] != "" && x[[1]] != "NA",
+                                                              TRUE, FALSE)
+                                             }))
+
+
+  x$tempMutColumn <- NULL
+  return(x)
 }

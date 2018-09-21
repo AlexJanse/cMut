@@ -40,8 +40,8 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
   stopifnot(is.character(ref) & is.character(alt) & is.character(context))
-  stopifnot(!grepl("[^ACGTacgt]",ref))
-  stopifnot(!grepl("[^ACGTacgt]",alt))
+  if(grepl("[^ACGTacgt]",ref)){return(list(""))}
+  if(grepl("[^ACGTacgt]",alt)){return(list(""))}
 
   if(is.null(searchPatterns)){
     searchPatterns <- tibble::as.tibble(readRDS("data/mutationPatterns.rds")) %>%
