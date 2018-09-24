@@ -15,8 +15,7 @@ imports: AnnotationHub ,
          tidyverse ,
          BSgenome.Hsapiens.UCSC.hg19 ,
          VariantAnnotation ,
-         foreach ,
-         svMisc
+         foreach
 Suggests: testthat,
     knitr,
     rmarkdown
