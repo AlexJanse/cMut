@@ -34,9 +34,6 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
                          searchIdHeader = "proces", searchReverseComplement = TRUE,
                          patternsAsList = TRUE){
 
-  tempWd <- setwd(paste0(.libPaths(),"/cMut")) # To avoid connection issues with the required files
-  on.exit(setwd(tempWd), add = T) # Set the wd back to the orignal one
-
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
   stopifnot(is.character(ref) & is.character(alt) & is.character(context))
@@ -44,13 +41,14 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   if(grepl("[^ACGTacgt]",alt)){return(list(""))}
 
   if(is.null(searchPatterns)){
-    searchPatterns <- tibble::as.tibble(readRDS("data/mutationPatterns.rds")) %>%
-      dplyr::mutate_all(as.character)
+    # Get the default table
+    searchPatterns <- getSearchPatterns()
   } else {
     # check if the assigned headers are present in the given table
     stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
     stopifnot(any(grepl(searchRefHeader,names(searchPatterns))))
     stopifnot(any(grepl(searchContextHeader,names(searchPatterns))))
+    searchPatterns <- convertFactor(searchPatterns)
   }
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
@@ -206,8 +204,10 @@ getAlphaMatches <- function(nuc, alphabet){
   return(alphabet[grepl(nuc,alphabet$represent),1])
 }
 
-getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader){
 
+#' getRevComTable
+#' @description A function to get the reverse complement of the known mutations
+getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader){
   table <- table %>%
     dplyr::mutate(!!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),getReverseComplement)) %>%
     dplyr::mutate(!!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),getReverseComplement)) %>%
@@ -217,6 +217,18 @@ getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader)
   return(table)
 }
 
+#' getReverseComplement
+#' @description A function to get the reverse complement of the nucleotides in param x
 getReverseComplement <- function(x){
   return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
+}
+
+#' getSearchPatterns
+#' @description Function to get the known mutation default table
+getSearchPatterns <- function(){
+  tempWd <- setwd(paste0(.libPaths(),"/cMut")) # To avoid connection issues with the required files
+  on.exit(setwd(tempWd), add = T) # Set the wd back to the orignal one
+  searchPatterns <- tibble::as.tibble(readRDS("data/mutationPatterns.rds")) %>%
+    dplyr::mutate_all(as.character)
+  return(searchPatterns)
 }

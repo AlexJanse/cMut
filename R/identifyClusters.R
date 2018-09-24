@@ -21,6 +21,7 @@ identifyClusters <- function(x,
   }
 
   # Create proximal distance matrix -----------------------------------------
+  x <- convertFactor(x)
   proxDistMatrix <- 1/as.matrix(dist(x[,positionHeader]))
 
   proxDistMatrix[proxDistMatrix <= 1/(maxDistance+2)] <- 0

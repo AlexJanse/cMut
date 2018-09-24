@@ -32,21 +32,18 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    tempWd <- setwd(paste0(.libPaths(),"/cMut")) # To avoid connection issues with the required files
-    on.exit(setwd(tempWd), add = T) # Set the wd back to the orignal one
-    resultTable <- tibble::as.tibble(readRDS("data/mutationPatterns.rds")) %>%
-      dplyr::mutate_all(as.character)
+    resultTable <- getSearchPatterns()
   } else {
     resultTable <- searchPatterns
   }
 
-  x[sapply(x, is.factor)] <- lapply(x[sapply(x, is.factor)],as.character)
+  x <- convertFactor(x)
 
   # Add a frequence column to fill up during bootstrapping
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
   # Preform bootstrap ------------------------------------------------------------
-  for(bootstrap in 1:nBootstrap){
+  foreach::foreach(bootstrap = 1:nBootstrap) %do% {
     # Create a table with shuffled mutations and contexts ------------------------
     shuffleTable <- createShuffleTable(x,chromHeader,
                                        positionHeader,
@@ -55,22 +52,17 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                                        surroundingHeader,
                                        sampleIdHeader)
 
+    # Identify, annotate and group clustered mutations --------------------------
+    clusterTablePerMut <- identifyAndAnnotateClusters(x = shuffleTable,
+                                                      maxDistance = maxDistance,
+                                                      positionHeader = "pos",
+                                                      linkPatterns = T)
+    clusterTable <- groupClusters(clusterTablePerMut,patternIntersect = T)
+
     # Add the frequencies of patterns to the resultTable -----------------------
-    resultTable <- addToResultTable(chromHeader = "chrom",
-                                     positionHeader = "pos",
-                                     refHeader = "ref",
-                                     altHeader = "alt",
-                                     surroundingHeader = "surrounding",
-                                     sampleIdHeader = "sampleIDs",
-                                     maxDistance,
-                                     shuffleTable,
-                                     reverseComplement,
+    resultTable <- addToResultTable(clusterTable,
                                      searchPatterns = resultTable,
-                                     searchRefHeader,
-                                     searchAltHeader,
-                                     searchContextHeader,
-                                     searchIdHeader,
-                                     searchReverseComplement)
+                                     searchIdHeader)
   }
 
   # Calculate the percentage of the frequecies -----------------------------------
@@ -116,20 +108,19 @@ createShuffleTable <-  function(x,chromHeader,
     # A loop to chosse a random alternative nucleotide while making sure that it's not the same as the reference ---------
     foreach::foreach(index = 1:length(ref)) %do% {
       grabbag <- alt
-
       refNuc = shuffleTable[index,1][[1]]
       grabbag <- setdiff(grabbag,c(refNuc))
       if(length(grabbag) == 0){
         again = TRUE
       } else{
         random <- as.character(sample(grabbag,1)[[1]])
+        alt <- alt[-match(random,alt)]
+        shuffleAlt[length(shuffleAlt)+1] <- random
       }
-
-      alt <- alt[-match(random,alt)]
-      shuffleAlt[length(shuffleAlt)+1] <- random
     }
   }
 
+  # Fill the table with mutation information ----------------------------------
   shuffleTable <- shuffleTable %>%
     dplyr::mutate(sampleIDs = dplyr::pull(x,sampleIdHeader),
                   chrom = dplyr::pull(x,chromHeader),
@@ -137,6 +128,7 @@ createShuffleTable <-  function(x,chromHeader,
                   alt = shuffleAlt,
                   check = !alt == ref)
 
+  # Create a table with the frequency of each mutation ------------------------
   nTable <- dplyr::count(dplyr::group_by(shuffleTable[c("sampleIDs","chrom","pos","ref","alt","surrounding","check")],
                                          sampleIDs,
                                          chrom,
@@ -154,32 +146,19 @@ createShuffleTable <-  function(x,chromHeader,
 
 #' addToResultTable
 #' @description A function to create a table with frequencies of patterns.
+#' @param clusterTable The outcome of the groupClusters functions
 #' @inheritParams shuffleMutations
 #' @import magrittr
 #' @import foreach
-addToResultTable <- function(chromHeader,
-                              positionHeader,
-                              refHeader,
-                              altHeader,
-                              surroundingHeader,
-                              sampleIdHeader,
-                              maxDistance,
-                              shuffleTable,
-                              reverseComplement,
-                              searchPatterns,
-                              searchRefHeader,
-                              searchAltHeader,
-                              searchContextHeader,
-                              searchIdHeader,
-                              searchReverseComplement){
+addToResultTable <- function(clusterTable,
+                             searchPatterns,
+                             searchIdHeader){
 
-  # Add patterns that match with the random mutations in the shuffleTable ----------------
-  clusterTablePerMut <- identifyAndAnnotateClusters(x = shuffleTable,maxDistance = maxDistance,positionHeader = "pos",linkPatterns = T)
-  clusterTable <- groupClusters(clusterTablePerMut,patternIntersect = T)
 
-  for(index in 1:nrow(clusterTable)){
+
+  foreach::foreach(index = 1:nrow(clusterTable)) %do% {
     if(clusterTable[index,"has.intersect"] == TRUE){
-      for(patroon in clusterTable[index,"patternIntersect"][[1]][[1]]){
+      foreach::foreach(patroon = clusterTable[index,"patternIntersect"][[1]][[1]]) %do% {
         frequency <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == patroon,"frequency"][[1]]
         addFreq <- sum(clusterTable[index,"cMuts"][[1]][[1]][,"n"])
         searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == patroon,"frequency"] <- frequency + addFreq
@@ -188,3 +167,12 @@ addToResultTable <- function(chromHeader,
   }
   return(searchPatterns)
 }
+
+#' convertFactor
+#' @description A function to convert factor columns to character
+convertFactor <- function(x){
+  x[sapply(x, is.factor)] <- lapply(x[sapply(x, is.factor)],as.character)
+  return(x)
+}
+
+

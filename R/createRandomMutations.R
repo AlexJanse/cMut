@@ -10,6 +10,10 @@
 #' @return A tibble with mutation information
 #' @export
 #' @import magrittr
+#' @examples
+#' x <- createRandomMutations(nMut = 10,
+#'                            sampleName = "test",
+#'                            sizeSur = 3)
 createRandomMutations <- function(nMut = 500,
                                   sampleName = "testSample",
                                   tibble = TRUE,

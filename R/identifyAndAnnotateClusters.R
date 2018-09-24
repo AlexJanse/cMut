@@ -39,6 +39,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
   stopifnot(is.numeric(maxDistance))
 
   # Sort data ---------------------------------------------------------------
+  x <- convertFactor(x)
   x <- dplyr::arrange(x,
           dplyr::pull(x, chromHeader),
           dplyr::pull(x, sampleIdHeader),

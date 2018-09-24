@@ -18,8 +18,26 @@
 #' @examples
 #' # Example of a table containing the right columns and data
 #' test <- createRandomMutations()
-#' test <- identifyAndAnnotateClusters(test, 20000, chromHeader = "chrom",
-#'                                     sampleIdHeader = "sampleIDs",positionHeader = "start")
+#'
+#' # Example of using this function without linking it with patterns
+#' mutations <- identifyAndAnnotateClusters(x = test,
+#'                                          maxDistance = 20000,
+#'                                          chromHeader = "chrom",
+#'                                          sampleIdHeader = "sampleIDs",
+#'                                          positionHeader = "start",
+#'                                          linkPatterns = FALSE)
+#' clusters <- groupClusters(table = mutations,
+#'                           patternIntersect = FALSE)
+#'
+#' # Example of using this function with linking it with patterns
+#' mutations <- identifyAndAnnotateClusters(x = test,
+#'                                          maxDistance = 20000,
+#'                                          chromHeader = "chrom",
+#'                                          sampleIdHeader = "sampleIDs",
+#'                                          positionHeader = "start",
+#'                                          linkPatterns = TRUE)
+#' clusters <- groupClusters(table = mutations,
+#'                           patternIntersect = TRUE)
 groupClusters <- function(table, clusterIdHeader = "clusterId",
                           refHeader = "ref", altHeader = "alt", tibble = TRUE,
                           patternIntersect = FALSE, patternHeader = "linkedPatterns"){
@@ -29,6 +47,7 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
   stopifnot(!any(is.na(dplyr::select(table,clusterIdHeader,refHeader, altHeader))))
 
   # Build table -------------------------------------------------------------------------------------------
+  table <- convertFactor(table)
   table <- table %>%
     dplyr::group_by_(clusterIdHeader) %>%
     tidyr::nest(.key = "cMuts") %>%

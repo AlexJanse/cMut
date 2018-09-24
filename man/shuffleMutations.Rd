@@ -7,8 +7,7 @@
 shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   refHeader = "ref", altHeader = "alt",
   surroundingHeader = "surrounding", sampleIdHeader = "sampleIDs",
-  nBootstrap = 1000, showProgress = TRUE, linkPatterns = FALSE,
-  maxDistance = 20000, reverseComplement = FALSE,
+  nBootstrap = 1000, maxDistance = 20000, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "proces", searchReverseComplement = TRUE,
@@ -31,10 +30,6 @@ nucleotides.}
 \item{sampleIdHeader}{A string; The name of the column with the sample ID.}
 
 \item{nBootstrap}{A number with the ammount of bootstraps there need to be excecuted.}
-
-\item{showProgress}{A boolean whether or not to show the progress.}
-
-\item{linkPatterns}{A boolean to tell if patterns are needed to be found.}
 
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}

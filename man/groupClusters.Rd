@@ -33,6 +33,24 @@ A function that will group the clusters and give the mutation
 \examples{
 # Example of a table containing the right columns and data
 test <- createRandomMutations()
-test <- identifyAndAnnotateClusters(test, 20000, chromHeader = "chrom",
-                                    sampleIdHeader = "sampleIDs",positionHeader = "start")
+
+# Example of using this function without linking it with patterns
+mutations <- identifyAndAnnotateClusters(x = test,
+                                         maxDistance = 20000,
+                                         chromHeader = "chrom",
+                                         sampleIdHeader = "sampleIDs",
+                                         positionHeader = "start",
+                                         linkPatterns = FALSE)
+clusters <- groupClusters(table = mutations,
+                          patternIntersect = FALSE)
+
+# Example of using this function with linking it with patterns
+mutations <- identifyAndAnnotateClusters(x = test,
+                                         maxDistance = 20000,
+                                         chromHeader = "chrom",
+                                         sampleIdHeader = "sampleIDs",
+                                         positionHeader = "start",
+                                         linkPatterns = TRUE)
+clusters <- groupClusters(table = mutations,
+                          patternIntersect = TRUE)
 }

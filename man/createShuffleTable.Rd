@@ -5,7 +5,7 @@
 \title{createShuffleTable}
 \usage{
 createShuffleTable(x, chromHeader, positionHeader, refHeader, altHeader,
-  surroundingHeader, sampleIdHeader, nBootstrap, showProgress)
+  surroundingHeader, sampleIdHeader)
 }
 \arguments{
 \item{x}{A table with the reference, alternative and surrounding
@@ -22,10 +22,6 @@ nucleotides.}
 \item{surroundingHeader}{A string with the column header of the surrounding nucleotides.}
 
 \item{sampleIdHeader}{A string; The name of the column with the sample ID.}
-
-\item{nBootstrap}{A number with the ammount of bootstraps there need to be excecuted.}
-
-\item{showProgress}{A boolean whether or not to show the progress.}
 }
 \description{
 A function to bootstrap the mutation table
