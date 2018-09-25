@@ -15,103 +15,107 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-```{r global_options, include = FALSE}
-old <- options(tibble.width = Inf)
-on.exit(options(old), add = TRUE)
+```{r include = FALSE}
+library(cMut)
 ```
 The cMut package provide functions to find and annotate clustered mutations.
 In the following examples, the functions will be explained and used.
 
 
 ## createRandomMutations
-The `cMut::createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package). The surrounding nucleotides are also from the reference genome.
+The `createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package). The surrounding nucleotides are also from the reference genome.
 ```{r include=TRUE}
-randomData <- cMut::createRandomMutations(nMut = 1000)
+randomData <- createRandomMutations(nMut = 1000)
 randomData
 ```
 
 If a tibble is inconvenience, use the `tibble = FALSE` argument to get a data frame.
 It is also possible to change the number of surrounding nucleotides with the `sizeSur` argument:
 ```{r include = T}
-cMut::createRandomMutations(nMut = 10, 
+createRandomMutations(nMut = 10, 
                             tibble = FALSE,
                             sizeSur = 4)
 ```
 
 
 ## identifyAndAnnotateClusters
-The `cMut::identifyAndAnnotateClusters()` applies the `cMut::identifyClusters()` and if wanted the `cMut::linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table and change if needed.
+The `identifyAndAnnotateClusters()` applies the `identifyClusters()` and (if wanted) `linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
 
 ```{r include = TRUE}
-results <- cMut::identifyAndAnnotateClusters(x = randomData, 
+results <- identifyAndAnnotateClusters(x = testDataSet, 
                                              maxDistance = 20000,
                                              tibble = FALSE)
-results[results$is.clustered == T,]
+results[results$is.clustered == T,][1:10,]
 ```
 
-If the `cMut::linkPatterns()` is needed, use the `linkPatterns = TRUE` argument. See the `cMut::linkPatterns()` paragraph for more information
+If the `linkPatterns()` is needed, use the `linkPatterns = TRUE` argument. See the `linkPatterns()` paragraph for more information
 ```{r include = TRUE}
-results <- cMut::identifyAndAnnotateClusters(x = randomData, 
+results <- identifyAndAnnotateClusters(x = testDataSet, 
                                              maxDistance = 20000,
                                              tibble = FALSE,
                                              linkPatterns = TRUE)
-results[results$is.linked == T,]
+results[results$is.linked == T,][1:10,]
 ```
 
 ## identifyClusters.R
-The `cMut::identifyCluster()` function finds clusters in a table and returns a vector with cluster IDs.
+The `identifyCluster()` function finds clusters in a table and returns a vector with cluster IDs.
 
 ```{r include = TRUE}
-resultVector <- cMut::identifyClusters(x = randomData,
+resultVector <- identifyClusters(x = testDataSet,
                  maxDistance = 20000,
                  chromHeader = "chrom",
                  positionHeader = "start",
                  sampleIdHeader = "sampleIDs")
-head(resultVector)
+tail(resultVector)
 ```
 
 ## linkPatterns
-The `cMut::linkPatterns()` function can check if the provided mutation can be matched with known mutation patterns in a table and returns the ID of the match.
+The `linkPatterns()` function will check if the provided mutation can be matched with known mutation patterns in a table and returns the ID of the match.
 If no table is sent the default table is used:
 
 ```{r echo = FALSE}
-getData <- function(){
-  tempWd <- setwd(paste0(.libPaths(),"/cMut")) 
-  on.exit(setwd(tempWd), add = T)
-  return(tibble::as.tibble(readRDS("data/mutationPatterns.rds")))
-}
 print("DEFAULT TABLE:")
-getData()
+print(mutationPatterns)
 ```
 
 A proper way of using this function with the default table:
 ```{r include = TRUE}
-cMut::linkPatterns("C","T","TA.T")
+linkPatterns("C","T","TA.T")
 ```
 
 As visible in the default table, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation:
 ```{r include = TRUE, error = TRUE}
-cMut::linkPatterns("C","D","A.A")
+linkPatterns("C","D","A.A")
+```
+It is possible that the reference nucleotide is an N. In this case no match is possible because the N represent for every nucleotide. In this case the function shall simply give an empty list back:
+```{r include = TRUE}
+linkPatterns("N","C","TT.")
 ```
 
-
 ## groupClusters
-The `cMut::groupClusters()` function is best used as an optional followup function for `cMut::identifyAndAnnotateClusters()`. This function will group the data based on the cluster IDs. 
+The `groupClusters()` function is best used as an optional followup function for `identifyAndAnnotateClusters()`. This function will group the data based on the cluster IDs. 
 ```{r include = TRUE}
-groups <- cMut::groupClusters(table = results,
+groups <- groupClusters(table = results,
                     tibble = FALSE)
 # The cMuts column contains lists of mutations that belong to the cluster.
 # It's excluded because it messed up the format.
-groups[,-which(names(groups) == "cMuts")] 
+groups[,-which(names(groups) == "cMuts")][1:10,] 
 ```
 
-If the `linkPatterns = TRUE` argument is used during the `cMut::identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` argument in the `cMut::groupClusters()` to add a column with the intersection of the patterns per cluster.
+If the `linkPatterns = TRUE` argument is used during the `identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` argument in the `groupClusters()` to add a column with the intersection of the patterns per cluster.
 ```{r include = TRUE}
-groups <- cMut::groupClusters(table = results,
+groups <- groupClusters(table = results,
                     patternIntersect = TRUE)
 # The cMuts column contains lists of mutations that belong to the cluster.
 # It's excluded because it messed up the format.
-groups[,-which(names(groups) == "cMuts")] 
+groups[,-which(names(groups) == "cMuts")][1:10,]
+```
+
+## shuffleMutations
+Since the `groupCluster()` function is most likely the final function to use, it might be handy to know how likely those results with linked patterns might happen though chance alone. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it excecute the `identifyAndAnnotateClusters()` and `groupCluster()` function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a propper indication.
+```{r include = TRUE}
+clusteredMut <- results[results$is.clustered == TRUE,]
+shuffleMutations(clusteredMut,nBootstrap = 2)
 ```
 
 ### Bugs, questions, suggestions?

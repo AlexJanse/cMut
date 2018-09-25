@@ -1,0 +1,8 @@
+structure(list(process = c("AID", "AID(hotspot)", "AID(pref.hotspot)", 
+"MMR(1)", "MMR(2)", "A1/A3G", "A3F", "A3A", "A3B", "A3"), ref = c("C", 
+"C", "C", "A", "T", "C", "C", "C", "C", "C"), alt = c("D", "D", 
+"D", "B", "V", "D", "D", "T", "T", "K"), surrounding = c("WR.", 
+"WR.Y", "AG.T", "W.", ".W", "T.", "C.", "YT.A", "RT.A", "T.W"
+), frequency = c(0, 0, 0, 0, 4, 0, 2, 0, 0, 0), percentage = c(0, 
+0, 0, 0, 66.6666666666667, 0, 33.3333333333333, 0, 0, 0)), class = c("tbl_df", 
+"tbl", "data.frame"), row.names = c(NA, -10L))

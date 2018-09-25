@@ -48,22 +48,20 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
 
   # Build table -------------------------------------------------------------------------------------------
   table <- convertFactor(table)
-  table <- table %>%
-    dplyr::group_by_(clusterIdHeader) %>%
-    tidyr::nest(.key = "cMuts") %>%
-    dplyr::filter(clusterId!="") %>%
-    dplyr::mutate(refs = purrr::map(cMuts, ~as.character(dplyr::pull(., refHeader))),
-           alts = purrr::map(cMuts, ~as.character(dplyr::pull(., altHeader)))) %>%
-    dplyr::mutate(plusStrand = purrr::map2_chr(refs, alts, formatClusterMutations),
-           minusStrand = purrr::map2_chr(refs, alts, formatClusterMutations, convert=TRUE)) %>%
-    dplyr::mutate(clusterType = purrr::map2_chr(plusStrand, minusStrand, getClusterType))
+  table <- dplyr::group_by_(table, clusterIdHeader)
+  table <- tidyr::nest(table, .key = "cMuts")
+  table <- dplyr::filter(table, clusterId!="")
+  table <- dplyr::mutate(table, refs = purrr::map(cMuts, ~as.character(dplyr::pull(., refHeader))),
+           alts = purrr::map(cMuts, ~as.character(dplyr::pull(., altHeader))))
+  table <- dplyr::mutate(table, plusStrand = purrr::map2_chr(refs, alts, formatClusterMutations),
+           minusStrand = purrr::map2_chr(refs, alts, formatClusterMutations, convert=TRUE))
+  table <- dplyr::mutate(table, clusterType = purrr::map2_chr(plusStrand, minusStrand, getClusterType))
 
   # Find the pattern intersect if needed --------------------------------------------------------
   if(patternIntersect){
     patternHeader <- dplyr::enquo(patternHeader)
-    table <- table %>%
-      dplyr::mutate(patternIntersect = purrr::map(cMuts,getPatternIntersect,!!patternHeader)) %>%
-      dplyr::mutate(has.intersect = purrr::map_lgl(patternIntersect, function(x){ifelse(length(x) > 0 && x[[1]] != "",TRUE,FALSE)}))
+    table <- dplyr::mutate(table, patternIntersect = purrr::map(cMuts,getPatternIntersect,!!patternHeader))
+    table <- dplyr::mutate(table, has.intersect = purrr::map_lgl(patternIntersect, function(x){ifelse(length(x) > 0 && x[[1]] != "",TRUE,FALSE)}))
   }
 
   # Let know if no rows are found ---------------------------------------------------------------

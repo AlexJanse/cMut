@@ -5,6 +5,6 @@
 #' @format A data frame with 16 rows and 2 columns:
 #' \describe{
 #'   \item{symbol}{the symbol that is used to describe certain nucleotides}
-#'   \item{represent}(the represented nucleotides)
+#'   \item{represent}{the represented nucleotides}
 #' }
 "dnaAlphabet"

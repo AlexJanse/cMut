@@ -38,7 +38,7 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   stopifnot(grepl(mutationSymbol,context))
   stopifnot(is.character(ref) & is.character(alt) & is.character(context))
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
-  if(grepl("[^ACGTacgt]",alt)){return(list(""))}
+  stopifnot(grepl("[ACGTacgt]",alt))
 
   if(is.null(searchPatterns)){
     # Get the default table
@@ -79,15 +79,14 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   mutationSymbol <- dplyr::enquo(mutationSymbol)
 
   # Create results -----------------------------------------------------------------
-  results <- searchPatterns %>%
-    dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
-                           getAlphaMatches(!!ref,!!dnaSymbols))) %>%
-    dplyr::filter(match == T) %>%
-    dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
-                           getAlphaMatches(!!alt,!!dnaSymbols))) %>%
-    dplyr::filter(match == T) %>%
-    dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols)) %>%
-    dplyr::filter(match == T)
+  results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
+                           getAlphaMatches(!!ref,!!dnaSymbols)))
+  results <- dplyr::filter(results, match == T)
+  results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
+                           getAlphaMatches(!!alt,!!dnaSymbols)))
+  results <- dplyr::filter(results, match == T)
+  results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols))
+  results <- dplyr::filter(results, match == T)
 
   if(nrow(results) > 0){
     matchedPatterns <- list(dplyr::pull(results,searchIdHeader))

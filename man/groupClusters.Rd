@@ -32,7 +32,7 @@ A function that will group the clusters and give the mutation
 }
 \examples{
 # Example of a table containing the right columns and data
-test <- createRandomMutations()
+test <- testDataSet
 
 # Example of using this function without linking it with patterns
 mutations <- identifyAndAnnotateClusters(x = test,
