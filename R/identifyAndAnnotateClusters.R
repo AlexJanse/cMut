@@ -20,7 +20,7 @@
 #' @export
 #' @import magrittr
 #' @examples
-#' data <- createRandomMutations(1000)
+#' data <- testDataSet
 #' results <- identifyAndAnnotateClusters(x = data,
 #'                                        maxDistance = 20000)
 #' resultsWithPatterns <- identifyAndAnnotateClusters(x = data,
@@ -33,7 +33,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
                                         mutationSymbol = ".", linkPatterns = FALSE,
                                         reverseComplement = FALSE, searchPatterns = NULL,
                                         searchRefHeader = "ref", searchAltHeader = "alt", searchContextHeader = "surrounding",
-                                        searchIdHeader = "proces", searchReverseComplement = TRUE) {
+                                        searchIdHeader = "process", searchReverseComplement = TRUE) {
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))
@@ -44,8 +44,8 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
           dplyr::pull(x, chromHeader),
           dplyr::pull(x, sampleIdHeader),
           dplyr::pull(x, positionHeader))  # Used pulled function because we want the
-                                          # string inside the variable and not the
-                                          # variable name itself as column name.
+                                           # string inside the variable and not the
+                                           # variable name itself as column name.
 
   # Create GRange object ----------------------------------------------------
   ranges <- x %>%
@@ -161,9 +161,10 @@ addLinkPatterns <- function(x, refHeader, altHeader, contextHeader,
                                                function(x,y){
                                                  ifelse(y,callLinkPatterns(x,linkVariables),list(""))
                                                })) %>%
+    dplyr::mutate(linkedPatterns = purrr::map(linkedPatterns,function(x){x[[1]]})) %>%
     dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
                                              function(x){
-                                               dplyr::if_else(x[[1]] != "" && x[[1]] != "NA",
+                                               dplyr::if_else(x[[1]][[1]] != "" && x[[1]][[1]] != "NA",
                                                               TRUE, FALSE)
                                              }))
 

@@ -31,7 +31,7 @@ A function that is able to search for clusters in DNA mutation
   sample.
 }
 \examples{
-data <- createRandomMutations()
+data <- testDataSet
 dataClusters <- identifyClusters(x = data,
                                  maxDistance = 20000)
 }

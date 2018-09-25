@@ -31,7 +31,7 @@
 linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplement = FALSE,
                          searchPatterns = NULL, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
-                         searchIdHeader = "proces", searchReverseComplement = TRUE,
+                         searchIdHeader = "process", searchReverseComplement = TRUE,
                          patternsAsList = TRUE){
 
   # check and adjust parameters ---------------------------------------------------------------
@@ -42,7 +42,7 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
 
   if(is.null(searchPatterns)){
     # Get the default table
-    searchPatterns <- getSearchPatterns()
+    searchPatterns <- tibble::as.tibble(mutationPatterns)
   } else {
     # check if the assigned headers are present in the given table
     stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
@@ -63,9 +63,8 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
     context <- getReverseComplement(context)
   }
 
-
-  dnaAlphabet <- tibble::as.tibble(readRDS("./data/dnaAlphabet.rds"))
-  dnaAlphabet <- dplyr::enquo(dnaAlphabet)
+  dnaSymbols <- tibble::as.tibble(dnaAlphabet)
+  dnaSymbols <- dplyr::enquo(dnaSymbols)
 
 
   ref <- casefold(ref,upper = T)
@@ -82,12 +81,12 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   # Create results -----------------------------------------------------------------
   results <- searchPatterns %>%
     dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
-                           getAlphaMatches(!!ref,!!dnaAlphabet))) %>%
+                           getAlphaMatches(!!ref,!!dnaSymbols))) %>%
     dplyr::filter(match == T) %>%
     dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
-                           getAlphaMatches(!!alt,!!dnaAlphabet))) %>%
+                           getAlphaMatches(!!alt,!!dnaSymbols))) %>%
     dplyr::filter(match == T) %>%
-    dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaAlphabet)) %>%
+    dplyr::mutate(match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols)) %>%
     dplyr::filter(match == T)
 
   if(nrow(results) > 0){
@@ -223,12 +222,4 @@ getReverseComplement <- function(x){
   return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
 }
 
-#' getSearchPatterns
-#' @description Function to get the known mutation default table
-getSearchPatterns <- function(){
-  tempWd <- setwd(paste0(.libPaths(),"/cMut")) # To avoid connection issues with the required files
-  on.exit(setwd(tempWd), add = T) # Set the wd back to the orignal one
-  searchPatterns <- tibble::as.tibble(readRDS("data/mutationPatterns.rds")) %>%
-    dplyr::mutate_all(as.character)
-  return(searchPatterns)
-}
+

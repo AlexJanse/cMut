@@ -7,7 +7,7 @@
 #'   sample naam and any cluster ID's. For example: Chr1 15-15-15 c(10,50,100)
 #' @export
 #' @examples
-#' data <- createRandomMutations()
+#' data <- testDataSet
 #' dataClusters <- identifyClusters(x = data,
 #'                                  maxDistance = 20000)
 identifyClusters <- function(x,

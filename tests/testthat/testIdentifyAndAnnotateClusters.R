@@ -13,3 +13,19 @@ test_that("Check if the results are the same as the original file",
               tibble::as.tibble(dget("extdata/expectedResultsAnnotate.txt",keep.source = F))),
             TRUE)
           )
+
+testResults <- identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T)
+test_that("Check if the linked patterns are as expected",{
+  expect_equal(
+    nrow(testResults[testResults$is.linked == T, ]) == 40,
+    TRUE,
+    TRUE)
+  expect_equal(
+    testResults[testResults$sampleIDs == "TEST","linkedPatterns"][1,][[1]][[1]],
+    c("AID","AID(hotspot)"),
+    TRUE)
+  expect_equal(
+    testResults[testResults$sampleIDs == "TEST","linkedPatterns"][2,][[1]][[1]],
+    c("AID","AID(hotspot)","AID(pref.hotspot)"),
+    TRUE)
+})

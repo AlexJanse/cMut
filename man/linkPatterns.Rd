@@ -7,7 +7,7 @@
 linkPatterns(ref, alt, context, mutationSymbol = ".",
   reverseComplement = FALSE, searchPatterns = NULL,
   searchRefHeader = "ref", searchAltHeader = "alt",
-  searchContextHeader = "surrounding", searchIdHeader = "proces",
+  searchContextHeader = "surrounding", searchIdHeader = "process",
   searchReverseComplement = TRUE, patternsAsList = TRUE)
 }
 \arguments{

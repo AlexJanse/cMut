@@ -17,7 +17,7 @@
 #' @import foreach
 #' @examples
 #' # Example of a table containing the right columns and data
-#' test <- createRandomMutations()
+#' test <- testDataSet
 #'
 #' # Example of using this function without linking it with patterns
 #' mutations <- identifyAndAnnotateClusters(x = test,
@@ -142,9 +142,9 @@ getPatternIntersect <- function(clusterList,patternHeader){
     foreach::foreach(index = 1:nrow(clusterList),
                      .combine = c) %do% {
                        if(counter == 0){
-                         patterns <- clusterList[index,patternHeader][[1]][[1]][[1]]
+                         patterns <- clusterList[index,patternHeader][[1]][[1]]
                        }
-                       patterns <- intersect(patterns, clusterList[index,patternHeader][[1]][[1]][[1]])
+                       patterns <- intersect(patterns, clusterList[index,patternHeader][[1]][[1]])
                        counter <- counter+1
                      }
   if(length(patterns) == 0){

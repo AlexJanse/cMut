@@ -11,7 +11,7 @@ identifyAndAnnotateClusters(x, maxDistance, tibble = TRUE,
   linkPatterns = FALSE, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "proces", searchReverseComplement = TRUE)
+  searchIdHeader = "process", searchReverseComplement = TRUE)
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome nr., sampleID and
@@ -71,7 +71,7 @@ A function that finds and annotate clusters in a genomic data
   tibble.
 }
 \examples{
-data <- createRandomMutations(1000)
+data <- testDataSet
 results <- identifyAndAnnotateClusters(x = data,
                                        maxDistance = 20000)
 resultsWithPatterns <- identifyAndAnnotateClusters(x = data,

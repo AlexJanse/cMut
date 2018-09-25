@@ -26,7 +26,10 @@ Function to generate random data in a tibble with DNA mutation
   object>))
 }
 \examples{
-x <- createRandomMutations(nMut = 10,
+x <- createRandomMutations(nMut = 100,
                            sampleName = "test",
                            sizeSur = 3)
+
+# See explanation of table columns
+cat(comment(x))
 }

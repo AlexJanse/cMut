@@ -11,9 +11,12 @@
 #' @export
 #' @import magrittr
 #' @examples
-#' x <- createRandomMutations(nMut = 10,
+#' x <- createRandomMutations(nMut = 100,
 #'                            sampleName = "test",
 #'                            sizeSur = 3)
+#'
+#' # See explanation of table columns
+#' cat(comment(x))
 createRandomMutations <- function(nMut = 500,
                                   sampleName = "testSample",
                                   tibble = TRUE,

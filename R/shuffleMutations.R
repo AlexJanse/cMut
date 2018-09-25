@@ -29,10 +29,11 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              searchIdHeader = "proces",
                              searchReverseComplement = TRUE,
                              tibble = TRUE){
+
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    resultTable <- getSearchPatterns()
+    resultTable <- tibble::as.tibble(mutationPatterns)
   } else {
     resultTable <- searchPatterns
   }
