@@ -80,14 +80,13 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
 
   # Add the cluster information to the x tibble ------------------------------
   ranges$clusterId <- unlist(clusterIds)
-  x <- x %>%
-    dplyr::arrange(dplyr::pull(x, chromHeader),
+  x <- dplyr::arrange(x, dplyr::pull(x, chromHeader),
                   dplyr::pull(x, sampleIdHeader),
-                  dplyr::pull(x, positionHeader)) %>%
-    dplyr::mutate(clusterId = ranges$clusterId,
-           is.clusteredTemp = ranges$is.clustered) %>%
-    dplyr::mutate(is.clustered = purrr::map2_lgl(is.clusteredTemp, !!rlang::sym(refHeader), function(x,y){ifelse(x & y != "N",return(TRUE),return(FALSE))})) %>%
-    dplyr::mutate(distance = ranges$distance)
+                  dplyr::pull(x, positionHeader))
+  x <- dplyr::mutate(x,clusterId = ranges$clusterId,
+                       is.clusteredTemp = ranges$is.clustered)
+  x <- dplyr::mutate(x, is.clustered = purrr::map2_lgl(is.clusteredTemp, !!rlang::sym(refHeader), function(x,y){ifelse(x & y != "N",return(TRUE),return(FALSE))}),
+                        distance = ranges$distance)
 
   x$is.clusteredTemp <- NULL
 
@@ -151,18 +150,17 @@ addLinkPatterns <- function(x, refHeader, altHeader, contextHeader,
                         searchAltHeader,  searchContextHeader,
                         searchIdHeader, searchReverseComplement) # Variables are put in a list to reduce the amount of code
 
-  x <- x %>%
-    dplyr::mutate(tempMutColumn = paste(!!rlang::sym(refHeader),
+  x <- dplyr::mutate(x, tempMutColumn = paste(!!rlang::sym(refHeader),
                                         !!rlang::sym(altHeader),
                                         !!rlang::sym(contextHeader),
-                                        sep = "!")) %>%
-    dplyr::mutate(linkedPatterns = purrr::map2(tempMutColumn,
+                                        sep = "!"))
+  x <- dplyr::mutate(x, linkedPatterns = purrr::map2(tempMutColumn,
                                                !!rlang::sym(checkHeader),
                                                function(x,y){
                                                  ifelse(y,callLinkPatterns(x,linkVariables),list(""))
-                                               })) %>%
-    dplyr::mutate(linkedPatterns = purrr::map(linkedPatterns,function(x){x[[1]]})) %>%
-    dplyr::mutate(is.linked = purrr::map_lgl(linkedPatterns,
+                                               }))
+  x <- dplyr::mutate(x, linkedPatterns = purrr::map(linkedPatterns,function(x){x[[1]]}))
+  x <- dplyr::mutate(x, is.linked = purrr::map_lgl(linkedPatterns,
                                              function(x){
                                                dplyr::if_else(x[[1]][[1]] != "" && x[[1]][[1]] != "NA",
                                                               TRUE, FALSE)
