@@ -29,7 +29,7 @@
 #' @examples
 #' results <- linkPatterns("C","T","TA.T")
 linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplement = FALSE,
-                         searchPatterns = NULL, searchRefHeader = "ref",
+                         searchPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchReverseComplement = TRUE,
                          patternsAsList = TRUE){
@@ -40,16 +40,12 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
   stopifnot(grepl("[ACGTacgt]",alt))
 
-  if(is.null(searchPatterns)){
-    # Get the default table
-    searchPatterns <- tibble::as.tibble(mutationPatterns)
-  } else {
-    # check if the assigned headers are present in the given table
-    stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
-    stopifnot(any(grepl(searchRefHeader,names(searchPatterns))))
-    stopifnot(any(grepl(searchContextHeader,names(searchPatterns))))
-    searchPatterns <- convertFactor(searchPatterns)
-  }
+  # check if the assigned headers are present in the given table
+  stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
+  stopifnot(any(grepl(searchRefHeader,names(searchPatterns))))
+  stopifnot(any(grepl(searchContextHeader,names(searchPatterns))))
+  searchPatterns <- convertFactor(searchPatterns)
+
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
   if(searchReverseComplement){
@@ -89,7 +85,7 @@ linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplem
   results <- dplyr::filter(results, match == T)
 
   if(nrow(results) > 0){
-    matchedPatterns <- list(dplyr::pull(results,searchIdHeader))
+    matchedPatterns <- list(unique(dplyr::pull(results,searchIdHeader)))
   } else {
     return(list(""))
   }
@@ -210,7 +206,7 @@ getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader)
     dplyr::mutate(!!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),getReverseComplement)) %>%
     dplyr::mutate(!!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),getReverseComplement)) %>%
     dplyr::mutate(!!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),getReverseComplement)) %>%
-    dplyr::mutate(!!rlang::sym(idHeader) := purrr::map_chr(!!rlang::sym(idHeader),paste0,"[Rev.Com.]"))
+    dplyr::mutate(!!rlang::sym(idHeader) := !!rlang::sym(idHeader))
 
   return(table)
 }
@@ -219,6 +215,22 @@ getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader)
 #' @description A function to get the reverse complement of the nucleotides in param x
 getReverseComplement <- function(x){
   return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
+}
+
+#' getSearchPatterns
+#' @description A function to get the default search pattern table
+#' @param reverse A Boolean if the reverse complementend also needed to be added
+#' @export
+getSearchPatterns <- function(reverse = TRUE){
+  searchPatterns <- tibble::as.tibble(mutationPatterns)
+  if(reverse){
+    searchPatterns <- rbind(searchPatterns,getRevComTable(searchPatterns,
+                                                          refHeader = "ref",
+                                                          altHeader = "alt",
+                                                          contextHeader = "surrounding",
+                                                          idHeader = "process"))
+  }
+  return(searchPatterns)
 }
 
 

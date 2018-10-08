@@ -6,7 +6,7 @@
 \usage{
 groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
   altHeader = "alt", tibble = TRUE, patternIntersect = FALSE,
-  patternHeader = "linkedPatterns")
+  patternHeader = "linkedPatterns", showWarning = TRUE)
 }
 \arguments{
 \item{table}{A table with columns containing cluster ID's, reference and
@@ -25,6 +25,8 @@ needed to be processed aswell.}
 
 \item{patternHeader}{A string with the column name of the patterns. Only in
 use when patternIntersect is TRUE.}
+
+\item{showWarning}{A boolean if there need to be a warning if nrow is 0}
 }
 \description{
 A function that will group the clusters and give the mutation

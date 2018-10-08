@@ -92,11 +92,15 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
 
   # Add information about if the mutation can be linked to a certain pattern ------
   if(linkPatterns){
+    if(is.null(searchPatterns)){
+      searchPatterns <- getSearchPatterns(searchReverseComplement)
+      searchReverseComplement <- FALSE
+    }
     x <- addLinkPatterns(x, refHeader, altHeader, contextHeader,
                          mutationSymbol, reverseComplement,
                          searchPatterns, searchRefHeader,
                          searchAltHeader,  searchContextHeader,
-                         searchIdHeader, searchReverseComplement,"is.clustered")
+                         searchIdHeader, searchReverseComplement)
   }
   if(tibble){
     x <- tibble::as.tibble(x)
@@ -114,6 +118,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
 #' @param ranges A GRange object which were created during identifyAndAnnotateClusters function
 #' @param maxDistance A number with the maximum distance
 #' @return A GRange with added distance and a logical column as metadata
+#' @export
 addDistance <- function(ranges, maxDistance) {
 
   hits <- GenomicRanges::distanceToNearest(ranges)
@@ -138,12 +143,18 @@ callLinkPatterns <- function(x,linkedVariables){
 
 #' addLinkPatterns
 #' @inheritParams identifyAndAnnotateClusters
-addLinkPatterns <- function(x, refHeader, altHeader, contextHeader,
-                            mutationSymbol, reverseComplement,
-                            searchPatterns, searchRefHeader,
-                            searchAltHeader,  searchContextHeader,
-                            searchIdHeader, searchReverseComplement,
-                            checkHeader){
+addLinkPatterns <- function(x, refHeader = "ref",
+                            altHeader = "alt",
+                            contextHeader = "surrounding",
+                            mutationSymbol = ".",
+                            reverseComplement = FALSE,
+                            searchPatterns = NULL,
+                            searchRefHeader = "ref",
+                            searchAltHeader = "alt",
+                            searchContextHeader = "surrounding",
+                            searchIdHeader = "process",
+                            searchReverseComplement = TRUE,
+                            checkHeader = "is.clustered"){
 
   linkVariables <- list(mutationSymbol, reverseComplement,
                         searchPatterns, searchRefHeader,

@@ -39,7 +39,7 @@ createRandomMutations(nMut = 10,
 
 
 ## identifyAndAnnotateClusters
-The `identifyAndAnnotateClusters()` applies the `identifyClusters()` and (if wanted) `linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
+The `identifyAndAnnotateClusters()` applies the `identifyClusters()` and (if wanted) `linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with Booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
 
 ```{r include = TRUE}
 results <- identifyAndAnnotateClusters(x = testDataSet, 
@@ -112,7 +112,7 @@ groups[,-which(names(groups) == "cMuts")][1:10,]
 ```
 
 ## shuffleMutations
-Since the `groupCluster()` function is most likely the final function to use, it might be handy to know how likely those results with linked patterns might happen though chance alone. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it excecute the `identifyAndAnnotateClusters()` and `groupCluster()` function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a propper indication.
+Since the `groupCluster()` function is most likely the final function to use, it might be handy to know how likely those results with linked patterns might happen though chance alone. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it execute the `identifyAndAnnotateClusters()` and `groupCluster()` function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a proper indication.
 ```{r include = TRUE}
 clusteredMut <- results[results$is.clustered == TRUE,]
 shuffleMutations(clusteredMut,nBootstrap = 2)

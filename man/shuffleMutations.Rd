@@ -10,7 +10,7 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   nBootstrap = 1000, maxDistance = 20000, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "proces", searchReverseComplement = TRUE,
+  searchIdHeader = "process", searchReverseComplement = TRUE,
   tibble = TRUE)
 }
 \arguments{

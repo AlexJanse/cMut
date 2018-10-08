@@ -26,25 +26,32 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              searchRefHeader = "ref",
                              searchAltHeader = "alt",
                              searchContextHeader = "surrounding",
-                             searchIdHeader = "proces",
+                             searchIdHeader = "process",
                              searchReverseComplement = TRUE,
                              tibble = TRUE){
 
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    resultTable <- tibble::as.tibble(mutationPatterns)
+    resultTable <- tibble::as.tibble(unique(mutationPatterns[,searchIdHeader]))
   } else {
-    resultTable <- searchPatterns
+    resultTable <- tibble::as.tibble(unique(searchPatterns[,searchIdHeader]))
+  }
+
+  # Add the reverse complement of the known table to the search table -----------------------------------------------
+  if(searchReverseComplement){
+    resultTable <- rbind(resultTable,getRevComTable(resultTable,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader))
   }
 
   x <- convertFactor(x)
 
   # Add a frequence column to fill up during bootstrapping
+  resultTable[nrow(resultTable)+1,searchIdHeader] <- "Unidentified"
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
+
   # Preform bootstrap ------------------------------------------------------------
-  foreach::foreach(bootstrap = 1:nBootstrap) %do% {
+  for(bootstrap in 1:nBootstrap){
     # Create a table with shuffled mutations and contexts ------------------------
     shuffleTable <- createShuffleTable(x,chromHeader,
                                        positionHeader,
@@ -58,17 +65,22 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                                                       maxDistance = maxDistance,
                                                       positionHeader = "pos",
                                                       linkPatterns = T)
-    clusterTable <- groupClusters(clusterTablePerMut,patternIntersect = T)
+    clusterTable <- groupClusters(clusterTablePerMut,patternIntersect = T, showWarning = F)
 
     # Add the frequencies of patterns to the resultTable -----------------------
-    resultTable <- addToResultTable(clusterTable,
+    resultTable <- createSummaryPatterns(clusterTable,
                                      searchPatterns = resultTable,
-                                     searchIdHeader)
+                                     searchIdHeader,
+                                     random = T)
   }
 
   # Calculate the percentage of the frequecies -----------------------------------
   total = sum(resultTable$frequency)
-  results <- resultTable %>% dplyr::mutate(percentage = purrr::map_dbl(frequency,function(x){x/total*100}))
+  if(total != 0){
+    results <- dplyr::mutate(resultTable, percentage = purrr::map_dbl(frequency,function(x){x/total*100}))
+  } else {
+    results <- dplyr::mutate(resultTable, percentage = rep.int(0, nrow(resultTable)))
+  }
 
   if(tibble){
     return(tibble::as.tibble(results))
@@ -145,27 +157,38 @@ createShuffleTable <-  function(x,chromHeader,
   return(shuffleTable)
 }
 
-#' addToResultTable
+#' createSummaryPatterns
 #' @description A function to create a table with frequencies of patterns.
-#' @param clusterTable The outcome of the groupClusters functions
+#' @param clusterTable Table with cluster information
+#' @param grouped A Boolean to tell if the data is grouped or not
 #' @inheritParams shuffleMutations
 #' @import magrittr
 #' @import foreach
-addToResultTable <- function(clusterTable,
+createSummaryPatterns <- function(clusterTable,
                              searchPatterns,
-                             searchIdHeader){
+                             searchIdHeader,
+                             random = FALSE){
 
-
-
-  foreach::foreach(index = 1:nrow(clusterTable)) %do% {
-    if(clusterTable[index,"has.intersect"] == TRUE){
-      foreach::foreach(patroon = clusterTable[index,"patternIntersect"][[1]][[1]]) %do% {
-        frequency <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == patroon,"frequency"][[1]]
-        addFreq <- sum(clusterTable[index,"cMuts"][[1]][[1]][,"n"])
-        searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == patroon,"frequency"] <- frequency + addFreq
+  if(nrow(clusterTable) == 0){
+    return(searchPatterns)
+  }
+  nonIntersectFreq <- 0
+  for(index in 1:nrow(clusterTable)){
+    if(clusterTable[index,"has.intersect"][[1]] == TRUE){
+      foreach::foreach(pattern = clusterTable[index,"patternIntersect"][[1]][[1]]) %do% {
+        if(random){
+          addFreq <- sum(clusterTable[index,"cMuts"][[1]][[1]][,"n"])
+        } else {
+          addFreq <- nrow(clusterTable[index,"cMuts"][[1]][[1]])
+        }
+        frequency <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"][[1]]
+        searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"] <- frequency + addFreq
       }
+    } else {
+      nonIntersectFreq <- nonIntersectFreq + nrow(clusterTable[index,"cMuts"][[1]][[1]])
     }
   }
+  searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == "Unidentified","frequency"] <- nonIntersectFreq
   return(searchPatterns)
 }
 

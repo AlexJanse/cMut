@@ -12,6 +12,7 @@
 #'   needed to be processed aswell.
 #' @param patternHeader A string with the column name of the patterns. Only in
 #'   use when patternIntersect is TRUE.
+#' @param showWarning A boolean if there need to be a warning if nrow is 0
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -39,8 +40,9 @@
 #' clusters <- groupClusters(table = mutations,
 #'                           patternIntersect = TRUE)
 groupClusters <- function(table, clusterIdHeader = "clusterId",
-                          refHeader = "ref", altHeader = "alt", tibble = TRUE,
-                          patternIntersect = FALSE, patternHeader = "linkedPatterns"){
+                          refHeader = "ref", altHeader = "alt",
+                          tibble = TRUE, patternIntersect = FALSE,
+                          patternHeader = "linkedPatterns", showWarning = TRUE){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)
