@@ -4,10 +4,12 @@
 \alias{addLinkPatterns}
 \title{addLinkPatterns}
 \usage{
-addLinkPatterns(x, refHeader, altHeader, contextHeader, mutationSymbol,
-  reverseComplement, searchPatterns, searchRefHeader, searchAltHeader,
-  searchContextHeader, searchIdHeader, searchReverseComplement,
-  checkHeader)
+addLinkPatterns(x, refHeader = "ref", altHeader = "alt",
+  contextHeader = "surrounding", mutationSymbol = ".",
+  reverseComplement = FALSE, searchPatterns = NULL,
+  searchRefHeader = "ref", searchAltHeader = "alt",
+  searchContextHeader = "surrounding", searchIdHeader = "process",
+  searchReverseComplement = TRUE, checkHeader = "is.clustered")
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome nr., sampleID and

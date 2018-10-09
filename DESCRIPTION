@@ -16,7 +16,8 @@ imports: AnnotationHub ,
          BSgenome.Hsapiens.UCSC.hg19 ,
          VariantAnnotation ,
          foreach ,
-         data.table
+         data.table ,
+         doParallel
 Suggests: testthat,
     knitr,
     rmarkdown

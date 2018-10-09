@@ -144,6 +144,7 @@ callLinkPatterns <- function(x,linkedVariables){
 
 #' addLinkPatterns
 #' @inheritParams identifyAndAnnotateClusters
+#' @export
 addLinkPatterns <- function(x, refHeader = "ref",
                             altHeader = "alt",
                             contextHeader = "surrounding",

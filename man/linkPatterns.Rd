@@ -5,10 +5,10 @@
 \title{linkPatterns}
 \usage{
 linkPatterns(ref, alt, context, mutationSymbol = ".",
-  reverseComplement = FALSE, searchPatterns = NULL,
-  searchRefHeader = "ref", searchAltHeader = "alt",
-  searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchReverseComplement = TRUE, patternsAsList = TRUE)
+  reverseComplement = FALSE, searchPatterns, searchRefHeader = "ref",
+  searchAltHeader = "alt", searchContextHeader = "surrounding",
+  searchIdHeader = "process", searchReverseComplement = TRUE,
+  patternsAsList = TRUE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide.}

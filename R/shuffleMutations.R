@@ -12,6 +12,7 @@
 #' @inheritParams identifyAndAnnotateClusters
 #' @import magrittr
 #' @import foreach
+#' @import doParallel
 #' @export
 shuffleMutations <- function(x,chromHeader = "chrom",
                              positionHeader = "start",
@@ -52,9 +53,13 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   resultTable <- tibble::tibble(!!rlang::sym(searchIdHeader) := unique(resultTable[,searchIdHeader]))
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
-  total <- 0 # Variable to keep up the total nrows
+  # Prepare for parallel loop
+  nCores <- parallel::detectCores()
+  clusters <- parallel::makeCluster(nCores)
+  doParallel::registerDoParallel(clusters)
+
   # Preform bootstrap ------------------------------------------------------------
-  for(bootstrap in 1:nBootstrap){
+  resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %dopar% {
     # Create a table with shuffled mutations and contexts ------------------------
     shuffleTable <- createShuffleTable(x,chromHeader,
                                        positionHeader,
@@ -71,18 +76,26 @@ shuffleMutations <- function(x,chromHeader = "chrom",
     clusterTable <- groupClusters(clusterTablePerMut,patternIntersect = T, showWarning = F)
 
 
-    total <- total+nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,])
-
-
     # Add the frequencies of patterns to the resultTable -----------------------
     resultTable <- createSummaryPatterns(clusterTable,
                                      searchPatterns = resultTable,
                                      searchIdHeader,
                                      random = T)
+
+    total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,]))
+    resultTable <- rbind(resultTable,total)
   }
+  parallel::stopCluster(clusters)
+
 
   # Calculate the percentage of the frequecies -----------------------------------
-
+  total <- list("total",0)
+  resultTable <- rbind(resultTable,total)
+  for(table in resultTables){
+    resultTable <- data.table::data.table(process = table$process, frequency = resultTable$frequency + table$frequency)
+  }
+  total <- resultTable[resultTable$process == "total",2][[1]]
+  resultTable <- resultTable[resultTable$process != "total",]
 
 
   if(total != 0){
