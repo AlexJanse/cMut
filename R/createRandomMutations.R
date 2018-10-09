@@ -48,7 +48,7 @@ createRandomMutations <- function(nMut = 500,
   lenChromEnquo <- dplyr::enquo(lenChrom)
   sizeSur <- dplyr::enquo(sizeSur)
 
-  randomTable <- data.frame(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
+  randomTable <- data.table::data.table(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
                             stringsAsFactors = F) %>%
     dplyr::mutate(chromLen = lenChrom[chrom]) %>%
     dplyr::mutate(start = purrr::map_int(chromLen, ~sample(., 1))) %>%

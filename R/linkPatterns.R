@@ -202,11 +202,10 @@ getAlphaMatches <- function(nuc, alphabet){
 #' getRevComTable
 #' @description A function to get the reverse complement of the known mutations
 getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader){
-  table <- table %>%
-    dplyr::mutate(!!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),getReverseComplement)) %>%
-    dplyr::mutate(!!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),getReverseComplement)) %>%
-    dplyr::mutate(!!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),getReverseComplement)) %>%
-    dplyr::mutate(!!rlang::sym(idHeader) := !!rlang::sym(idHeader))
+  table <- dplyr::mutate(table, !!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),function(x){revNuc[x]}))
+  table <- dplyr::mutate(table, !!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),function(x){revNuc[x]}))
+  table <- dplyr::mutate(table, !!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),getReverseComplement))
+  table <- dplyr::mutate(table, !!rlang::sym(idHeader) := !!rlang::sym(idHeader))
 
   return(table)
 }

@@ -41,7 +41,7 @@ getSummaryPatterns <- function(clusterTable,
   # Determine the total clustered mutations --------------------------------------
   if(grouped){
     total <- 0
-    foreach::foreach(cMut = clusterTable$cMuts) %do% {
+    for(cMut in clusterTable$cMuts){
       total <- total+nrow(cMut)
     }
   } else {

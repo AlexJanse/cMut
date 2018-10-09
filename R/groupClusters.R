@@ -50,6 +50,7 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
 
   # Build table -------------------------------------------------------------------------------------------
   table <- convertFactor(table)
+  table <- data.table::as.data.table(table)
   table <- dplyr::group_by_(table, clusterIdHeader)
   table <- tidyr::nest(table, .key = "cMuts")
   table <- dplyr::filter(table, clusterId!="")
@@ -80,18 +81,6 @@ groupClusters <- function(table, clusterIdHeader = "clusterId",
 
 }
 
-#' convertLetter
-#' @description Function to get the reverse complement nucleotides.
-#' @param chars List with nucleotides
-convertLetter <- function(chars){
-
-  res <- foreach::foreach(char = chars,
-                 .combine = c) %do% {
-                   as.character(Biostrings::reverseComplement(Biostrings::DNAString(char)))
-                 }
-  return(res)
-}
-
 #' formatClusterMutations
 #' @description Function to make a mutation description symbol (e.g. G>C).
 #' @param refs A list containing the reference nucleotides.
@@ -108,7 +97,7 @@ formatClusterMutations <- function(refs, alts, convert=FALSE) {
     foreach::foreach(i = 1:length(refs),
             .combine = c) %do% {
               if(convert){
-                res <- paste0(convertLetter(refs[i]), ">", convertLetter(alts[i]))
+                res <- paste0(revNuc[refs[i]][[1]], ">", revNuc[alts[i]][[1]])
               } else {
                 res <- paste0(refs[i], ">", alts[i])
               }
