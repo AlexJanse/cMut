@@ -33,9 +33,9 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    resultTable <- tibble::as.tibble(unique(mutationPatterns[,searchIdHeader]))
+    resultTable <- mutationPatterns
   } else {
-    resultTable <- tibble::as.tibble(unique(searchPatterns[,searchIdHeader]))
+    resultTable <- searchPatterns
   }
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
@@ -43,10 +43,12 @@ shuffleMutations <- function(x,chromHeader = "chrom",
     resultTable <- rbind(resultTable,getRevComTable(resultTable,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader))
   }
 
+
   x <- convertFactor(x)
 
   # Add a frequence column to fill up during bootstrapping
   resultTable[nrow(resultTable)+1,searchIdHeader] <- "Unidentified"
+  resultTable <- tibble::tibble(!!rlang::sym(searchIdHeader) := unique(resultTable[,searchIdHeader]))
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
 
@@ -75,7 +77,13 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   }
 
   # Calculate the percentage of the frequecies -----------------------------------
-  total = sum(resultTable$frequency)
+
+  total <- 0
+  foreach::foreach(cMut = clusterTable$cMuts) %do% {
+    total <- total+nrow(cMut)
+  }
+  total <- total * nBootstrap
+
   if(total != 0){
     results <- dplyr::mutate(resultTable, percentage = purrr::map_dbl(frequency,function(x){x/total*100}))
   } else {
@@ -119,7 +127,7 @@ createShuffleTable <-  function(x,chromHeader,
     alt <- dplyr::pull(x,altHeader)
 
     # A loop to chosse a random alternative nucleotide while making sure that it's not the same as the reference ---------
-    foreach::foreach(index = 1:length(ref)) %do% {
+    for(index in 1:length(ref)) {
       grabbag <- alt
       refNuc = shuffleTable[index,1][[1]]
       grabbag <- setdiff(grabbag,c(refNuc))
