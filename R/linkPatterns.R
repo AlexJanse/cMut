@@ -27,7 +27,7 @@
 #' @export
 #' @import magrittr
 #' @examples
-#' results <- linkPatterns("C","T","TA.T")
+#' results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
 linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplement = FALSE,
                          searchPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
@@ -204,16 +204,11 @@ getAlphaMatches <- function(nuc, alphabet){
 getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader){
   table <- dplyr::mutate(table, !!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),function(x){revNuc[x]}))
   table <- dplyr::mutate(table, !!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),function(x){revNuc[x]}))
-  table <- dplyr::mutate(table, !!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),getReverseComplement))
+  table <- dplyr::mutate(table, !!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),function(x){
+    as.character(Biostrings::reverseComplement(Biostrings::DNAString(x)))}))
   table <- dplyr::mutate(table, !!rlang::sym(idHeader) := !!rlang::sym(idHeader))
 
   return(table)
-}
-
-#' getReverseComplement
-#' @description A function to get the reverse complement of the nucleotides in param x
-getReverseComplement <- function(x){
-  return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
 }
 
 #' getSearchPatterns

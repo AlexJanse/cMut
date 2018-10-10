@@ -13,6 +13,7 @@
 #' @import magrittr
 #' @import foreach
 #' @import doParallel
+#' @import compiler
 #' @export
 shuffleMutations <- function(x,chromHeader = "chrom",
                              positionHeader = "start",
@@ -77,13 +78,14 @@ shuffleMutations <- function(x,chromHeader = "chrom",
 
 
     # Add the frequencies of patterns to the resultTable -----------------------
-    resultTable <- createSummaryPatterns(clusterTable,
-                                     searchPatterns = resultTable,
+    subResultTable <- resultTable
+    subResultTable <- createSummaryPatterns(clusterTable,
+                                     searchPatterns = subResultTable,
                                      searchIdHeader,
                                      random = T)
 
     total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,]))
-    resultTable <- rbind(resultTable,total)
+    subResultTable <- rbind(subResultTable,total)
   }
   parallel::stopCluster(clusters)
 
@@ -209,9 +211,12 @@ createSummaryPatterns <- function(clusterTable,
   if(nrow(clusterTable) == 0){
     return(searchPatterns)
   }
+  condition <- clusterTable[,"has.intersect"][[1]]
   nonIntersectFreq <- 0
+
   for(index in 1:nrow(clusterTable)){
-    if(clusterTable[index,"has.intersect"][[1]] == TRUE){
+    if(condition[index]){
+
       for(pattern in clusterTable[index,"patternIntersect"][[1]][[1]]) {
         if(random){
           addFreq <- sum(clusterTable[index,"cMuts"][[1]][[1]][,"n"])
@@ -221,6 +226,7 @@ createSummaryPatterns <- function(clusterTable,
         frequency <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"][[1]]
         searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"] <- frequency + addFreq
       }
+
     } else {
       nonIntersectFreq <- nonIntersectFreq + nrow(clusterTable[index,"cMuts"][[1]][[1]])
     }
