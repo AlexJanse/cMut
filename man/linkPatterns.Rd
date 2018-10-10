@@ -5,10 +5,10 @@
 \title{linkPatterns}
 \usage{
 linkPatterns(ref, alt, context, mutationSymbol = ".",
-  reverseComplement = FALSE, searchPatterns, searchRefHeader = "ref",
-  searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "process", searchReverseComplement = TRUE,
-  patternsAsList = TRUE)
+  reverseComplement = FALSE, searchPatterns = mutationPatterns,
+  searchRefHeader = "ref", searchAltHeader = "alt",
+  searchContextHeader = "surrounding", searchIdHeader = "process",
+  searchReverseComplement = TRUE, patternsAsList = TRUE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide.}
@@ -53,5 +53,5 @@ A function that is able to find matches between a submitted
   unkown mutation and a known mutation table.
 }
 \examples{
-results <- linkPatterns("C","T","TA.T")
+results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
 }

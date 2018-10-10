@@ -49,16 +49,16 @@ createRandomMutations <- function(nMut = 500,
   sizeSur <- dplyr::enquo(sizeSur)
 
   randomTable <- data.table::data.table(chrom = sample(nameChrom, nMut, replace = T, prob = probability),
-                            stringsAsFactors = F) %>%
-    dplyr::mutate(chromLen = lenChrom[chrom]) %>%
-    dplyr::mutate(start = purrr::map_int(chromLen, ~sample(., 1))) %>%
-    dplyr::mutate(stop = start) %>%
-    dplyr::mutate(irange = paste(chrom,start,stop,sep = "-")) %>%
-    dplyr::mutate(sampleIDs = sampleName) %>%
-    dplyr::mutate(refdata = purrr::map2_chr(chrom,start,function(x,y){getRefData(x,y,sizeSur, lenChrom = !!lenChromEnquo)})) %>%
-    dplyr::mutate(surrounding = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][1]})) %>%
-    dplyr::mutate(ref = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][2]})) %>%
-    dplyr::mutate(alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1)))
+                            stringsAsFactors = F)
+  randomTable <- dplyr::mutate(randomTable, chromLen = lenChrom[chrom])
+  randomTable <- dplyr::mutate(randomTable, start = purrr::map_int(chromLen, ~sample(., 1)))
+  randomTable <- dplyr::mutate(randomTable, stop = start)
+  randomTable <- dplyr::mutate(randomTable, irange = paste(chrom,start,stop,sep = "-"))
+  randomTable <- dplyr::mutate(randomTable, sampleIDs = sampleName)
+  randomTable <- dplyr::mutate(randomTable, refdata = purrr::map2_chr(chrom,start,function(x,y){getRefData(x,y,sizeSur, lenChrom = !!lenChromEnquo)}))
+  randomTable <- dplyr::mutate(randomTable, surrounding = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][1]}))
+  randomTable <- dplyr::mutate(randomTable, ref = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][2]}))
+  randomTable <- dplyr::mutate(randomTable, alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1)))
 
   randomTable$refdata <- NULL
   randomTable$irange <- NULL

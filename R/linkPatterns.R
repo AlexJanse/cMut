@@ -29,7 +29,7 @@
 #' @examples
 #' results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
 linkPatterns <- function(ref, alt, context, mutationSymbol = ".", reverseComplement = FALSE,
-                         searchPatterns, searchRefHeader = "ref",
+                         searchPatterns = mutationPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchReverseComplement = TRUE,
                          patternsAsList = TRUE){

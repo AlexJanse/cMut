@@ -11,7 +11,6 @@ getSummaryPatterns <- function(clusterTable,
                              searchRefHeader = "ref",
                              searchAltHeader = "alt",
                              searchContextHeader = "surrounding",
-                             grouped = FALSE,
                              searchReverseComplement = TRUE){
 
   # get or check the searchPatterns table -----------------------------------
@@ -39,14 +38,11 @@ getSummaryPatterns <- function(clusterTable,
                                  searchIdHeader, random = F)
 
   # Determine the total clustered mutations --------------------------------------
-  if(grouped){
-    total <- 0
-    for(cMut in clusterTable$cMuts){
-      total <- total+nrow(cMut)
-    }
-  } else {
-    total = nrow(clusterTable[clusterTable$is.clustered == T,])
+  total <- 0
+  for(cMut in clusterTable$cMuts){
+    total <- total+nrow(cMut)
   }
+
 
   # Determine the percentage per pattern over the total --------------------------
   if(total == 0){

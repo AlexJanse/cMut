@@ -10,7 +10,8 @@
 #' @param chromHeader A string; The name of the column with the chromosome nr.
 #' @param sampleIdHeader A string; The name of the column with the sample ID.
 #' @param positionHeader A string; The name of the column with the position nr.
-#' @param linkPatterns A boolean to tell if patterns are needed to be found.
+#' @param linkPatterns A boolean to tell if patterns are needed to be found. If
+#'   FALSE then the search... parameters are irrelevant.
 #' @inheritParams linkPatterns
 #' @inheritParams groupClusters
 #' @param contextHeader A String; The name of the column with the context.
@@ -64,15 +65,12 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
   ranges <- addDistance(ranges,maxDistance)
 
   # Get clusterIDs ----------------------------------------------------------
+  tempIds <- paste(dplyr::pull(x, chromHeader),
+                   dplyr::pull(x, sampleIdHeader))
   clusterIds <- by(x,
-                   factor(
-                     paste(dplyr::pull(x, chromHeader),
-                           dplyr::pull(x, sampleIdHeader)),
-                     levels = unique(
-                                paste(
-                                  dplyr::pull(x, chromHeader),
-                                  dplyr::pull(x, sampleIdHeader))),
-                                ordered = TRUE),
+                   factor(tempIds,
+                     levels = unique(tempIds),
+                          ordered = TRUE),
                    identifyClusters,
                    round(maxDistance), # Just to be sure that the max is a rounded number
                    positionHeader = positionHeader,
@@ -119,7 +117,6 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
 #' @param ranges A GRange object which were created during identifyAndAnnotateClusters function
 #' @param maxDistance A number with the maximum distance
 #' @return A GRange with added distance and a logical column as metadata
-#' @export
 addDistance <- function(ranges, maxDistance) {
 
   hits <- GenomicRanges::distanceToNearest(ranges)

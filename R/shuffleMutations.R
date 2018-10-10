@@ -211,7 +211,8 @@ createSummaryPatterns <- function(clusterTable,
   if(nrow(clusterTable) == 0){
     return(searchPatterns)
   }
-  condition <- clusterTable[,"has.intersect"][[1]]
+  clusterTable <- data.table::as.data.table(clusterTable)
+  condition <- clusterTable[,"has.intersect"]
   nonIntersectFreq <- 0
 
   for(index in 1:nrow(clusterTable)){
@@ -219,16 +220,16 @@ createSummaryPatterns <- function(clusterTable,
 
       for(pattern in clusterTable[index,"patternIntersect"][[1]][[1]]) {
         if(random){
-          addFreq <- sum(clusterTable[index,"cMuts"][[1]][[1]][,"n"])
+          addFreq <- sum(clusterTable[index,"cMuts"][[1]][,"n"])
         } else {
-          addFreq <- nrow(clusterTable[index,"cMuts"][[1]][[1]])
+          addFreq <- nrow(clusterTable[index,"cMuts"][[1]])
         }
         frequency <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"][[1]]
         searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"] <- frequency + addFreq
       }
 
     } else {
-      nonIntersectFreq <- nonIntersectFreq + nrow(clusterTable[index,"cMuts"][[1]][[1]])
+      nonIntersectFreq <- nonIntersectFreq + nrow(clusterTable[index,"cMuts"][[1]])
     }
   }
   oldNonIntFreq <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == "Unidentified","frequency"]

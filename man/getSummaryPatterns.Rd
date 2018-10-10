@@ -7,15 +7,13 @@
 getSummaryPatterns(clusterTable, searchPatterns = NULL,
   searchIdHeader = "process", searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
-  grouped = FALSE, searchReverseComplement = TRUE)
+  searchReverseComplement = TRUE)
 }
 \arguments{
 \item{clusterTable}{Table with cluster information}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
 data/mutationPatterns.rds is the default search table.}
-
-\item{grouped}{A Boolean to tell if the data is grouped or not}
 }
 \description{
 A function to summarise the found patterns

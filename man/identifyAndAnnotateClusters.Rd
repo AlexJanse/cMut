@@ -40,7 +40,8 @@ nucleotides.}
 \item{mutationSymbol}{A string with the symbol that stands for the mutated
 nucleotide location (e.g. "." in G.C).}
 
-\item{linkPatterns}{A boolean to tell if patterns are needed to be found.}
+\item{linkPatterns}{A boolean to tell if patterns are needed to be found. If
+FALSE then the search... parameters are irrelevant.}
 
 \item{reverseComplement}{A boolean to tell if the ref, alt and context needed
 to be searched with the reverse complement.}

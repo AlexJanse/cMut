@@ -25,7 +25,7 @@ In the following examples, the functions will be explained and used.
 ## createRandomMutations
 The `createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome (GRCh37/hg19) and store them in a tibble (table object from the tidyverse package). The surrounding nucleotides are also from the reference genome.
 ```{r include=TRUE}
-randomData <- createRandomMutations(nMut = 1000)
+randomData <- createRandomMutations(nMut = 10)
 randomData
 ```
 
@@ -74,7 +74,6 @@ The `linkPatterns()` function will check if the provided mutation can be matched
 If no table is sent the default table is used:
 
 ```{r echo = FALSE}
-print("DEFAULT TABLE:")
 print(mutationPatterns)
 ```
 
@@ -98,7 +97,7 @@ The `groupClusters()` function is best used as an optional followup function for
 groups <- groupClusters(table = results,
                     tibble = FALSE)
 # The cMuts column contains lists of mutations that belong to the cluster.
-# It's excluded because it messed up the format.
+# It's excluded in the preview because it messed up the format.
 groups[,-which(names(groups) == "cMuts")][1:10,] 
 ```
 
@@ -109,10 +108,18 @@ groups <- groupClusters(table = results,
 # The cMuts column contains lists of mutations that belong to the cluster.
 # It's excluded because it messed up the format.
 groups[,-which(names(groups) == "cMuts")][1:10,]
+# Because multiple patterns might matched the results are put into a list.
+groups[groups$has.intersect == T,]$patternIntersect
+```
+## getSummaryPatterns
+Because analysing the results of the `groupClusters()` function might be a lot of work, cMut provides the `getSummaryPatterns()` function to summaries the pattern intersection. The result of this function will show the frequency of the patterns (the number of mutations in the matching clusters with this pattern) and the percentage (frequency pattern is compared with the number of clustered mutations). The `unidentified` row contains the information about the clusters that didn't have a linked pattern.
+```{r include = TRUE}
+getSummaryPatterns(groups)
 ```
 
+
 ## shuffleMutations
-Since the `groupCluster()` function is most likely the final function to use, it might be handy to know how likely those results with linked patterns might happen though chance alone. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it execute the `identifyAndAnnotateClusters()` and `groupCluster()` function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a proper indication.
+Since the `getSummaryPatterns()` function is most likely the final function to use, it might be handy to know how likely those results with linked patterns might happen though chance alone. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it execute the `identifyAndAnnotateClusters()` and `groupCluster()` function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a proper indication.
 ```{r include = TRUE}
 clusteredMut <- results[results$is.clustered == TRUE,]
 shuffleMutations(clusteredMut,nBootstrap = 2)
