@@ -8,8 +8,7 @@ createShuffleTable(x, chromHeader, positionHeader, refHeader, altHeader,
   surroundingHeader, sampleIdHeader)
 }
 \arguments{
-\item{x}{A table with the reference, alternative and surrounding
-nucleotides.}
+\item{x}{A table with the reference, alternative and surrounding nucleotides.}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 
@@ -17,9 +16,11 @@ nucleotides.}
 
 \item{refHeader}{A string with the column header of the reference nucleotide.}
 
-\item{altHeader}{A string with the column header of the alternative nucleotide.}
+\item{altHeader}{A string with the column header of the alternative
+nucleotide.}
 
-\item{surroundingHeader}{A string with the column header of the surrounding nucleotides.}
+\item{surroundingHeader}{A string with the column header of the surrounding
+nucleotides.}
 
 \item{sampleIdHeader}{A string; The name of the column with the sample ID.}
 }

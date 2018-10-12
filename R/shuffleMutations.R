@@ -2,14 +2,20 @@
 #' @description A function to shuffle the reference, alternative and surrounding
 #'   nucleotides. Usefull to determine the chance that the results of your data
 #'   might be due randomness.
-#' @param x A table with the reference, alternative and surrounding
-#'   nucleotides.
+#' @param x A table with the reference, alternative and surrounding nucleotides.
 #' @param refHeader A string with the column header of the reference nucleotide.
-#' @param altHeader A string with the column header of the alternative nucleotide.
-#' @param surroundingHeader A string with the column header of the surrounding nucleotides.
-#' @param nBootstrap A number with the ammount of bootstraps there need to be excecuted.
+#' @param altHeader A string with the column header of the alternative
+#'   nucleotide.
+#' @param surroundingHeader A string with the column header of the surrounding
+#'   nucleotides.
+#' @param nBootstrap A number with the ammount of bootstraps there need to be
+#'   excecuted.
 #' @inheritParams linkPatterns
 #' @inheritParams identifyAndAnnotateClusters
+#' @param saveEachBootstrap A boolean if the summaries per bootstrap are needed
+#'   to be saved
+#' @param saveFileName A string with the name and location of the file that
+#'   contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.
 #' @import magrittr
 #' @import foreach
 #' @import doParallel
@@ -30,7 +36,9 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              searchContextHeader = "surrounding",
                              searchIdHeader = "process",
                              searchReverseComplement = TRUE,
-                             tibble = TRUE){
+                             tibble = TRUE,
+                             saveEachBootstrap = FALSE,
+                             saveFileName = NULL){
 
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
@@ -60,14 +68,15 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   doParallel::registerDoParallel(clusters)
 
   # Preform bootstrap ------------------------------------------------------------
-  resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %dopar% {
+  resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %do% {
     # Create a table with shuffled mutations and contexts ------------------------
     shuffleTable <- createShuffleTable(x,chromHeader,
                                        positionHeader,
                                        refHeader,
                                        altHeader,
-                                       surroundingHeader,
-                                       sampleIdHeader)
+                                       surroundingHeader
+                                       ,sampleIdHeader
+    )
 
     # Identify, annotate and group clustered mutations --------------------------
     clusterTablePerMut <- identifyAndAnnotateClusters(x = shuffleTable,
@@ -80,15 +89,18 @@ shuffleMutations <- function(x,chromHeader = "chrom",
     # Add the frequencies of patterns to the resultTable -----------------------
     subResultTable <- resultTable
     subResultTable <- createSummaryPatterns(clusterTable,
-                                     searchPatterns = subResultTable,
-                                     searchIdHeader,
-                                     random = T)
+                                            searchPatterns = subResultTable,
+                                            searchIdHeader,
+                                            random = T)
 
     total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,]))
     subResultTable <- rbind(subResultTable,total)
   }
   parallel::stopCluster(clusters)
 
+  if(saveEachBootstrap){
+    dput(resultTables,saveFileName)
+  }
 
   # Calculate the percentage of the frequecies -----------------------------------
   total <- list("total",0)
@@ -124,7 +136,8 @@ createShuffleTable <-  function(x,chromHeader,
                                 refHeader,
                                 altHeader,
                                 surroundingHeader,
-                                sampleIdHeader){
+                                sampleIdHeader
+                                ){
 
   # Extract the muation data from the table --------------------------------------
   ref <- dplyr::pull(x,refHeader)
@@ -204,9 +217,9 @@ createShuffleTable <-  function(x,chromHeader,
 #' @import magrittr
 #' @import foreach
 createSummaryPatterns <- function(clusterTable,
-                             searchPatterns,
-                             searchIdHeader,
-                             random = FALSE){
+                                  searchPatterns,
+                                  searchIdHeader,
+                                  random = FALSE){
 
   if(nrow(clusterTable) == 0){
     return(searchPatterns)
@@ -218,7 +231,7 @@ createSummaryPatterns <- function(clusterTable,
   for(index in 1:nrow(clusterTable)){
     if(condition[index]){
 
-      for(pattern in clusterTable[index,"patternIntersect"][[1]][[1]]) {
+      for(pattern in clusterTable[index,"patternIntersect"][[1]]) {
         if(random){
           addFreq <- sum(clusterTable[index,"cMuts"][[1]][,"n"])
         } else {

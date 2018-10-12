@@ -11,11 +11,10 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchReverseComplement = TRUE,
-  tibble = TRUE)
+  tibble = TRUE, saveEachBootstrap = FALSE, saveFileName = NULL)
 }
 \arguments{
-\item{x}{A table with the reference, alternative and surrounding
-nucleotides.}
+\item{x}{A table with the reference, alternative and surrounding nucleotides.}
 
 \item{chromHeader}{A string; The name of the column with the chromosome nr.}
 
@@ -23,13 +22,16 @@ nucleotides.}
 
 \item{refHeader}{A string with the column header of the reference nucleotide.}
 
-\item{altHeader}{A string with the column header of the alternative nucleotide.}
+\item{altHeader}{A string with the column header of the alternative
+nucleotide.}
 
-\item{surroundingHeader}{A string with the column header of the surrounding nucleotides.}
+\item{surroundingHeader}{A string with the column header of the surrounding
+nucleotides.}
 
 \item{sampleIdHeader}{A string; The name of the column with the sample ID.}
 
-\item{nBootstrap}{A number with the ammount of bootstraps there need to be excecuted.}
+\item{nBootstrap}{A number with the ammount of bootstraps there need to be
+excecuted.}
 
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}
@@ -54,6 +56,12 @@ complement of the searchPatterns tibble. When matched the returned ID will
 have [Rev.Com] attached to it.}
 
 \item{tibble}{A boolean if the table has to be a tibble}
+
+\item{saveEachBootstrap}{A boolean if the summaries per bootstrap are needed
+to be saved}
+
+\item{saveFileName}{A string with the name and location of the file that
+contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding
