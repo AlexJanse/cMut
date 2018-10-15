@@ -13,6 +13,17 @@
 #' @param patternHeader A string with the column name of the patterns. Only in
 #'   use when patternIntersect is TRUE.
 #' @param showWarning A boolean if there need to be a warning if nrow is 0
+#' @param searchLocationPatterns A boolean that tells if it's needed to search
+#'   to patterns that are determined by distance and the variants in the
+#'   clusters
+#' @param locationPatterns A data frame that contains the id, reference and
+#'   alternative of the location type mutations.
+#' @param locationRefHeader A string with the header of the column with the
+#'   reference nucleotides
+#' @param locationAltHeader A string with the header of the column with the
+#'   alternative nucleotide
+#' @param locationIdHeader A string with the header of the column with the
+#'   id's of the location mutations
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -39,10 +50,19 @@
 #'                                          linkPatterns = TRUE)
 #' clusters <- groupClusters(table = mutations,
 #'                           patternIntersect = TRUE)
-groupClusters <- function(table, clusterIdHeader = "clusterId",
-                          refHeader = "ref", altHeader = "alt",
-                          tibble = TRUE, patternIntersect = FALSE,
-                          patternHeader = "linkedPatterns", showWarning = TRUE){
+groupClusters <- function(table,
+                          clusterIdHeader = "clusterId",
+                          refHeader = "ref",
+                          altHeader = "alt",
+                          tibble = TRUE,
+                          patternIntersect = FALSE,
+                          patternHeader = "linkedPatterns",
+                          showWarning = TRUE,
+                          searchLocationPatterns = FALSE,
+                          locationPatterns = getSearchPatterns(location = T),
+                          locationRefHeader = "ref",
+                          locationAltHeader = "alt",
+                          locationIdHeader = "process"){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)

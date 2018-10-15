@@ -34,7 +34,7 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
                                         mutationSymbol = ".", linkPatterns = FALSE,
                                         reverseComplement = FALSE, searchPatterns = NULL,
                                         searchRefHeader = "ref", searchAltHeader = "alt", searchContextHeader = "surrounding",
-                                        searchIdHeader = "process", searchReverseComplement = TRUE) {
+                                        searchIdHeader = "process", searchReverseComplement = TRUE, patternsAsList = TRUE) {
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))

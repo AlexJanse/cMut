@@ -11,7 +11,8 @@ identifyAndAnnotateClusters(x, maxDistance, tibble = TRUE,
   linkPatterns = FALSE, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "process", searchReverseComplement = TRUE)
+  searchIdHeader = "process", searchReverseComplement = TRUE,
+  patternsAsList = TRUE)
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome nr., sampleID and
@@ -61,6 +62,9 @@ nucleotide of the searchPatterns table.}
 \item{searchReverseComplement}{A boolean to also search in the reverse
 complement of the searchPatterns tibble. When matched the returned ID will
 have [Rev.Com] attached to it.}
+
+\item{patternsAsList}{A boolean to tell if the return value needs to be in a
+list or not.}
 }
 \value{
 The tibble that was sent as an argument for this fuction with extra
