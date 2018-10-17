@@ -133,10 +133,12 @@ addDistance <- function(ranges, maxDistance) {
 callLinkPatterns <- function(x,linkedVariables){
   # linkedVariables <- rlang::get_expr(linkedVariables)
   mutation <- strsplit(x,"!")
-  return(linkPatterns(mutation[[1]][1],mutation[[1]][2],mutation[[1]][3], linkedVariables[[1]],
-                      linkedVariables[[2]], linkedVariables[[3]], linkedVariables[[4]],
-                      linkedVariables[[5]], linkedVariables[[6]],
-                      linkedVariables[[7]], linkedVariables[[8]]))
+  return(linkPatterns(ref = mutation[[1]][1], alt = mutation[[1]][2],
+                      context = mutation[[1]][3], distance = as.numeric(mutation[[1]][4]),
+                      mutationSymbol = linkedVariables[[1]], reverseComplement = linkedVariables[[2]],
+                      searchPatterns = linkedVariables[[3]], searchRefHeader = linkedVariables[[4]],
+                      searchAltHeader = linkedVariables[[5]], searchContextHeader = linkedVariables[[6]],
+                      searchIdHeader = linkedVariables[[7]], searchReverseComplement = linkedVariables[[8]]))
 }
 
 #' addLinkPatterns
@@ -164,6 +166,7 @@ addLinkPatterns <- function(x, refHeader = "ref",
   x <- dplyr::mutate(x, tempMutColumn = paste(!!rlang::sym(refHeader),
                                         !!rlang::sym(altHeader),
                                         !!rlang::sym(contextHeader),
+                                        distance,
                                         sep = "!"))
   x <- dplyr::mutate(x, linkedPatterns = purrr::map2(tempMutColumn,
                                                !!rlang::sym(checkHeader),

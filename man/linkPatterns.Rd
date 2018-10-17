@@ -4,11 +4,12 @@
 \alias{linkPatterns}
 \title{linkPatterns}
 \usage{
-linkPatterns(ref, alt, context, mutationSymbol = ".",
+linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
   reverseComplement = FALSE, searchPatterns = mutationPatterns,
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchReverseComplement = TRUE, patternsAsList = TRUE)
+  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
+  patternsAsList = TRUE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide.}
@@ -16,6 +17,10 @@ linkPatterns(ref, alt, context, mutationSymbol = ".",
 \item{alt}{A string containing the alternative nucleotide.}
 
 \item{context}{A string containing the surrounding nucleotides (e.g. G.C).}
+
+\item{distance}{A number that tells the distance to the nearest mutation in a
+cluster. This will be used if a pattern in the search table has een
+maxDistance column.}
 
 \item{mutationSymbol}{A string with the symbol that stands for the mutated
 nucleotide location (e.g. "." in G.C).}
@@ -34,6 +39,10 @@ nucleotide of the searchPatterns table.}
 
 \item{searchContextHeader}{A string with the column name of the context
 nucleotide of the searchPatterns table.}
+
+\item{searchDistanceHeader}{A string with the column name of the maximum
+distance between clustered mutations. Not needed if the distance parameter
+is NULL. NA's within this column are allowed.}
 
 \item{searchReverseComplement}{A boolean to also search in the reverse
 complement of the searchPatterns tibble. When matched the returned ID will

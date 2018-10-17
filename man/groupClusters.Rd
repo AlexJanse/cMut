@@ -6,7 +6,10 @@
 \usage{
 groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
   altHeader = "alt", tibble = TRUE, patternIntersect = FALSE,
-  patternHeader = "linkedPatterns", showWarning = TRUE)
+  searchClusterPatterns = FALSE, patternHeader = "linkedPatterns",
+  showWarning = TRUE, searchPatterns = NULL, searchRefHeader = "ref",
+  searchAltHeader = "alt", searchIdHeader = "process",
+  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE)
 }
 \arguments{
 \item{table}{A table with columns containing cluster ID's, reference and
@@ -20,8 +23,13 @@ nucleotides..}
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
+\item{tibble}{A boolean if the table has to be a tibble}
+
 \item{patternIntersect}{Boolean if the table contains patterns and these
 needed to be processed aswell.}
+
+\item{searchClusterPatterns}{A boolean if it's needed to search to cluster
+patterns (e.g. GA > TT).}
 
 \item{patternHeader}{A string with the column name of the patterns. Only in
 use when patternIntersect is TRUE.}

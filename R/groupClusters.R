@@ -13,17 +13,9 @@
 #' @param patternHeader A string with the column name of the patterns. Only in
 #'   use when patternIntersect is TRUE.
 #' @param showWarning A boolean if there need to be a warning if nrow is 0
-#' @param searchLocationPatterns A boolean that tells if it's needed to search
-#'   to patterns that are determined by distance and the variants in the
-#'   clusters
-#' @param locationPatterns A data frame that contains the id, reference and
-#'   alternative of the location type mutations.
-#' @param locationRefHeader A string with the header of the column with the
-#'   reference nucleotides
-#' @param locationAltHeader A string with the header of the column with the
-#'   alternative nucleotide
-#' @param locationIdHeader A string with the header of the column with the
-#'   id's of the location mutations
+#' @param searchClusterPatterns A boolean if it's needed to search to cluster
+#'   patterns (e.g. GA > TT).
+#' @inheritParams identifyAndAnnotateClusters
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -56,13 +48,13 @@ groupClusters <- function(table,
                           altHeader = "alt",
                           tibble = TRUE,
                           patternIntersect = FALSE,
+                          searchClusterPatterns = FALSE,
                           patternHeader = "linkedPatterns",
                           showWarning = TRUE,
-                          searchLocationPatterns = FALSE,
-                          locationPatterns = getSearchPatterns(location = T),
-                          locationRefHeader = "ref",
-                          locationAltHeader = "alt",
-                          locationIdHeader = "process"){
+                          searchPatterns = NULL, searchRefHeader = "ref",
+                          searchAltHeader = "alt",
+                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
+                          searchReverseComplement = TRUE){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)
@@ -76,20 +68,38 @@ groupClusters <- function(table,
   table <- dplyr::filter(table, clusterId!="")
   table <- dplyr::mutate(table, refs = purrr::map(cMuts, ~as.character(dplyr::pull(., refHeader))),
            alts = purrr::map(cMuts, ~as.character(dplyr::pull(., altHeader))))
+  table <- dplyr::mutate(table, refs = purrr::map_chr(refs, function(x){paste0(x,collapse = "")}),
+                         alts = purrr::map_chr(alts, function(x){paste0(x,collapse = "")}))
   table <- dplyr::mutate(table, plusStrand = purrr::map2_chr(refs, alts, formatClusterMutations),
            minusStrand = purrr::map2_chr(refs, alts, formatClusterMutations, convert=TRUE))
   table <- dplyr::mutate(table, clusterType = purrr::map2_chr(plusStrand, minusStrand, getClusterType))
+  table <- dplyr::mutate(table, distance = purrr::map_int(cMuts,function(x){x$distance[1]}))
 
   # Find the pattern intersect if needed --------------------------------------------------------
   if(patternIntersect){
     patternHeader <- dplyr::enquo(patternHeader)
-    table <- dplyr::mutate(table, patternIntersect = purrr::map(cMuts,getPatternIntersect,!!patternHeader))
-    table <- dplyr::mutate(table, has.intersect = purrr::map_lgl(patternIntersect, function(x){ifelse(length(x) > 0 && x[[1]] != "",TRUE,FALSE)}))
+    table <- dplyr::mutate(table, foundPatterns = purrr::map(cMuts,getPatternIntersect,!!patternHeader))
+    table <- dplyr::mutate(table, has.intersect = purrr::map_lgl(foundPatterns, function(x){ifelse(length(x) > 0 && x[[1]] != "",TRUE,FALSE)}))
+  }
+
+  if(searchClusterPatterns){
+    if(is.null(searchPatterns)){
+      searchPatterns <- getSearchPatterns(searchReverseComplement)
+      searchPatterns <- searchPatterns[nchar(searchPatterns$ref) > 1,]
+    }
+    table <- searchClusterPatterns(table,
+                                    searchPatterns,
+                                    searchRefHeader,
+                                    searchAltHeader,
+                                    searchDistanceHeader,
+                                    searchIdHeader )
   }
 
   # Let know if no rows are found ---------------------------------------------------------------
-  if(nrow(table) == 0){
-    warning("No rows found. Please make sure the cluster IDs are present and try again.")
+  if(showWarning){
+    if(nrow(table) == 0){
+      warning("No rows found. Please make sure the cluster IDs are present and try again.")
+    }
   }
 
   if(tibble){
@@ -113,20 +123,19 @@ formatClusterMutations <- function(refs, alts, convert=FALSE) {
   stopifnot(is.logical(convert))
 
   # Create the description symbols per mutation-------------------------------------
-  combinedResult <-
-    foreach::foreach(i = 1:length(refs),
-            .combine = c) %do% {
-              if(convert){
-                res <- paste0(revNuc[refs[i]][[1]], ">", revNuc[alts[i]][[1]])
-              } else {
-                res <- paste0(refs[i], ">", alts[i])
-              }
-            }
+
+  if(convert){
+    res <- paste0(Biostrings::reverseComplement(Biostrings::DNAString(refs)), ">",
+                  Biostrings::reverseComplement(Biostrings::DNAString(alts)))
+  } else {
+    res <- paste0(refs, ">", alts)
+  }
+
 
   # Combine the mutation pairs -----------------------------------------------------
   finalResult <- dplyr::if_else(convert,
-                         do.call(paste, as.list(rev(combinedResult))),
-                         do.call(paste, as.list(combinedResult)))
+                         do.call(paste, as.list(rev(res))),
+                         do.call(paste, as.list(res)))
   return(finalResult)
 }
 

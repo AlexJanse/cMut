@@ -5,9 +5,8 @@
 \title{getSummaryPatterns}
 \usage{
 getSummaryPatterns(clusterTable, searchPatterns = NULL,
-  searchIdHeader = "process", searchRefHeader = "ref",
-  searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchReverseComplement = TRUE)
+  searchIdHeader = "process", searchReverseComplement = TRUE,
+  locationBased = FALSE)
 }
 \arguments{
 \item{clusterTable}{Table with cluster information}

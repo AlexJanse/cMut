@@ -8,16 +8,19 @@
 getSummaryPatterns <- function(clusterTable,
                              searchPatterns = NULL,
                              searchIdHeader = "process",
-                             searchRefHeader = "ref",
-                             searchAltHeader = "alt",
-                             searchContextHeader = "surrounding",
-                             searchReverseComplement = TRUE){
+                             searchReverseComplement = TRUE,
+                             locationBased = FALSE){
 
   # get or check the searchPatterns table -----------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[,"process"])
+    if(locationBased){
+      searchPatterns <- tibble::as.tibble(data.frame(process = unique(locationPatterns[,"process"])
+                                                     ,stringsAsFactors = F))
+    } else {
+      searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[,"process"])
                                                 ,stringsAsFactors = F))
+    }
 
   } else {
     # check if the assigned headers are present in the given table
@@ -35,7 +38,7 @@ getSummaryPatterns <- function(clusterTable,
   # Count the amount of mutations per pattern per cluster ------------------------
   table <- createSummaryPatterns(clusterTable,
                                  searchPatterns,
-                                 searchIdHeader, random = F)
+                                 searchIdHeader, random = F, locationBased = locationBased)
 
   # Determine the total clustered mutations --------------------------------------
   total <- 0

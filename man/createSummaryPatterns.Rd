@@ -5,7 +5,7 @@
 \title{createSummaryPatterns}
 \usage{
 createSummaryPatterns(clusterTable, searchPatterns, searchIdHeader,
-  random = FALSE)
+  random = FALSE, locationBased = FALSE)
 }
 \arguments{
 \item{clusterTable}{Table with cluster information}

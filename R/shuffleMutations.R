@@ -38,12 +38,22 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              searchReverseComplement = TRUE,
                              tibble = TRUE,
                              saveEachBootstrap = FALSE,
-                             saveFileName = NULL){
+                             saveFileName = NULL,
+                             searchLocationPatterns = FALSE,
+                             locationPatternsTable = NULL,
+                             locationDistanceHeader = "maxDistance",
+                             locationRefHeader = "ref",
+                             locationAltHeader = "alt",
+                             locationIdHeader = "process"){
 
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    resultTable <- mutationPatterns
+    if(searchLocationPatterns){
+     resultTable <- tibble::as.tibble(getSearchPatterns(location = TRUE))
+    } else {
+      resultTable <- mutationPatterns
+    }
   } else {
     resultTable <- searchPatterns
   }
@@ -59,7 +69,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
 
   # Add a frequence column to fill up during bootstrapping
   resultTable[nrow(resultTable)+1,searchIdHeader] <- "Unidentified"
-  resultTable <- tibble::tibble(!!rlang::sym(searchIdHeader) := unique(resultTable[,searchIdHeader]))
+  resultTable <- tibble::tibble(!!rlang::sym(searchIdHeader) := unique(resultTable[,searchIdHeader])[[1]])
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
   # Prepare for parallel loop
@@ -68,7 +78,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   doParallel::registerDoParallel(clusters)
 
   # Preform bootstrap ------------------------------------------------------------
-  resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %do% {
+  resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %dopar% {
     # Create a table with shuffled mutations and contexts ------------------------
     shuffleTable <- createShuffleTable(x,chromHeader,
                                        positionHeader,
@@ -82,8 +92,15 @@ shuffleMutations <- function(x,chromHeader = "chrom",
     clusterTablePerMut <- identifyAndAnnotateClusters(x = shuffleTable,
                                                       maxDistance = maxDistance,
                                                       positionHeader = "pos",
-                                                      linkPatterns = T)
-    clusterTable <- groupClusters(clusterTablePerMut,patternIntersect = T, showWarning = F)
+                                                      linkPatterns = !searchLocationPatterns)
+    clusterTable <- groupClusters(clusterTablePerMut,
+                                  patternIntersect = !searchLocationPatterns,
+                                  showWarning = F,
+                                  searchLocationPatterns = searchLocationPatterns,
+                                  locationRefHeader = searchRefHeader,
+                                  locationAltHeader = searchAltHeader,
+                                  locationDistanceHeader = locationDistanceHeader,
+                                  locationReverseComplement = searchReverseComplement)
 
 
     # Add the frequencies of patterns to the resultTable -----------------------
@@ -91,7 +108,8 @@ shuffleMutations <- function(x,chromHeader = "chrom",
     subResultTable <- createSummaryPatterns(clusterTable,
                                             searchPatterns = subResultTable,
                                             searchIdHeader,
-                                            random = T)
+                                            random = T,
+                                            locationBased = searchLocationPatterns)
 
     total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,]))
     subResultTable <- rbind(subResultTable,total)
@@ -219,19 +237,26 @@ createShuffleTable <-  function(x,chromHeader,
 createSummaryPatterns <- function(clusterTable,
                                   searchPatterns,
                                   searchIdHeader,
-                                  random = FALSE){
-
+                                  random = FALSE,
+                                  locationBased = FALSE){
+  if(locationBased){
+    checkHeader <- "has.locPatterns"
+    patternHeader <- "locationPatterns"
+  } else {
+    checkHeader <- "has.intersect"
+    patternHeader <- "patternIntersect"
+  }
   if(nrow(clusterTable) == 0){
     return(searchPatterns)
   }
   clusterTable <- data.table::as.data.table(clusterTable)
-  condition <- clusterTable[,"has.intersect"]
+  condition <- clusterTable[,checkHeader]
   nonIntersectFreq <- 0
 
   for(index in 1:nrow(clusterTable)){
     if(condition[index]){
 
-      for(pattern in clusterTable[index,"patternIntersect"][[1]]) {
+      for(pattern in clusterTable[index,patternHeader][[1]]) {
         if(random){
           addFreq <- sum(clusterTable[index,"cMuts"][[1]][,"n"])
         } else {

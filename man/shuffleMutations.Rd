@@ -11,7 +11,10 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchReverseComplement = TRUE,
-  tibble = TRUE, saveEachBootstrap = FALSE, saveFileName = NULL)
+  tibble = TRUE, saveEachBootstrap = FALSE, saveFileName = NULL,
+  searchLocationPatterns = FALSE, locationPatternsTable = NULL,
+  locationDistanceHeader = "maxDistance", locationRefHeader = "ref",
+  locationAltHeader = "alt", locationIdHeader = "process")
 }
 \arguments{
 \item{x}{A table with the reference, alternative and surrounding nucleotides.}
