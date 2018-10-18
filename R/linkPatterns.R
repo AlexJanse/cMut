@@ -1,39 +1,44 @@
 #' linkPatterns
 #' @description A function that is able to find matches between a submitted
-#'   unkown mutation and a known mutation table.
-#' @param ref A string containing the reference nucleotide.
-#' @param alt A string containing the alternative nucleotide.
-#' @param context A string containing the surrounding nucleotides (e.g. G.C).
+#'   unkown mutation and a known mutation pattern table.
+#' @param ref A string containing the reference nucleotide. (e.g. "C")
+#' @param alt A string containing the alternative nucleotide. (e.g. "T")
+#' @param context A string containing the surrounding nucleotides. (e.g. "G.C")
 #' @param distance A number that tells the distance to the nearest mutation in a
-#'   cluster. This will be used if a pattern in the search table has een
-#'   maxDistance column.
-#' @param reverseComplement A boolean to tell if the ref, alt and context needed
-#'   to be searched with the reverse complement.
+#'   cluster. This parameter should stay NULL unless the \code{searchPatterns}
+#'   table has a distance column and it's needed to be take into acount while
+#'   comparing.
+#' @param reverseComplement A Boolean to tell if the \code{ref}, \code{alt} and
+#'   \code{context} needed to be searched with the reverse complement.
 #' @param mutationSymbol A string with the symbol that stands for the mutated
-#'   nucleotide location (e.g. "." in G.C).
+#'   nucleotide location in the \code{context}. (e.g. "." in "G.C")
 #' @param searchPatterns A tibble with the known mutation patterns. The
-#'   data/mutationPatterns.rds is the default search table.
-#' @param searchRefHeader A string with the column name of the reference
-#'   nucleotide of the searchPatterns table.
-#' @param searchAltHeader A string with the column name of the alternative
-#'   nucleotide of the searchPatterns table.
-#' @param searchContextHeader A string with the column name of the context
-#'   nucleotide of the searchPatterns table.
+#'   \code{\link{mutationPatterns}} is the default search table.
+#' @param searchRefHeader A string with the column name of the one with the
+#'   reference nucleotide in the searchPatterns table.
+#' @param searchAltHeader A string with the column name of the one with the
+#'   alternative nucleotide in the searchPatterns table.
+#' @param searchContextHeader A string with the column name of the one with the
+#'   context nucleotide in the searchPatterns table.
 #' @param searchSource A string with the column name of the ID of the known
-#'   mutations.
-#' @param searchDistanceHeader A string with the column name of the maximum
-#'   distance between clustered mutations. Not needed if the distance parameter
-#'   is NULL. NA's within this column are allowed.
-#' @param searchReverseComplement A boolean to also search in the reverse
-#'   complement of the searchPatterns tibble. When matched the returned ID will
-#'   have [Rev.Com] attached to it.
+#'   pattern.
+#' @param searchDistanceHeader A string with the column name of the one with the
+#'   maximum distance between clustered mutations. Not needed if the distance
+#'   parameter is NULL. NA's within this column are allowed.
+#' @param searchReverseComplement A boolean to also search the patterns in the
+#'   reverse complement of the searchPatterns tibble.
 #' @param patternsAsList A boolean to tell if the return value needs to be in a
-#'   list or not.
-#' @return list or string with the matched patterns.
+#'   list or in a string.
+#' @return list or string with the matched patterns. If nothing's found, return
+#'   an empty list.
 #' @export
 #' @import magrittr
 #' @examples
 #' results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
+#'
+#' # To see the default searchPattern table and it's information:
+#' ?mutationPatterns
+#' mutationPatterns
 linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".", reverseComplement = FALSE,
                          searchPatterns = mutationPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
@@ -83,17 +88,16 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
 
   # Create results -----------------------------------------------------------------
   results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
-                           getAlphaMatches(!!ref,!!dnaSymbols)))
-  results <- dplyr::filter(results, match == T)
-  results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
-                           getAlphaMatches(!!alt,!!dnaSymbols)))
-  results <- dplyr::filter(results, match == T)
-  results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols))
-  results <- dplyr::filter(results, match == T)
+                                                                  getAlphaMatches(!!ref,!!dnaSymbols)))
+  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
+                                                                                getAlphaMatches(!!alt,!!dnaSymbols)))
+
+  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols))
+  results <- results[results$match == T,]
 
   if(!is.null(distance)){
     results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),function(x){ifelse(is.na(x),TRUE,x >= distance)}))
-    results <- dplyr::filter(results, match == T)
+    results <- results[results$match == T,]
   }
 
   if(nrow(results) > 0){
@@ -209,35 +213,4 @@ getNnuc <- function(context1,context2){
 getAlphaMatches <- function(nuc, alphabet){
   return(alphabet[grepl(nuc,alphabet$represent),1])
 }
-
-
-#' getRevComTable
-#' @description A function to get the reverse complement of the known mutations
-getRevComTable <- function(table, refHeader, altHeader, contextHeader, idHeader){
-  table <- dplyr::mutate(table, !!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),function(x){ifelse(nchar(x) == 1,revNuc[x],as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))}))
-  table <- dplyr::mutate(table, !!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),function(x){ifelse(nchar(x) == 1,revNuc[x],as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))}))
-  table <- dplyr::mutate(table, !!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),function(x){
-    as.character(Biostrings::reverseComplement(Biostrings::DNAString(x)))}))
-  table <- dplyr::mutate(table, !!rlang::sym(idHeader) := !!rlang::sym(idHeader))
-
-  return(table)
-}
-
-#' getSearchPatterns
-#' @description A function to get the default search pattern table
-#' @param reverse A Boolean if the reverse complementend also needed to be added
-#' @export
-getSearchPatterns <- function(reverse = TRUE){
-  searchPatterns <- tibble::as.tibble(mutationPatterns)
-
-  if(reverse){
-    searchPatterns <- rbind(searchPatterns,getRevComTable(searchPatterns,
-                                                          refHeader = "ref",
-                                                          altHeader = "alt",
-                                                          contextHeader = "surrounding",
-                                                          idHeader = "process"))
-  }
-  return(searchPatterns)
-}
-
 

@@ -12,9 +12,9 @@ addLinkPatterns(x, refHeader = "ref", altHeader = "alt",
   searchReverseComplement = TRUE, checkHeader = "is.clustered")
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome nr., sampleID and
+\item{x}{A tibble that contains at least chromosome name, sample ID and
 position information. The data cannot contain any NA. For an example use
-createRandomMutations function.}
+\code{\link{createRandomMutations}} function.}
 
 \item{refHeader}{Contains the name of the column with the reference
 nucleotides..}
@@ -22,29 +22,33 @@ nucleotides..}
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
-\item{contextHeader}{A String; The name of the column with the context.}
+\item{contextHeader}{A string with the name of the column with the context.
+The data inside this column is e.g. "C.G" hereby stands the "." for the
+location of the mutation. What symbol is used to describe this location is
+irrelevant but be sure to adjust the \code{mutationSymbol} accordingly when
+searching for patterns. The \code{contextHeader} is irrelevant if
+\code{linkPatterns} is FALSE.}
 
 \item{mutationSymbol}{A string with the symbol that stands for the mutated
-nucleotide location (e.g. "." in G.C).}
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
 
-\item{reverseComplement}{A boolean to tell if the ref, alt and context needed
-to be searched with the reverse complement.}
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
+\code{context} needed to be searched with the reverse complement.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
-data/mutationPatterns.rds is the default search table.}
+\code{\link{mutationPatterns}} is the default search table.}
 
-\item{searchRefHeader}{A string with the column name of the reference
-nucleotide of the searchPatterns table.}
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
 
-\item{searchAltHeader}{A string with the column name of the alternative
-nucleotide of the searchPatterns table.}
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
 
-\item{searchContextHeader}{A string with the column name of the context
-nucleotide of the searchPatterns table.}
+\item{searchContextHeader}{A string with the column name of the one with the
+context nucleotide in the searchPatterns table.}
 
-\item{searchReverseComplement}{A boolean to also search in the reverse
-complement of the searchPatterns tibble. When matched the returned ID will
-have [Rev.Com] attached to it.}
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
 }
 \description{
 addLinkPatterns

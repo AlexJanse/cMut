@@ -12,55 +12,60 @@ linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
   patternsAsList = TRUE)
 }
 \arguments{
-\item{ref}{A string containing the reference nucleotide.}
+\item{ref}{A string containing the reference nucleotide. (e.g. "C")}
 
-\item{alt}{A string containing the alternative nucleotide.}
+\item{alt}{A string containing the alternative nucleotide. (e.g. "T")}
 
-\item{context}{A string containing the surrounding nucleotides (e.g. G.C).}
+\item{context}{A string containing the surrounding nucleotides. (e.g. "G.C")}
 
 \item{distance}{A number that tells the distance to the nearest mutation in a
-cluster. This will be used if a pattern in the search table has een
-maxDistance column.}
+cluster. This parameter should stay NULL unless the \code{searchPatterns}
+table has a distance column and it's needed to be take into acount while
+comparing.}
 
 \item{mutationSymbol}{A string with the symbol that stands for the mutated
-nucleotide location (e.g. "." in G.C).}
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
 
-\item{reverseComplement}{A boolean to tell if the ref, alt and context needed
-to be searched with the reverse complement.}
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
+\code{context} needed to be searched with the reverse complement.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
-data/mutationPatterns.rds is the default search table.}
+\code{\link{mutationPatterns}} is the default search table.}
 
-\item{searchRefHeader}{A string with the column name of the reference
-nucleotide of the searchPatterns table.}
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
 
-\item{searchAltHeader}{A string with the column name of the alternative
-nucleotide of the searchPatterns table.}
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
 
-\item{searchContextHeader}{A string with the column name of the context
-nucleotide of the searchPatterns table.}
+\item{searchContextHeader}{A string with the column name of the one with the
+context nucleotide in the searchPatterns table.}
 
-\item{searchDistanceHeader}{A string with the column name of the maximum
-distance between clustered mutations. Not needed if the distance parameter
-is NULL. NA's within this column are allowed.}
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
 
-\item{searchReverseComplement}{A boolean to also search in the reverse
-complement of the searchPatterns tibble. When matched the returned ID will
-have [Rev.Com] attached to it.}
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
 
 \item{patternsAsList}{A boolean to tell if the return value needs to be in a
-list or not.}
+list or in a string.}
 
 \item{searchSource}{A string with the column name of the ID of the known
-mutations.}
+pattern.}
 }
 \value{
-list or string with the matched patterns.
+list or string with the matched patterns. If nothing's found, return
+  an empty list.
 }
 \description{
 A function that is able to find matches between a submitted
-  unkown mutation and a known mutation table.
+  unkown mutation and a known mutation pattern table.
 }
 \examples{
 results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
+
+# To see the default searchPattern table and it's information:
+?mutationPatterns
+mutationPatterns
 }

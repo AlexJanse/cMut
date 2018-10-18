@@ -12,16 +12,16 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchReverseComplement = TRUE,
   tibble = TRUE, saveEachBootstrap = FALSE, saveFileName = NULL,
-  searchLocationPatterns = FALSE, locationPatternsTable = NULL,
-  locationDistanceHeader = "maxDistance", locationRefHeader = "ref",
-  locationAltHeader = "alt", locationIdHeader = "process")
+  searchClusterPatterns = FALSE)
 }
 \arguments{
 \item{x}{A table with the reference, alternative and surrounding nucleotides.}
 
-\item{chromHeader}{A string; The name of the column with the chromosome nr.}
+\item{chromHeader}{A string with the name of the column with the chromosome
+name. (So the data in the column needs to be notated as e.g. "chr2")}
 
-\item{positionHeader}{A string; The name of the column with the position nr.}
+\item{positionHeader}{A string with the name of the column with the position
+of the mutation. The data in the column needs to be numberic.}
 
 \item{refHeader}{A string with the column header of the reference nucleotide.}
 
@@ -31,7 +31,8 @@ nucleotide.}
 \item{surroundingHeader}{A string with the column header of the surrounding
 nucleotides.}
 
-\item{sampleIdHeader}{A string; The name of the column with the sample ID.}
+\item{sampleIdHeader}{A string with the name of the column with the sample
+ID.}
 
 \item{nBootstrap}{A number with the ammount of bootstraps there need to be
 excecuted.}
@@ -39,26 +40,23 @@ excecuted.}
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}
 
-\item{reverseComplement}{A boolean to tell if the ref, alt and context needed
-to be searched with the reverse complement.}
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
+\code{context} needed to be searched with the reverse complement.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
-data/mutationPatterns.rds is the default search table.}
+\code{\link{mutationPatterns}} is the default search table.}
 
-\item{searchRefHeader}{A string with the column name of the reference
-nucleotide of the searchPatterns table.}
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
 
-\item{searchAltHeader}{A string with the column name of the alternative
-nucleotide of the searchPatterns table.}
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
 
-\item{searchContextHeader}{A string with the column name of the context
-nucleotide of the searchPatterns table.}
+\item{searchContextHeader}{A string with the column name of the one with the
+context nucleotide in the searchPatterns table.}
 
-\item{searchReverseComplement}{A boolean to also search in the reverse
-complement of the searchPatterns tibble. When matched the returned ID will
-have [Rev.Com] attached to it.}
-
-\item{tibble}{A boolean if the table has to be a tibble}
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
 
 \item{saveEachBootstrap}{A boolean if the summaries per bootstrap are needed
 to be saved}

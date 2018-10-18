@@ -8,18 +8,21 @@ identifyClusters(x, maxDistance, chromHeader = "Chr",
   sampleIdHeader = "sampleID", positionHeader = "Pos")
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome nr., sampleID and
+\item{x}{A tibble that contains at least chromosome name, sample ID and
 position information. The data cannot contain any NA. For an example use
-createRandomMutations function.}
+\code{\link{createRandomMutations}} function.}
 
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}
 
-\item{chromHeader}{A string; The name of the column with the chromosome nr.}
+\item{chromHeader}{A string with the name of the column with the chromosome
+name. (So the data in the column needs to be notated as e.g. "chr2")}
 
-\item{sampleIdHeader}{A string; The name of the column with the sample ID.}
+\item{sampleIdHeader}{A string with the name of the column with the sample
+ID.}
 
-\item{positionHeader}{A string; The name of the column with the position nr.}
+\item{positionHeader}{A string with the name of the column with the position
+of the mutation. The data in the column needs to be numberic.}
 }
 \value{
 A atomic character vector; contains per index the chromosoom nr,

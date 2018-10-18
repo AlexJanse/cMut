@@ -62,7 +62,6 @@ groupClusters <- function(table,
 
   # Build table -------------------------------------------------------------------------------------------
   table <- convertFactor(table)
-  table <- data.table::as.data.table(table)
   table <- dplyr::group_by_(table, clusterIdHeader)
   table <- tidyr::nest(table, .key = "cMuts")
   table <- dplyr::filter(table, clusterId!="")
@@ -125,8 +124,9 @@ formatClusterMutations <- function(refs, alts, convert=FALSE) {
   # Create the description symbols per mutation-------------------------------------
 
   if(convert){
-    res <- paste0(Biostrings::reverseComplement(Biostrings::DNAString(refs)), ">",
-                  Biostrings::reverseComplement(Biostrings::DNAString(alts)))
+    seq <- paste0(alts,".",refs)
+    rev <- strsplit(as.character(Biostrings::reverseComplement(Biostrings::DNAString(seq))),"\\.")[[1]]
+    res <- paste(rev[1],rev[2],sep = ">")
   } else {
     res <- paste0(refs, ">", alts)
   }
@@ -153,18 +153,18 @@ getClusterType <- function(plusStrand, minusStrand) {
 #' @param clusterList A tibble with the mutations information.
 #' @param patternHeader A string with the column header of the patterns.
 getPatternIntersect <- function(clusterList,patternHeader){
+  clusterList <- as.data.frame(clusterList)
   patternHeader <- rlang::get_expr(patternHeader)
   patterns <- c()
   counter <- 0
-  allPatterns <-
-    foreach::foreach(index = 1:nrow(clusterList),
-                     .combine = c) %do% {
-                       if(counter == 0){
-                         patterns <- clusterList[index,patternHeader][[1]][[1]]
-                       }
-                       patterns <- intersect(patterns, clusterList[index,patternHeader][[1]][[1]])
-                       counter <- counter+1
-                     }
+  for(index in 1:nrow(clusterList)){
+   if(counter == 0){
+     patterns <- clusterList[index,patternHeader][[1]]
+   }
+   patterns <- intersect(patterns, clusterList[index,patternHeader][[1]])
+   counter <- counter+1
+  }
+
   if(length(patterns) == 0){
     return(c(""))
   }

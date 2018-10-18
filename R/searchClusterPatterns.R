@@ -20,6 +20,7 @@ searchClusterPatterns <- function(groupedClusters,
                                        searchAltHeader,searchDistanceHeader))))
   stopifnot("cMuts" %in% names(groupedClusters))
 
+
   searchPatterns <- as.data.frame(searchPatterns)
   # Call patterns ------------------------------------------------
   clusterPatterns <- list()
@@ -52,3 +53,5 @@ searchClusterPatterns <- function(groupedClusters,
   groupedClusters$clusterPatterns <- NULL
   return(groupedClusters)
 }
+
+

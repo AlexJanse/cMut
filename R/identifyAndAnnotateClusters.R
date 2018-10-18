@@ -1,33 +1,58 @@
 #' identifyAndAnnotateClusters
 #' @description A function that finds and annotate clusters in a genomic data
 #'   tibble.
-#' @param x A tibble that contains at least chromosome nr., sampleID and
+#' @param x A tibble that contains at least chromosome name, sample ID and
 #'   position information. The data cannot contain any NA. For an example use
-#'   createRandomMutations function.
+#'   \code{\link{createRandomMutations}} function.
 #' @param maxDistance A number; The maximum distance between DNA mutations that
 #'   count as clustered.
-#' @param tibble A boolean if the table has to be a tibble
-#' @param chromHeader A string; The name of the column with the chromosome nr.
-#' @param sampleIdHeader A string; The name of the column with the sample ID.
-#' @param positionHeader A string; The name of the column with the position nr.
-#' @param linkPatterns A boolean to tell if patterns are needed to be found. If
-#'   FALSE then the search... parameters are irrelevant.
+#' @param asTibble A boolean if the result table has to be a tibble
+#' @param chromHeader A string with the name of the column with the chromosome
+#'   name. (So the data in the column needs to be notated as e.g. "chr2")
+#' @param sampleIdHeader A string with the name of the column with the sample
+#'   ID.
+#' @param positionHeader A string with the name of the column with the position
+#'   of the mutation. The data in the column needs to be numberic.
+#' @param linkPatterns A Boolean to tell if it's necessary to try and link the
+#'   mutations to patterns. If FALSE then the search... parameters are
+#'   irrelevant.
 #' @inheritParams linkPatterns
 #' @inheritParams groupClusters
-#' @param contextHeader A String; The name of the column with the context.
+#' @param contextHeader A string with the name of the column with the context.
+#'   The data inside this column is e.g. "C.G" hereby stands the "." for the
+#'   location of the mutation. What symbol is used to describe this location is
+#'   irrelevant but be sure to adjust the \code{mutationSymbol} accordingly when
+#'   searching for patterns. The \code{contextHeader} is irrelevant if
+#'   \code{linkPatterns} is FALSE.
 #' @return The tibble that was sent as an argument for this fuction with extra
 #'   columns: clusterId, is.clustered and distance till nearest mutation below
 #'   the maximum distance.
 #' @export
 #' @import magrittr
 #' @examples
+#' # Example data set:
 #' data <- testDataSet
+#'
+#' # Example for just clustering:
 #' results <- identifyAndAnnotateClusters(x = data,
 #'                                        maxDistance = 20000)
-#' resultsWithPatterns <- identifyAndAnnotateClusters(x = data,
+#'
+#' # Example for clustering and linking patterns with the default searchPattern table:
+#' results <- identifyAndAnnotateClusters(x = data,
 #'                                                    maxDistance = 20000,
 #'                                                    linkPatterns = TRUE)
-identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
+#' # See the getSearchPattern funtion for more information about it.
+#'
+#' # For more information about the added columns, use:
+#' cat(comment(results))
+#' @seealso
+#' \itemize{
+#'   \item \code{\link{createRandomMutations}} for an example
+#'   of data as input for parameter \code{x}
+#'   \item \code{\link{mutationPatterns}} for looking at the default pattern search
+#'   table
+#'   }
+identifyAndAnnotateClusters <- function(x, maxDistance, asTibble = TRUE,
                                         chromHeader = "chrom", sampleIdHeader = "sampleIDs",
                                         positionHeader = "start", refHeader = "ref",
                                         altHeader = "alt", contextHeader = "surrounding",
@@ -101,11 +126,29 @@ identifyAndAnnotateClusters <- function(x, maxDistance, tibble = TRUE,
                          searchAltHeader,  searchContextHeader,
                          searchIdHeader, searchReverseComplement)
   }
-  if(tibble){
+  if(asTibble){
     x <- tibble::as.tibble(x)
   } else {
     x <- as.data.frame(x)
   }
+
+  comment(x) <-
+  "Information about the added columns:
+  clusterId       : Column with the ID of a column.
+                    It consist of the chromosome name,
+                    sampleID and the sample unique
+                    cluster ID number. This is al
+                    seperated with a space.
+  is.clustered    : Column with Boolean if the mutation
+                    is part of a cluster.
+
+  (When using the linkPatterns parameter with TRUE):
+  linkedPatterns  : Column with the names from the
+                    searchPatterns table that matched
+                    with the mutation. The names are
+                    put in a vector.
+  is.linked       : Column with Boolean if there are
+                    found patterns for the mutation."
   return(x)
 
 }

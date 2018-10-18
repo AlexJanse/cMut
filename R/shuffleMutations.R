@@ -39,29 +39,28 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              tibble = TRUE,
                              saveEachBootstrap = FALSE,
                              saveFileName = NULL,
-                             searchLocationPatterns = FALSE,
-                             locationPatternsTable = NULL,
-                             locationDistanceHeader = "maxDistance",
-                             locationRefHeader = "ref",
-                             locationAltHeader = "alt",
-                             locationIdHeader = "process"){
+                             searchClusterPatterns = FALSE){
 
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    if(searchLocationPatterns){
-     resultTable <- tibble::as.tibble(getSearchPatterns(location = TRUE))
-    } else {
-      resultTable <- mutationPatterns
-    }
+    resultTable <- getSearchPatterns(reverse = F, asTibble = F)
+    searchPatterns <- getSearchPatterns(reverse = F, asTibble = F)
   } else {
-    resultTable <- searchPatterns
+    resultTable <- convertFactor(as.data.frame(searchPatterns))
+    searchPatterns <- convertFactor(as.data.frame(searchPatterns))
+  }
+
+  if(!searchClusterPatterns){
+    searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns, refHeader)) == 1,]
+    resultTable <- resultTable[nchar(dplyr::pull(resultTable, refHeader)) == 1,]
   }
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
   if(searchReverseComplement){
     i <- getRevComTable(resultTable,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader)
     resultTable <- rbind(resultTable,i)
+    searchPatterns <- getRevComTable(searchPatterns,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader)
   }
 
 
@@ -69,7 +68,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
 
   # Add a frequence column to fill up during bootstrapping
   resultTable[nrow(resultTable)+1,searchIdHeader] <- "Unidentified"
-  resultTable <- tibble::tibble(!!rlang::sym(searchIdHeader) := unique(resultTable[,searchIdHeader])[[1]])
+  resultTable <- tibble::tibble(!!rlang::sym(searchIdHeader) := unique(resultTable[,searchIdHeader]))
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
   # Prepare for parallel loop
@@ -84,23 +83,30 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                                        positionHeader,
                                        refHeader,
                                        altHeader,
-                                       surroundingHeader
-                                       ,sampleIdHeader
-    )
+                                       surroundingHeader,
+                                       sampleIdHeader)
 
     # Identify, annotate and group clustered mutations --------------------------
     clusterTablePerMut <- identifyAndAnnotateClusters(x = shuffleTable,
                                                       maxDistance = maxDistance,
                                                       positionHeader = "pos",
-                                                      linkPatterns = !searchLocationPatterns)
+                                                      linkPatterns = TRUE,
+                                                      searchPatterns = searchPatterns,
+                                                      searchRefHeader = searchRefHeader,
+                                                      searchAltHeader = searchAltHeader,
+                                                      searchContextHeader = searchContextHeader,
+                                                      searchIdHeader = searchIdHeader,
+                                                      searchReverseComplement = FALSE)
+
     clusterTable <- groupClusters(clusterTablePerMut,
-                                  patternIntersect = !searchLocationPatterns,
+                                  patternIntersect = TRUE,
                                   showWarning = F,
-                                  searchLocationPatterns = searchLocationPatterns,
-                                  locationRefHeader = searchRefHeader,
-                                  locationAltHeader = searchAltHeader,
-                                  locationDistanceHeader = locationDistanceHeader,
-                                  locationReverseComplement = searchReverseComplement)
+                                  searchClusterPatterns = searchClusterPatterns,
+                                  searchPatterns = searchPatterns[nchar(dplyr::pull(searchPatterns,searchRefHeader)) > 1,],
+                                  searchRefHeader = searchRefHeader,
+                                  searchAltHeader = searchAltHeader,
+                                  searchIdHeader = searchIdHeader,
+                                  searchReverseComplement = FALSE)
 
 
     # Add the frequencies of patterns to the resultTable -----------------------
@@ -108,8 +114,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
     subResultTable <- createSummaryPatterns(clusterTable,
                                             searchPatterns = subResultTable,
                                             searchIdHeader,
-                                            random = T,
-                                            locationBased = searchLocationPatterns)
+                                            random = T)
 
     total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,]))
     subResultTable <- rbind(subResultTable,total)
@@ -126,6 +131,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   for(table in resultTables){
     resultTable <- data.table::data.table(process = table$process, frequency = resultTable$frequency + table$frequency)
   }
+
   total <- resultTable[resultTable$process == "total",2][[1]]
   resultTable <- resultTable[resultTable$process != "total",]
 
@@ -237,26 +243,18 @@ createShuffleTable <-  function(x,chromHeader,
 createSummaryPatterns <- function(clusterTable,
                                   searchPatterns,
                                   searchIdHeader,
-                                  random = FALSE,
-                                  locationBased = FALSE){
-  if(locationBased){
-    checkHeader <- "has.locPatterns"
-    patternHeader <- "locationPatterns"
-  } else {
-    checkHeader <- "has.intersect"
-    patternHeader <- "patternIntersect"
-  }
+                                  random = FALSE){
+
   if(nrow(clusterTable) == 0){
     return(searchPatterns)
   }
   clusterTable <- data.table::as.data.table(clusterTable)
-  condition <- clusterTable[,checkHeader]
+  condition <- clusterTable[,"has.intersect"]
   nonIntersectFreq <- 0
 
   for(index in 1:nrow(clusterTable)){
     if(condition[index]){
-
-      for(pattern in clusterTable[index,patternHeader][[1]]) {
+      for(pattern in clusterTable[index,"foundPatterns"][[1]]) {
         if(random){
           addFreq <- sum(clusterTable[index,"cMuts"][[1]][,"n"])
         } else {

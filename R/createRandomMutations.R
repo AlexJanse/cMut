@@ -76,7 +76,7 @@ createRandomMutations <- function(nMut = 500,
   start : start position of the mutation,
   (random generated but with the borders of the human reference genome)
   stop : stop position of the mutation
-  ref : the nucleotide on the reference (also random generated)
+  ref : the nucleotide on the reference
   alt : the nucleotife that the sample has
   sampleName : name of the random sample
   surrounding : the direct linked nucleotides surrounding the mutation"

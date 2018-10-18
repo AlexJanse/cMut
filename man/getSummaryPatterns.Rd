@@ -4,15 +4,12 @@
 \alias{getSummaryPatterns}
 \title{getSummaryPatterns}
 \usage{
-getSummaryPatterns(clusterTable, searchPatterns = NULL,
-  searchIdHeader = "process", searchReverseComplement = TRUE,
-  locationBased = FALSE)
+getSummaryPatterns(groupedClusters, searchPatterns = NULL,
+  searchIdHeader = "process", searchReverseComplement = TRUE)
 }
 \arguments{
-\item{clusterTable}{Table with cluster information}
-
 \item{searchPatterns}{A tibble with the known mutation patterns. The
-data/mutationPatterns.rds is the default search table.}
+\code{\link{mutationPatterns}} is the default search table.}
 }
 \description{
 A function to summarise the found patterns

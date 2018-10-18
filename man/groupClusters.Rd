@@ -23,8 +23,6 @@ nucleotides..}
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
-\item{tibble}{A boolean if the table has to be a tibble}
-
 \item{patternIntersect}{Boolean if the table contains patterns and these
 needed to be processed aswell.}
 

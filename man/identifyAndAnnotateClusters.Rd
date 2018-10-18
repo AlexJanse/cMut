@@ -4,7 +4,7 @@
 \alias{identifyAndAnnotateClusters}
 \title{identifyAndAnnotateClusters}
 \usage{
-identifyAndAnnotateClusters(x, maxDistance, tibble = TRUE,
+identifyAndAnnotateClusters(x, maxDistance, asTibble = TRUE,
   chromHeader = "chrom", sampleIdHeader = "sampleIDs",
   positionHeader = "start", refHeader = "ref", altHeader = "alt",
   contextHeader = "surrounding", mutationSymbol = ".",
@@ -15,20 +15,23 @@ identifyAndAnnotateClusters(x, maxDistance, tibble = TRUE,
   patternsAsList = TRUE)
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome nr., sampleID and
+\item{x}{A tibble that contains at least chromosome name, sample ID and
 position information. The data cannot contain any NA. For an example use
-createRandomMutations function.}
+\code{\link{createRandomMutations}} function.}
 
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}
 
-\item{tibble}{A boolean if the table has to be a tibble}
+\item{asTibble}{A boolean if the result table has to be a tibble}
 
-\item{chromHeader}{A string; The name of the column with the chromosome nr.}
+\item{chromHeader}{A string with the name of the column with the chromosome
+name. (So the data in the column needs to be notated as e.g. "chr2")}
 
-\item{sampleIdHeader}{A string; The name of the column with the sample ID.}
+\item{sampleIdHeader}{A string with the name of the column with the sample
+ID.}
 
-\item{positionHeader}{A string; The name of the column with the position nr.}
+\item{positionHeader}{A string with the name of the column with the position
+of the mutation. The data in the column needs to be numberic.}
 
 \item{refHeader}{Contains the name of the column with the reference
 nucleotides..}
@@ -36,35 +39,40 @@ nucleotides..}
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
-\item{contextHeader}{A String; The name of the column with the context.}
+\item{contextHeader}{A string with the name of the column with the context.
+The data inside this column is e.g. "C.G" hereby stands the "." for the
+location of the mutation. What symbol is used to describe this location is
+irrelevant but be sure to adjust the \code{mutationSymbol} accordingly when
+searching for patterns. The \code{contextHeader} is irrelevant if
+\code{linkPatterns} is FALSE.}
 
 \item{mutationSymbol}{A string with the symbol that stands for the mutated
-nucleotide location (e.g. "." in G.C).}
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
 
-\item{linkPatterns}{A boolean to tell if patterns are needed to be found. If
-FALSE then the search... parameters are irrelevant.}
+\item{linkPatterns}{A Boolean to tell if it's necessary to try and link the
+mutations to patterns. If FALSE then the search... parameters are
+irrelevant.}
 
-\item{reverseComplement}{A boolean to tell if the ref, alt and context needed
-to be searched with the reverse complement.}
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
+\code{context} needed to be searched with the reverse complement.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
-data/mutationPatterns.rds is the default search table.}
+\code{\link{mutationPatterns}} is the default search table.}
 
-\item{searchRefHeader}{A string with the column name of the reference
-nucleotide of the searchPatterns table.}
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
 
-\item{searchAltHeader}{A string with the column name of the alternative
-nucleotide of the searchPatterns table.}
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
 
-\item{searchContextHeader}{A string with the column name of the context
-nucleotide of the searchPatterns table.}
+\item{searchContextHeader}{A string with the column name of the one with the
+context nucleotide in the searchPatterns table.}
 
-\item{searchReverseComplement}{A boolean to also search in the reverse
-complement of the searchPatterns tibble. When matched the returned ID will
-have [Rev.Com] attached to it.}
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
 
 \item{patternsAsList}{A boolean to tell if the return value needs to be in a
-list or not.}
+list or in a string.}
 }
 \value{
 The tibble that was sent as an argument for this fuction with extra
@@ -76,10 +84,27 @@ A function that finds and annotate clusters in a genomic data
   tibble.
 }
 \examples{
+# Example data set:
 data <- testDataSet
+
+# Example for just clustering:
 results <- identifyAndAnnotateClusters(x = data,
                                        maxDistance = 20000)
-resultsWithPatterns <- identifyAndAnnotateClusters(x = data,
+
+# Example for clustering and linking patterns with the default searchPattern table:
+results <- identifyAndAnnotateClusters(x = data,
                                                    maxDistance = 20000,
                                                    linkPatterns = TRUE)
+# See the getSearchPattern funtion for more information about it.
+
+# For more information about the added columns, use:
+cat(comment(results))
+}
+\seealso{
+\itemize{
+  \item \code{\link{createRandomMutations}} for an example
+  of data as input for parameter \code{x}
+  \item \code{\link{mutationPatterns}} for looking at the default pattern search
+  table
+  }
 }

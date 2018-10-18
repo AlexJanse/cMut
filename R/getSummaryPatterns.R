@@ -5,23 +5,16 @@
 #' @examples
 #' data <- testDataSet
 #' results <- identifyAndAnnotateclusters(data,20000,linkPatterns == T)
-getSummaryPatterns <- function(clusterTable,
+getSummaryPatterns <- function(groupedClusters,
                              searchPatterns = NULL,
                              searchIdHeader = "process",
-                             searchReverseComplement = TRUE,
-                             locationBased = FALSE){
+                             searchReverseComplement = TRUE){
 
   # get or check the searchPatterns table -----------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    if(locationBased){
-      searchPatterns <- tibble::as.tibble(data.frame(process = unique(locationPatterns[,"process"])
-                                                     ,stringsAsFactors = F))
-    } else {
-      searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[,"process"])
+    searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[,"process"])
                                                 ,stringsAsFactors = F))
-    }
-
   } else {
     # check if the assigned headers are present in the given table
     stopifnot(any(grepl(searchIdHeader,names(searchPatterns))))
@@ -36,13 +29,13 @@ getSummaryPatterns <- function(clusterTable,
 
 
   # Count the amount of mutations per pattern per cluster ------------------------
-  table <- createSummaryPatterns(clusterTable,
+  table <- createSummaryPatterns(groupedClusters,
                                  searchPatterns,
-                                 searchIdHeader, random = F, locationBased = locationBased)
+                                 searchIdHeader, random = F)
 
   # Determine the total clustered mutations --------------------------------------
   total <- 0
-  for(cMut in clusterTable$cMuts){
+  for(cMut in groupedClusters$cMuts){
     total <- total+nrow(cMut)
   }
 

@@ -10,9 +10,11 @@ createShuffleTable(x, chromHeader, positionHeader, refHeader, altHeader,
 \arguments{
 \item{x}{A table with the reference, alternative and surrounding nucleotides.}
 
-\item{chromHeader}{A string; The name of the column with the chromosome nr.}
+\item{chromHeader}{A string with the name of the column with the chromosome
+name. (So the data in the column needs to be notated as e.g. "chr2")}
 
-\item{positionHeader}{A string; The name of the column with the position nr.}
+\item{positionHeader}{A string with the name of the column with the position
+of the mutation. The data in the column needs to be numberic.}
 
 \item{refHeader}{A string with the column header of the reference nucleotide.}
 
@@ -22,7 +24,8 @@ nucleotide.}
 \item{surroundingHeader}{A string with the column header of the surrounding
 nucleotides.}
 
-\item{sampleIdHeader}{A string; The name of the column with the sample ID.}
+\item{sampleIdHeader}{A string with the name of the column with the sample
+ID.}
 }
 \description{
 A function to bootstrap the mutation table

@@ -5,13 +5,13 @@
 \title{createSummaryPatterns}
 \usage{
 createSummaryPatterns(clusterTable, searchPatterns, searchIdHeader,
-  random = FALSE, locationBased = FALSE)
+  random = FALSE)
 }
 \arguments{
 \item{clusterTable}{Table with cluster information}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
-data/mutationPatterns.rds is the default search table.}
+\code{\link{mutationPatterns}} is the default search table.}
 
 \item{grouped}{A Boolean to tell if the data is grouped or not}
 }
