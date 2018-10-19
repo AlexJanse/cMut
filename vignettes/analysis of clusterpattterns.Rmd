@@ -157,6 +157,12 @@ groups <- groupClusters(table = results,
 head(groups)
 groups[groups$has.clusterPatterns == T | groups$has.intersect == T,]$foundPatterns
 ```
+
+for more information about the columns of the group function, use:
+```{r include = TRUE}
+cat(comment(groups))
+```
+
 ## getSummaryPatterns
 Because analyzing the results of the `groupClusters()` function might be a lot of work, cMut provides the `getSummaryPatterns()` function to summaries the pattern intersection. The result of this function will show the frequency of the patterns (the number of mutations in the matching clusters with this pattern) and the percentage (frequency pattern is compared with the number of clustered mutations). The `unidentified` row contains the information about the clusters that didn't have a linked pattern.
 ```{r include = TRUE}
