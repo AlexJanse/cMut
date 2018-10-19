@@ -13,36 +13,39 @@ groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
 }
 \arguments{
 \item{table}{A table with columns containing cluster ID's, reference and
-alternative nucleotide.}
+alternative nucleotide. See the output of the
+\code{\link{identifyAndAnnotateClusters}} function for more information about the
+table.}
 
 \item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
 
 \item{refHeader}{Contains the name of the column with the reference
-nucleotides..}
+nucleotides.}
 
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
-\item{patternIntersect}{Boolean if the table contains patterns and these
+\item{patternIntersect}{A Boolean if the table contains patterns and these
 needed to be processed aswell.}
 
-\item{searchClusterPatterns}{A boolean if it's needed to search to cluster
+\item{searchClusterPatterns}{A Boolean if it's needed to search to cluster
 patterns (e.g. GA > TT).}
 
 \item{patternHeader}{A string with the column name of the patterns. Only in
 use when patternIntersect is TRUE.}
 
-\item{showWarning}{A boolean if there need to be a warning if nrow is 0}
+\item{showWarning}{A Boolean if there need to be a warning if nrow is 0.}
 }
 \description{
 A function that will group the clusters and give the mutation
   consensus back.
 }
 \examples{
-# Example of a table containing the right columns and data
+# Example of a table containing the right columns and data for the
+# identifiAndAnnotateClusters function:
 test <- testDataSet
 
-# Example of using this function without linking it with patterns
+# Example of using this function without linking it without patterns
 mutations <- identifyAndAnnotateClusters(x = test,
                                          maxDistance = 20000,
                                          chromHeader = "chrom",
@@ -52,7 +55,7 @@ mutations <- identifyAndAnnotateClusters(x = test,
 clusters <- groupClusters(table = mutations,
                           patternIntersect = FALSE)
 
-# Example of using this function with linking it with patterns
+# Example of using this function with data that contain patterns:
 mutations <- identifyAndAnnotateClusters(x = test,
                                          maxDistance = 20000,
                                          chromHeader = "chrom",
@@ -61,4 +64,14 @@ mutations <- identifyAndAnnotateClusters(x = test,
                                          linkPatterns = TRUE)
 clusters <- groupClusters(table = mutations,
                           patternIntersect = TRUE)
+
+# Example of using this function when it is needed to search for
+# cluster patterns. Use ?mutationPatterns to learn about the
+# difference between mutation patterns and cluster patterns.
+clusters <- groupClusters(table = mutations,
+                          patternsInterSect = TRUE,
+                          searchClusterPatterns = TRUE)
+
+# For more information about the table:
+cat(comment(clusters))
 }

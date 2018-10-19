@@ -34,7 +34,7 @@ ID.}
 of the mutation. The data in the column needs to be numberic.}
 
 \item{refHeader}{Contains the name of the column with the reference
-nucleotides..}
+nucleotides.}
 
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}

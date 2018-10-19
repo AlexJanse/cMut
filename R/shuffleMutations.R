@@ -1,8 +1,12 @@
 #' shuffleMutations
 #' @description A function to shuffle the reference, alternative and surrounding
-#'   nucleotides. Usefull to determine the chance that the results of your data
-#'   might be due randomness.
+#'   nucleotides. Then it will use the \code{\link{identifyAndAnnotateClusters}}
+#'   and \code{\link{groupClusters}} functions and returns a summary of the
+#'   frequency of found patterns.
 #' @param x A table with the reference, alternative and surrounding nucleotides.
+#'   The best data to use is the output of the
+#'   \code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
+#'   TRUE.
 #' @param refHeader A string with the column header of the reference nucleotide.
 #' @param altHeader A string with the column header of the alternative
 #'   nucleotide.
@@ -12,7 +16,7 @@
 #'   excecuted.
 #' @inheritParams linkPatterns
 #' @inheritParams identifyAndAnnotateClusters
-#' @param saveEachBootstrap A boolean if the summaries per bootstrap are needed
+#' @param saveEachBootstrap A Boolean if the summaries per bootstrap are needed
 #'   to be saved
 #' @param saveFileName A string with the name and location of the file that
 #'   contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.
@@ -21,6 +25,17 @@
 #' @import doParallel
 #' @import compiler
 #' @export
+#' @examples
+#' identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = T)
+#'
+#' # If only the mutation patterns are needed searched:
+#' shuffleResults <- shuffleMutations(identResults,nBootstrap = 5)
+#'
+#' # If also the cluster patterns are needed to be added:
+#' shuffleResults <- shuffleMutations(identResults,
+#'                                    nBootstrap = 5,
+#'                                    searchClusterPatterns = T)
+#'
 shuffleMutations <- function(x,chromHeader = "chrom",
                              positionHeader = "start",
                              refHeader = "ref",
@@ -141,6 +156,23 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   } else {
     results <- dplyr::mutate(resultTable, percentage = rep.int(0, nrow(resultTable)))
   }
+
+  comment(results) <-
+    "
+    Information about the summary table columns:
+    *searchIdHeader*     : Column with the pattern IDs from
+                           the searchPatterns table.
+    frequency            : Column with the number of mutations
+                           that had this pattern ID as intersect
+                           of their cluster.
+    percentage           : Column with the percentage of the
+                           frequency. Please notice that it is
+                           possible to have a total percentage
+                           above 100% since clusters may be
+                           linked with multiple patterns. However
+                           the total percentage should never be
+                           below 100%.
+  "
 
   if(tibble){
     return(tibble::as.tibble(results))

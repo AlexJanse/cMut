@@ -17,7 +17,7 @@ position information. The data cannot contain any NA. For an example use
 \code{\link{createRandomMutations}} function.}
 
 \item{refHeader}{Contains the name of the column with the reference
-nucleotides..}
+nucleotides.}
 
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}

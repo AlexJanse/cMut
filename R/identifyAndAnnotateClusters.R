@@ -134,6 +134,8 @@ identifyAndAnnotateClusters <- function(x, maxDistance, asTibble = TRUE,
 
   comment(x) <-
   "Information about the added columns:
+  distance        : Column with the distances to
+                    the nearest mutation.
   clusterId       : Column with the ID of a column.
                     It consist of the chromosome name,
                     sampleID and the sample unique

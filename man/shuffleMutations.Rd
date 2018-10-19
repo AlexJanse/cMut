@@ -15,7 +15,10 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   searchClusterPatterns = FALSE)
 }
 \arguments{
-\item{x}{A table with the reference, alternative and surrounding nucleotides.}
+\item{x}{A table with the reference, alternative and surrounding nucleotides.
+The best data to use is the output of the
+\code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
+TRUE.}
 
 \item{chromHeader}{A string with the name of the column with the chromosome
 name. (So the data in the column needs to be notated as e.g. "chr2")}
@@ -58,7 +61,7 @@ context nucleotide in the searchPatterns table.}
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
-\item{saveEachBootstrap}{A boolean if the summaries per bootstrap are needed
+\item{saveEachBootstrap}{A Boolean if the summaries per bootstrap are needed
 to be saved}
 
 \item{saveFileName}{A string with the name and location of the file that
@@ -66,6 +69,19 @@ contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding
-  nucleotides. Usefull to determine the chance that the results of your data
-  might be due randomness.
+  nucleotides. Then it will use the \code{\link{identifyAndAnnotateClusters}}
+  and \code{\link{groupClusters}} functions and returns a summary of the
+  frequency of found patterns.
+}
+\examples{
+identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = T)
+
+# If only the mutation patterns are needed searched:
+shuffleResults <- shuffleMutations(identResults,nBootstrap = 5)
+
+# If also the cluster patterns are needed to be added:
+shuffleResults <- shuffleMutations(identResults,
+                                   nBootstrap = 5,
+                                   searchClusterPatterns = T)
+
 }

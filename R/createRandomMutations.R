@@ -2,11 +2,12 @@
 #' @description Function to generate random data in a tibble with DNA mutation
 #'   information. For explanation of the columns use cat(comment(<returned
 #'   object>))
-#' @param nMut number of mutations that needed to be generated
-#' @param sampleName A name for the test sample
-#' @param tibble A boolean if the table has to be a tibble
+#' @param nMut The number of mutations that needed to be generated.
+#' @param sampleName A name for the test sample.
+#' @param tibble A Boolean if the returned table needs to be a tibble.
 #' @param sizeSur A number with the ammount of nucleotides left and right of the
-#'   mutation. (e.g. sizeSur = 2; CC.GT)
+#'   mutation. (e.g. sizeSur = 2 --> "CC.GT")
+#' @param refGenome A boolean with the prefered reference genome. If TRUE: the reference will be hg19. if FALSE: HG38.
 #' @return A tibble with mutation information
 #' @export
 #' @import magrittr
@@ -20,7 +21,8 @@
 createRandomMutations <- function(nMut = 500,
                                   sampleName = "testSample",
                                   tibble = TRUE,
-                                  sizeSur = 2){
+                                  sizeSur = 2,
+                                  refGenomeHg19 = TRUE){
 
   stopifnot(sizeSur > 1)
 
@@ -32,12 +34,21 @@ createRandomMutations <- function(nMut = 500,
                  "chr13","chr14","chr15","chr16",
                  "chr17","chr18","chr19","chr20",
                  "chr21","chr22","chrX","chrY")
-  lenChrom <- c(249250621, 243199373, 198022430, 191154276,
-                180915260, 171115067, 159138663, 146364022,
-                141213431, 135534747, 135006516, 133851895,
-                115169878, 107349540, 102531392, 90354753,
-                81195210, 78077248, 59128983, 63025520,
-                48129895, 51304566, 155270560, 59373566)
+  if(refGenomeHg19){
+    lenChrom <- c(249250621, 243199373, 198022430, 191154276,
+                  180915260, 171115067, 159138663, 146364022,
+                  141213431, 135534747, 135006516, 133851895,
+                  115169878, 107349540, 102531392, 90354753,
+                  81195210, 78077248, 59128983, 63025520,
+                  48129895, 51304566, 155270560, 59373566)
+  } else {
+    lenChrom <- c(248956422, 242193529, 198295559, 190214555,
+                  181538259, 170805979, 159345973, 145138636,
+                  138394717, 133797422, 135086622, 133275309,
+                  114364328, 107043718, 101991189, 90338345,
+                  83257441, 80373285, 58617616, 64444167,
+                  46709983, 50818468, 156040895, 57227415)
+  }
   names(lenChrom) <- nameChrom
 
   # Check argument ----------------------------------------------------------
@@ -55,7 +66,7 @@ createRandomMutations <- function(nMut = 500,
   randomTable <- dplyr::mutate(randomTable, stop = start)
   randomTable <- dplyr::mutate(randomTable, irange = paste(chrom,start,stop,sep = "-"))
   randomTable <- dplyr::mutate(randomTable, sampleIDs = sampleName)
-  randomTable <- dplyr::mutate(randomTable, refdata = purrr::map2_chr(chrom,start,function(x,y){getRefData(x,y,sizeSur, lenChrom = !!lenChromEnquo)}))
+  randomTable <- dplyr::mutate(randomTable, refdata = purrr::map2_chr(chrom,start,function(x,y){getRefData(x,y,sizeSur, lenChrom = !!lenChromEnquo, refGenomeHg19)}))
   randomTable <- dplyr::mutate(randomTable, surrounding = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][1]}))
   randomTable <- dplyr::mutate(randomTable, ref = purrr::map_chr(refdata,function(x){strsplit(x,"-")[[1]][2]}))
   randomTable <- dplyr::mutate(randomTable, alt = purrr::map_chr(ref, ~sample(setdiff(nucleotides, c(.)),1)))
@@ -72,14 +83,14 @@ createRandomMutations <- function(nMut = 500,
 
   comment(randomTable) <-
     " A random generated tibble with the following information
-  chrom : Name of the chromosome
-  start : start position of the mutation,
-  (random generated but with the borders of the human reference genome)
-  stop : stop position of the mutation
-  ref : the nucleotide on the reference
-  alt : the nucleotife that the sample has
-  sampleName : name of the random sample
-  surrounding : the direct linked nucleotides surrounding the mutation"
+  chrom       : Name of the chromosome
+  start       : Start position of the mutation,
+                (random generated but with the borders of the human reference genome)
+  stop        : Stop position of the mutation. Always the same as start.
+  ref         : The nucleotide on the reference genome HG19.
+  alt         : The nucleotife that the sample has
+  sampleName  : Name of the random sample
+  surrounding : The direct linked nucleotides surrounding the mutation"
 
   return(randomTable)
 }
@@ -90,7 +101,7 @@ createRandomMutations <- function(nMut = 500,
 #' @param x A string that contains the chromosome name, start and stop location
 #'   and is seperated by "-"
 #' @param lenChrom A vector with chromosomes length
-getRef <- function(x,lenChrom){
+getRef <- function(x,lenChrom, refGenomeHg19){
   data <- unlist(strsplit(x,"\\-"))
   chr <- as.character(data[1])
   start <- as.numeric(data[2])
@@ -99,7 +110,11 @@ getRef <- function(x,lenChrom){
     return("")
   }
   range <- GenomicRanges::GRanges(chr,IRanges::IRanges(start,stop))
-  return(as.character(BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19,range)))
+  if(refGenomeHg19){
+    return(as.character(BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19,range)))
+  } else {
+    return(as.character(BSgenome::getSeq(BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,range)))
+  }
 }
 
 #' getRefData
@@ -110,7 +125,7 @@ getRef <- function(x,lenChrom){
 #'   arround the mutation.
 #' @param table A table containing the mutation information
 #' @inherit getRef
-getRefData <- function(chr,pos,sizeSur,lenChrom){
+getRefData <- function(chr,pos,sizeSur,lenChrom, refGenomeHg19){
   lenChrom <- rlang::get_expr(lenChrom)
   sizeSur <- rlang::get_expr(sizeSur)
   maxPos <- lenChrom[chr]
@@ -123,7 +138,7 @@ getRefData <- function(chr,pos,sizeSur,lenChrom){
   if(stop > maxPos){
     stop <- maxPos
   }
-  context <- getRef(paste(chr,start,stop,sep = "-"),lenChrom)
+  context <- getRef(paste(chr,start,stop,sep = "-"),lenChrom,refGenomeHg19)
   if(pos == start){
     mutPos <- 1
   } else if(pos == maxPos){

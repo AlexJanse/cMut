@@ -1,9 +1,11 @@
 Package: cMut
 Type: Package
-Title: Identify and annotate clustal mutations 
+Title: Identify and annotate clustered mutations and link to patterns.
 Version: 0.1.0
 Authors@R: person("Alex", "Janse", email = "alex.janse@radboudumc.nl", role = c("aut", "cre"))
-Description: Identify and annotate clustered mutations from a data.frame.
+Description: cMut is capable to find clusters and link them to mutation patterns. 
+             It also provide a stimulation function to determine the reliability 
+             of the found pattern results.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
@@ -14,11 +16,12 @@ imports: AnnotationHub ,
          igraph ,
          tidyverse ,
          BSgenome.Hsapiens.UCSC.hg19 ,
+         BSgenome.Hsapiens.UCSC.hg38 ,
          VariantAnnotation ,
          foreach ,
          data.table ,
          doParallel
 Suggests: testthat,
-    knitr,
-    rmarkdown
+          knitr,
+          rmarkdown
 VignetteBuilder: knitr

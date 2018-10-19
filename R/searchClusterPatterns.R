@@ -1,8 +1,10 @@
 #' searchClusterPatterns
-#' @param groupedClusters Table gained by using the groupClusters function.
+#' @description A function to search cluster patterns based on reference,
+#'   variant and distance of the nucleotides within the cluster.
+#' @param groupedClusters Table gained by using the \code{\link{groupClusters}}
+#'   function.
 #' @inheritParams groupClusters
 #' @import magrittr
-#' @export
 searchClusterPatterns <- function(groupedClusters,
                                   searchPatterns = mutationPatterns,
                                   searchRefHeader = "ref",
@@ -32,8 +34,14 @@ searchClusterPatterns <- function(groupedClusters,
       refPat <- searchPatterns[pattIndex,searchRefHeader]
       altPat <- searchPatterns[pattIndex,searchAltHeader]
       maxDistance <- searchPatterns[pattIndex, searchDistanceHeader]
-      if(grepl(refPat,row$refs) & grepl(altPat,row$alts) & row$distance <= maxDistance){
-        subclusterPatterns[length(subclusterPatterns)+1] <- id
+      if(grepl(refPat,row$refs) & grepl(altPat,row$alts)){
+        location <- gregexpr(refPat, row$refs)
+        position <- location[[1]][1]
+        end <- position+(attr(location[[1]],"match.length")-1)
+        clusterDistance <- max(row$distance[[1]][position:end])
+        if(clusterDistance <= maxDistance){
+          subclusterPatterns[length(subclusterPatterns)+1] <- id
+        }
       }
     }
     if(is.null(subclusterPatterns)){

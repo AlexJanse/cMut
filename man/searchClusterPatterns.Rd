@@ -9,8 +9,10 @@ searchClusterPatterns(groupedClusters, searchPatterns = mutationPatterns,
   searchDistanceHeader = "maxDistance", searchIdHeader = "process")
 }
 \arguments{
-\item{groupedClusters}{Table gained by using the groupClusters function.}
+\item{groupedClusters}{Table gained by using the \code{\link{groupClusters}}
+function.}
 }
 \description{
-searchClusterPatterns
+A function to search cluster patterns based on reference,
+  variant and distance of the nucleotides within the cluster.
 }

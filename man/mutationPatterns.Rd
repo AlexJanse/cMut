@@ -4,7 +4,7 @@
 \name{mutationPatterns}
 \alias{mutationPatterns}
 \title{Mutation patterns of mutators}
-\format{A data frame with 10 rows and 4 columns \describe{
+\format{A data frame with 15 rows and 5 columns \describe{
   \item{process}{*A process that is connected with the mutation pattern.}
   \item{ref}{*Nucleotide that is found in the reference genome.}
   \item{alt}{*Nucleotide that the reference is transformed/mutated in.}

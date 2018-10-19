@@ -5,17 +5,19 @@
 \title{createRandomMutations}
 \usage{
 createRandomMutations(nMut = 500, sampleName = "testSample",
-  tibble = TRUE, sizeSur = 2)
+  tibble = TRUE, sizeSur = 2, refGenomeHg19 = TRUE)
 }
 \arguments{
-\item{nMut}{number of mutations that needed to be generated}
+\item{nMut}{The number of mutations that needed to be generated.}
 
-\item{sampleName}{A name for the test sample}
+\item{sampleName}{A name for the test sample.}
 
-\item{tibble}{A boolean if the table has to be a tibble}
+\item{tibble}{A Boolean if the returned table needs to be a tibble.}
 
 \item{sizeSur}{A number with the ammount of nucleotides left and right of the
-mutation. (e.g. sizeSur = 2; CC.GT)}
+mutation. (e.g. sizeSur = 2 --> "CC.GT")}
+
+\item{refGenome}{A boolean with the prefered reference genome. If TRUE: the reference will be hg19. if FALSE: HG38.}
 }
 \value{
 A tibble with mutation information

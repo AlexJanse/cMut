@@ -2,28 +2,31 @@
 #' @description A function that will group the clusters and give the mutation
 #'   consensus back.
 #' @param table A table with columns containing cluster ID's, reference and
-#'   alternative nucleotide.
+#'   alternative nucleotide. See the output of the
+#'   \code{\link{identifyAndAnnotateClusters}} function for more information about the
+#'   table.
 #' @param clusterIdHeader Contains the name of the column with the cluster IDs.
 #' @param refHeader Contains the name of the column with the reference
-#'   nucleotides..
+#'   nucleotides.
 #' @param altHeader Contains the name of the column with the alternative
 #'   nucleotides.
-#' @param patternIntersect Boolean if the table contains patterns and these
+#' @param patternIntersect A Boolean if the table contains patterns and these
 #'   needed to be processed aswell.
 #' @param patternHeader A string with the column name of the patterns. Only in
 #'   use when patternIntersect is TRUE.
-#' @param showWarning A boolean if there need to be a warning if nrow is 0
-#' @param searchClusterPatterns A boolean if it's needed to search to cluster
+#' @param showWarning A Boolean if there need to be a warning if nrow is 0.
+#' @param searchClusterPatterns A Boolean if it's needed to search to cluster
 #'   patterns (e.g. GA > TT).
 #' @inheritParams identifyAndAnnotateClusters
 #' @export
 #' @import magrittr
 #' @import foreach
 #' @examples
-#' # Example of a table containing the right columns and data
+#' # Example of a table containing the right columns and data for the
+#' # identifiAndAnnotateClusters function:
 #' test <- testDataSet
 #'
-#' # Example of using this function without linking it with patterns
+#' # Example of using this function without linking it without patterns
 #' mutations <- identifyAndAnnotateClusters(x = test,
 #'                                          maxDistance = 20000,
 #'                                          chromHeader = "chrom",
@@ -33,7 +36,7 @@
 #' clusters <- groupClusters(table = mutations,
 #'                           patternIntersect = FALSE)
 #'
-#' # Example of using this function with linking it with patterns
+#' # Example of using this function with data that contain patterns:
 #' mutations <- identifyAndAnnotateClusters(x = test,
 #'                                          maxDistance = 20000,
 #'                                          chromHeader = "chrom",
@@ -42,6 +45,16 @@
 #'                                          linkPatterns = TRUE)
 #' clusters <- groupClusters(table = mutations,
 #'                           patternIntersect = TRUE)
+#'
+#' # Example of using this function when it is needed to search for
+#' # cluster patterns. Use ?mutationPatterns to learn about the
+#' # difference between mutation patterns and cluster patterns.
+#' clusters <- groupClusters(table = mutations,
+#'                           patternsInterSect = TRUE,
+#'                           searchClusterPatterns = TRUE)
+#'
+#' # For more information about the table:
+#' cat(comment(clusters))
 groupClusters <- function(table,
                           clusterIdHeader = "clusterId",
                           refHeader = "ref",
@@ -72,7 +85,8 @@ groupClusters <- function(table,
   table <- dplyr::mutate(table, plusStrand = purrr::map2_chr(refs, alts, formatClusterMutations),
            minusStrand = purrr::map2_chr(refs, alts, formatClusterMutations, convert=TRUE))
   table <- dplyr::mutate(table, clusterType = purrr::map2_chr(plusStrand, minusStrand, getClusterType))
-  table <- dplyr::mutate(table, distance = purrr::map_int(cMuts,function(x){x$distance[1]}))
+  table <- dplyr::mutate(table, distance = purrr::map(cMuts,function(x){list(x$distance)}))
+  table <- dplyr::mutate(table, distance = purrr::map(distance,function(x){x[[1]]}))
 
   # Find the pattern intersect if needed --------------------------------------------------------
   if(patternIntersect){
@@ -100,6 +114,31 @@ groupClusters <- function(table,
       warning("No rows found. Please make sure the cluster IDs are present and try again.")
     }
   }
+
+  comment(table) <-
+    "Information about the columns:
+     clusterID            : Column with the cluster ID.
+     cMuts                : Column with the tables containing the
+                            mutations annotation of that cluster.
+     refs                 : Column with the reference nucleotides
+                            of the mutations within the cluster.
+     alts                 : Column with the alternative nucleotides
+                            of the mutations within the cluster.
+     clusterType          : Column with the cluster type for better
+                            comparison between cluster mutations.
+     distance             : Column with the distances found between
+                            the mutations within the cluster.
+
+     (if the parameter patternIntersect and/or
+     searchClusterPatterns is TRUE:)
+     foundPatterns        : Column with the patterns that are
+                            connected with the cluster.
+     has.intersect        : Column with a Boolean if there were
+                            patterns of the mutations within the
+                            cluster that overlap eachother.
+     has.clusterPatterns  : Colum with a Boolean if there were
+                            cluster patterns found.
+     "
 
   if(tibble){
     return(tibble::as.tibble(table))

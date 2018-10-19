@@ -4,7 +4,7 @@
 \alias{getRefData}
 \title{getRefData}
 \usage{
-getRefData(chr, pos, sizeSur, lenChrom)
+getRefData(chr, pos, sizeSur, lenChrom, refGenomeHg19)
 }
 \arguments{
 \item{chr}{A string with the chromosome name}

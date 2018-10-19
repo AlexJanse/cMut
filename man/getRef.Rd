@@ -4,7 +4,7 @@
 \alias{getRef}
 \title{getRef}
 \usage{
-getRef(x, lenChrom)
+getRef(x, lenChrom, refGenomeHg19)
 }
 \arguments{
 \item{x}{A string that contains the chromosome name, start and stop location
