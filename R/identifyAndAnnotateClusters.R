@@ -216,7 +216,7 @@ addLinkPatterns <- function(x, refHeader = "ref",
   x <- dplyr::mutate(x, linkedPatterns = purrr::map2(tempMutColumn,
                                                !!rlang::sym(checkHeader),
                                                function(x,y){
-                                                 ifelse(y,callLinkPatterns(x,linkVariables),list(""))
+                                                 ifelse(y,callLinkPatterns(x,linkVariables),"")
                                                }))
   x <- dplyr::mutate(x, linkedPatterns = purrr::map(linkedPatterns,function(x){x[[1]]}))
   x <- dplyr::mutate(x, is.linked = purrr::map_lgl(linkedPatterns,

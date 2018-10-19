@@ -1,7 +1,7 @@
 #' groupClusters
 #' @description A function that will group the clusters and give the mutation
 #'   consensus back.
-#' @param table A table with columns containing cluster ID's, reference and
+#' @param table A table with columns containing cluster IDs, reference and
 #'   alternative nucleotide. See the output of the
 #'   \code{\link{identifyAndAnnotateClusters}} function for more information about the
 #'   table.
@@ -96,6 +96,9 @@ groupClusters <- function(table,
   }
 
   if(searchClusterPatterns){
+    if(!patternIntersect){
+      table <- dplyr::mutate(table, foundPatterns = c(""))
+    }
     if(is.null(searchPatterns)){
       searchPatterns <- getSearchPatterns(searchReverseComplement)
       searchPatterns <- searchPatterns[nchar(searchPatterns$ref) > 1,]

@@ -7,7 +7,7 @@
 #' necessary the header name.
 #' As seen in the table, there are two kinds of patterns:
 #' \itemize{
-#'   \item patterns with 1 reference, 1 alternative, with surrounding
+#'   \item Patterns with 1 reference, 1 alternative, with surrounding
 #'   nucleotides and a maximum distance with a number or NA. These are used in
 #'   the \code{\link{identifyAndAnnotateClusters}} and \code{\link{linkPatterns}}
 #'   functions.

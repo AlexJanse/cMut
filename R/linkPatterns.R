@@ -27,14 +27,12 @@
 #'   parameter is NULL. NA's within this column are allowed.
 #' @param searchReverseComplement A boolean to also search the patterns in the
 #'   reverse complement of the searchPatterns tibble.
-#' @param patternsAsList A boolean to tell if the return value needs to be in a
-#'   list or in a string.
 #' @return list or string with the matched patterns. If nothing's found, return
 #'   an empty list.
 #' @export
 #' @import magrittr
 #' @examples
-#' results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
+#' results <- linkPatterns("C","T","TA.T")
 #'
 #' # To see the default searchPattern table and it's information:
 #' ?mutationPatterns
@@ -43,11 +41,12 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                          searchPatterns = mutationPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-                         searchReverseComplement = TRUE,
-                         patternsAsList = TRUE){
+                         searchReverseComplement = TRUE){
 
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
+  stopifnot(nchar(ref) == 1 & nchar(alt) == 1)
+  stopifnot(is.null(distance) | is.numeric(distance))
   stopifnot(is.character(ref) & is.character(alt) & is.character(context))
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
   stopifnot(grepl("[ACGTacgt]",alt))
@@ -104,15 +103,6 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
     matchedPatterns <- list(unique(dplyr::pull(results,searchIdHeader)))
   } else {
     return(list(""))
-  }
-  if(!patternsAsList){
-    if(length(matchedPatterns) > 0){
-      matchedPatterns <- paste(matchedPatterns,collapse = "; ")
-    } else {
-      matchedPatterns <- list("")
-    }
-  } else if (length(matchedPatterns) == 0){
-    matchedPatterns <- list("")
   }
 
   return(matchedPatterns)
