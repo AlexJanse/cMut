@@ -9,7 +9,8 @@ addLinkPatterns(x, refHeader = "ref", altHeader = "alt",
   reverseComplement = FALSE, searchPatterns = NULL,
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchReverseComplement = TRUE, checkHeader = "is.clustered")
+  searchReverseComplement = TRUE, checkHeader = "is.clustered",
+  searchDistanceHeader = "maxDistance")
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome name, sample ID and
@@ -49,6 +50,10 @@ context nucleotide in the searchPatterns table.}
 
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
 }
 \description{
 addLinkPatterns

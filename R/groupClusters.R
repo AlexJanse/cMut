@@ -66,7 +66,8 @@ groupClusters <- function(table,
                           showWarning = TRUE,
                           searchPatterns = NULL, searchRefHeader = "ref",
                           searchAltHeader = "alt",
-                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
+                          searchIdHeader = "process",
+                          searchDistanceHeader = "maxDistance",
                           searchReverseComplement = TRUE){
 
   # Check data --------------------------------------------------------------------------------------------

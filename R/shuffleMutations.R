@@ -50,6 +50,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              searchAltHeader = "alt",
                              searchContextHeader = "surrounding",
                              searchIdHeader = "process",
+                             searchDistanceHeader = "maxDistance",
                              searchReverseComplement = TRUE,
                              tibble = TRUE,
                              saveEachBootstrap = FALSE,
@@ -67,15 +68,15 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   }
 
   if(!searchClusterPatterns){
-    searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns, refHeader)) == 1,]
-    resultTable <- resultTable[nchar(dplyr::pull(resultTable, refHeader)) == 1,]
+    searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns, searchRefHeader)) == 1,]
+    resultTable <- resultTable[nchar(dplyr::pull(resultTable, searchRefHeader)) == 1,]
   }
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
   if(searchReverseComplement){
     i <- getRevComTable(resultTable,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader)
     resultTable <- rbind(resultTable,i)
-    searchPatterns <- getRevComTable(searchPatterns,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader)
+    searchPatterns <- dplyr::bind_rows(searchPatterns, getRevComTable(searchPatterns,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader))
   }
 
 
@@ -111,6 +112,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                                                       searchAltHeader = searchAltHeader,
                                                       searchContextHeader = searchContextHeader,
                                                       searchIdHeader = searchIdHeader,
+                                                      searchDistanceHeader = searchDistanceHeader,
                                                       searchReverseComplement = FALSE)
 
     clusterTable <- groupClusters(clusterTablePerMut,
@@ -121,6 +123,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                                   searchRefHeader = searchRefHeader,
                                   searchAltHeader = searchAltHeader,
                                   searchIdHeader = searchIdHeader,
+                                  searchDistanceHeader = searchDistanceHeader,
                                   searchReverseComplement = FALSE)
 
 
@@ -144,11 +147,12 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   total <- list("total",0)
   resultTable <- rbind(resultTable,total)
   for(table in resultTables){
-    resultTable <- data.table::data.table(process = table$process, frequency = resultTable$frequency + table$frequency)
+    resultTable <- data.table::as.data.table(tibble::tibble(!!rlang::sym(searchIdHeader) := dplyr::pull(table,!!rlang::sym(searchIdHeader)),
+                                          frequency = resultTable$frequency + table$frequency))
   }
 
-  total <- resultTable[resultTable$process == "total",2][[1]]
-  resultTable <- resultTable[resultTable$process != "total",]
+  total <- resultTable[dplyr::pull(resultTable,!!rlang::sym(searchIdHeader)) == "total",2][[1]]
+  resultTable <- resultTable[dplyr::pull(resultTable,!!rlang::sym(searchIdHeader)) != "total",]
 
 
   if(total != 0){
@@ -282,6 +286,9 @@ createSummaryPatterns <- function(clusterTable,
   }
   clusterTable <- data.table::as.data.table(clusterTable)
   condition <- clusterTable[,"has.intersect"]
+  if(length(which(clusterTable == "has.clusterPatterns")) != 0){
+    condition <- condition | clusterTable[,"has.clusterPatterns"]
+  }
   nonIntersectFreq <- 0
 
   for(index in 1:nrow(clusterTable)){

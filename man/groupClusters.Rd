@@ -12,7 +12,7 @@ groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
   searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE)
 }
 \arguments{
-\item{table}{A table with columns containing cluster ID's, reference and
+\item{table}{A table with columns containing cluster IDs, reference and
 alternative nucleotide. See the output of the
 \code{\link{identifyAndAnnotateClusters}} function for more information about the
 table.}

@@ -10,8 +10,9 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   nBootstrap = 1000, maxDistance = 20000, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "process", searchReverseComplement = TRUE,
-  tibble = TRUE, saveEachBootstrap = FALSE, saveFileName = NULL,
+  searchIdHeader = "process", searchDistanceHeader = "maxDistance",
+  searchReverseComplement = TRUE, tibble = TRUE,
+  saveEachBootstrap = FALSE, saveFileName = NULL,
   searchClusterPatterns = FALSE)
 }
 \arguments{
@@ -57,6 +58,10 @@ alternative nucleotide in the searchPatterns table.}
 
 \item{searchContextHeader}{A string with the column name of the one with the
 context nucleotide in the searchPatterns table.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
 
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}

@@ -59,7 +59,8 @@ identifyAndAnnotateClusters <- function(x, maxDistance, asTibble = TRUE,
                                         mutationSymbol = ".", linkPatterns = FALSE,
                                         reverseComplement = FALSE, searchPatterns = NULL,
                                         searchRefHeader = "ref", searchAltHeader = "alt", searchContextHeader = "surrounding",
-                                        searchIdHeader = "process", searchReverseComplement = TRUE, patternsAsList = TRUE) {
+                                        searchIdHeader = "process", searchDistanceHeader = "maxDistance",
+                                        searchReverseComplement = TRUE, patternsAsList = TRUE) {
   # Check if arguments are correct ------------------------------------------
   stopifnot(!any(is.na(dplyr::select(x,chromHeader,sampleIdHeader, positionHeader))))
   stopifnot(is.numeric(maxDistance))
@@ -120,11 +121,18 @@ identifyAndAnnotateClusters <- function(x, maxDistance, asTibble = TRUE,
       searchPatterns <- getSearchPatterns(searchReverseComplement)
       searchReverseComplement <- FALSE
     }
-    x <- addLinkPatterns(x, refHeader, altHeader, contextHeader,
-                         mutationSymbol, reverseComplement,
-                         searchPatterns, searchRefHeader,
-                         searchAltHeader,  searchContextHeader,
-                         searchIdHeader, searchReverseComplement)
+    x <- addLinkPatterns(x, refHeader = refHeader,
+                         altHeader = altHeader,
+                         contextHeader = contextHeader,
+                         mutationSymbol = mutationSymbol,
+                         reverseComplement = reverseComplement,
+                         searchPatterns = searchPatterns,
+                         searchRefHeader = searchRefHeader,
+                         searchAltHeader = searchAltHeader,
+                         searchContextHeader = searchContextHeader,
+                         searchIdHeader = searchIdHeader,
+                         searchReverseComplement = searchReverseComplement,
+                         searchDistanceHeader = searchDistanceHeader)
   }
   if(asTibble){
     x <- tibble::as.tibble(x)
@@ -183,7 +191,8 @@ callLinkPatterns <- function(x,linkedVariables){
                       mutationSymbol = linkedVariables[[1]], reverseComplement = linkedVariables[[2]],
                       searchPatterns = linkedVariables[[3]], searchRefHeader = linkedVariables[[4]],
                       searchAltHeader = linkedVariables[[5]], searchContextHeader = linkedVariables[[6]],
-                      searchIdHeader = linkedVariables[[7]], searchReverseComplement = linkedVariables[[8]]))
+                      searchIdHeader = linkedVariables[[7]], searchReverseComplement = linkedVariables[[8]],
+                      searchDistanceHeader = linkedVariables[[9]]))
 }
 
 #' addLinkPatterns
@@ -201,12 +210,14 @@ addLinkPatterns <- function(x, refHeader = "ref",
                             searchContextHeader = "surrounding",
                             searchIdHeader = "process",
                             searchReverseComplement = TRUE,
-                            checkHeader = "is.clustered"){
+                            checkHeader = "is.clustered",
+                            searchDistanceHeader = "maxDistance"){
 
   linkVariables <- list(mutationSymbol, reverseComplement,
                         searchPatterns, searchRefHeader,
                         searchAltHeader,  searchContextHeader,
-                        searchIdHeader, searchReverseComplement) # Variables are put in a list to reduce the amount of code
+                        searchIdHeader, searchReverseComplement,
+                        searchDistanceHeader) # Variables are put in a list to reduce the amount of code
 
   x <- dplyr::mutate(x, tempMutColumn = paste(!!rlang::sym(refHeader),
                                         !!rlang::sym(altHeader),

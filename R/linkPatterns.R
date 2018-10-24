@@ -42,7 +42,6 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
                          searchReverseComplement = TRUE){
-
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
   stopifnot(nchar(ref) == 1 & nchar(alt) == 1)
@@ -64,12 +63,11 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   }
 
   # Use the reverse complement of the unknown mutation ---------------------------------------------------------------
-  if(reverseComplement == T){
+  if(reverseComplement){
     ref <- getReverseComplement(ref)
     alt <- getReverseComplement(alt)
     context <- getReverseComplement(context)
   }
-
   dnaSymbols <- tibble::as.tibble(dnaAlphabet)
   dnaSymbols <- dplyr::enquo(dnaSymbols)
 
@@ -84,7 +82,6 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   context <- dplyr::enquo(context)
 
   mutationSymbol <- dplyr::enquo(mutationSymbol)
-
   # Create results -----------------------------------------------------------------
   results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
                                                                   getAlphaMatches(!!ref,!!dnaSymbols)))
@@ -93,7 +90,6 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
 
   results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols))
   results <- results[results$match == T,]
-
   if(!is.null(distance)){
     results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),function(x){ifelse(is.na(x),TRUE,x >= distance)}))
     results <- results[results$match == T,]
@@ -104,7 +100,6 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   } else {
     return(list(""))
   }
-
   return(matchedPatterns)
 }
 

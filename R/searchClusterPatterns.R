@@ -36,8 +36,8 @@ searchClusterPatterns <- function(groupedClusters,
       maxDistance <- searchPatterns[pattIndex, searchDistanceHeader]
       if(grepl(refPat,row$refs) & grepl(altPat,row$alts)){
         location <- gregexpr(refPat, row$refs)
-        position <- location[[1]][1]
-        end <- position+(attr(location[[1]],"match.length")-1)
+        position <- min(location[[1]][1])
+        end <- max(position+(attr(location[[1]],"match.length")-1))
         clusterDistance <- max(row$distance[[1]][position:end])
         if(clusterDistance <= maxDistance){
           subclusterPatterns[length(subclusterPatterns)+1] <- id

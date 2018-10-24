@@ -8,8 +8,7 @@ linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
   reverseComplement = FALSE, searchPatterns = mutationPatterns,
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
-  patternsAsList = TRUE)
+  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide. (e.g. "C")}
@@ -48,9 +47,6 @@ parameter is NULL. NA's within this column are allowed.}
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
-\item{patternsAsList}{A boolean to tell if the return value needs to be in a
-list or in a string.}
-
 \item{searchSource}{A string with the column name of the ID of the known
 pattern.}
 }
@@ -63,7 +59,7 @@ A function that is able to find matches between a submitted
   unkown mutation and a known mutation pattern table.
 }
 \examples{
-results <- linkPatterns("C","T","TA.T",searchPatterns = mutationPatterns)
+results <- linkPatterns("C","T","TA.T")
 
 # To see the default searchPattern table and it's information:
 ?mutationPatterns

@@ -13,7 +13,7 @@ test_that("Check if the patterns match with the expected results",{
           )
           expect_equal(
             nrow(validationGroups[grepl("MMR",validationGroups$foundPatterns),]),
-            48/2
+            8/2
           )
           expect_equal(
             nrow(validationGroups[grepl("A1/A3G",validationGroups$foundPatterns),]),

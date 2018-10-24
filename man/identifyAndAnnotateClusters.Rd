@@ -11,8 +11,8 @@ identifyAndAnnotateClusters(x, maxDistance, asTibble = TRUE,
   linkPatterns = FALSE, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "process", searchReverseComplement = TRUE,
-  patternsAsList = TRUE)
+  searchIdHeader = "process", searchDistanceHeader = "maxDistance",
+  searchReverseComplement = TRUE, patternsAsList = TRUE)
 }
 \arguments{
 \item{x}{A tibble that contains at least chromosome name, sample ID and
@@ -68,11 +68,12 @@ alternative nucleotide in the searchPatterns table.}
 \item{searchContextHeader}{A string with the column name of the one with the
 context nucleotide in the searchPatterns table.}
 
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
+
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
-
-\item{patternsAsList}{A boolean to tell if the return value needs to be in a
-list or in a string.}
 }
 \value{
 The tibble that was sent as an argument for this fuction with extra
