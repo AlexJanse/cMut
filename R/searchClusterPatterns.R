@@ -13,9 +13,8 @@ searchClusterPatterns <- function(groupedClusters,
                                   searchIdHeader = "process"){
 
   # Check parameters -----------------------------------------------
-  stopifnot(all(nchar(searchPatterns[,searchRefHeader]) > 1))
+  stopifnot(all(nchar(searchPatterns[,searchRefHeader]) > 1 | nchar(searchPatterns[,searchRefHeader]) == 0))
   stopifnot(all(nchar(searchPatterns[,searchAltHeader]) > 1))
-  stopifnot(all(nchar(searchPatterns[,searchAltHeader]) == nchar(searchPatterns[,searchRefHeader])))
   stopifnot(!any(is.na(dplyr::select(searchPatterns,searchRefHeader,
                                      searchAltHeader,searchDistanceHeader))))
   stopifnot(!any(is.null(dplyr::select(searchPatterns,searchRefHeader,

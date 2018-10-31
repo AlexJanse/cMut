@@ -13,7 +13,7 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
   searchReverseComplement = TRUE, tibble = TRUE,
   saveEachBootstrap = FALSE, saveFileName = NULL,
-  searchClusterPatterns = FALSE)
+  searchClusterPatterns = FALSE, no.cores = parallel::detectCores())
 }
 \arguments{
 \item{x}{A table with the reference, alternative and surrounding nucleotides.
@@ -71,6 +71,10 @@ to be saved}
 
 \item{saveFileName}{A string with the name and location of the file that
 contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.}
+
+\item{no.cores}{A number with the amount of clusters that is allowed to
+use during shuffle. Default is maximum amount of cores present on the
+system.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding

@@ -1,4 +1,4 @@
 library(testthat)
-library(myfirstRpackage)
+library(cMut)
 
-test_check("myfirstRpackage")
+test_check("cMut")

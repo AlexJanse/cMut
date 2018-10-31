@@ -20,6 +20,9 @@
 #'   to be saved
 #' @param saveFileName A string with the name and location of the file that
 #'   contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.
+#' @param no.cores A number with the amount of clusters that is allowed to
+#'   use during shuffle. Default is maximum amount of cores present on the
+#'   system.
 #' @import magrittr
 #' @import foreach
 #' @import doParallel
@@ -55,7 +58,10 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                              tibble = TRUE,
                              saveEachBootstrap = FALSE,
                              saveFileName = NULL,
-                             searchClusterPatterns = FALSE){
+                             searchClusterPatterns = FALSE,
+                             no.cores = parallel::detectCores()){
+
+  stopifnot(no.cores > 0)
 
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
@@ -88,8 +94,10 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   resultTable <- dplyr::mutate(resultTable, frequency = rep.int(0,nrow(resultTable)))
 
   # Prepare for parallel loop
-  nCores <- parallel::detectCores()
-  clusters <- parallel::makeCluster(nCores)
+  if(no.cores > parallel::detectCores()){
+   stop("The no.cores parameter is higher than amount of clusters present.")
+  }
+  clusters <- parallel::makeCluster(no.cores)
   doParallel::registerDoParallel(clusters)
 
   # Preform bootstrap ------------------------------------------------------------

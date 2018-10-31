@@ -102,7 +102,7 @@ groupClusters <- function(table,
     }
     if(is.null(searchPatterns)){
       searchPatterns <- getSearchPatterns(searchReverseComplement)
-      searchPatterns <- searchPatterns[nchar(searchPatterns$ref) > 1,]
+      searchPatterns <- searchPatterns[nchar(searchPatterns$ref) > 1 | nchar(searchPatterns$ref) == 0,]
     }
     table <- searchClusterPatterns(table,
                                     searchPatterns,

@@ -24,8 +24,6 @@ createRandomMutations <- function(nMut = 500,
                                   sizeSur = 2,
                                   refGenomeHg19 = TRUE){
 
-  stopifnot(sizeSur > 1)
-
   # Human chromosomes information (GRCh37/hg19) ------------------------------
   nucleotides <- c("A","C","G","T")
   nameChrom <- c("chr1","chr2","chr3","chr4",
@@ -52,7 +50,8 @@ createRandomMutations <- function(nMut = 500,
   names(lenChrom) <- nameChrom
 
   # Check argument ----------------------------------------------------------
-  stopifnot(nMut > 1)
+  stopifnot(nMut > 0)
+  stopifnot(sizeSur > 1)
 
   # Create random data ------------------------------------------------------
   probability <- lenChrom/sum(lenChrom)*100
@@ -77,6 +76,22 @@ createRandomMutations <- function(nMut = 500,
 
   randomTable <- randomTable[c("chrom","start","stop","ref","alt","sampleIDs","surrounding")]
 
+  while(nrow(randomTable[randomTable$ref == "N",]) > 0){
+    randomTable <- dplyr::bind_rows(randomTable[randomTable$ref != "N",],createRandomMutations(nMut = nrow(randomTable[randomTable$ref == "N",]),
+                          sizeSur = rlang::get_expr(sizeSur),
+                          sampleName = sampleName,
+                          refGenomeHg19 = refGenomeHg19,
+                          tibble = tibble))
+  }
+  randomTable <- unique(randomTable)
+  while(nrow(randomTable) != nMut){
+    randomTable <- dplyr::bind_rows(randomTable[randomTable$ref != "N",],createRandomMutations(nMut = nMut-nrow(randomTable),
+                                                                                               sizeSur = rlang::get_expr(sizeSur),
+                                                                                               sampleName = sampleName,
+                                                                                               refGenomeHg19 = refGenomeHg19,
+                                                                                               tibble = tibble))
+    randomTable <- unique(randomTable)
+  }
   if(tibble){
     randomTable <- tibble::as.tibble(randomTable)
   }
