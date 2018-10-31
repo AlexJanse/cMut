@@ -8,7 +8,8 @@ linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
   reverseComplement = FALSE, searchPatterns = mutationPatterns,
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE)
+  searchDistanceHeader = "maxDistance", searchMutationSymbol = ".",
+  searchReverseComplement = TRUE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide. (e.g. "C")}
@@ -43,6 +44,10 @@ context nucleotide in the searchPatterns table.}
 \item{searchDistanceHeader}{A string with the column name of the one with the
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
+
+\item{searchMutationSymbol}{A string with symbol that stands for the mutated
+nucleotide location in the column of the \code{searchContextHeader}. (e.g.
+"." in "G.C")}
 
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}

@@ -34,31 +34,33 @@ For more information about the table use:
 cat(comment(randomData))
 ```
 
-If a tibble is inconvenience, use the `tibble = FALSE` argument to get a data frame.
-It is also possible to change the number of surrounding nucleotides with the `sizeSur` argument:
+If a tibble is inconvenience, use the `asTibble = FALSE` argument to get a data table.
+It is also possible to change the number of surrounding nucleotides with the `sizeSur` parameter, the chromosomes that are needed to be used and change the reference genome from Hg19 to Hg38 with the `refGenomeHg19 = F` parameter:
 ```{r include = T}
 createRandomMutations(nMut = 10, 
-                            tibble = FALSE,
-                            sizeSur = 4)
+                      asTibble = FALSE,
+                      sizeSur = 4,
+                      refGenomeHg19 = F,
+                      useChrom = c("chr1","chr2"))
 ```
 
 
 ## identifyAndAnnotateClusters
-The `identifyAndAnnotateClusters()` applies the `identifyClusters()` and (if wanted) `linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with Booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
+The `identifyAndAnnotateClusters()` searchs for clusters by looking per sample per chromosome if there are mutations within the range of the maximum distance and (if wanted) applies `linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with Booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
 
 ```{r include = TRUE}
 results <- identifyAndAnnotateClusters(x = testDataSet, 
-                                             maxDistance = 20000,
-                                             asTibble = FALSE)
+                                       maxDistance = 20000,
+                                       asTibble = FALSE)
 results[results$is.clustered == T,][1:10,]
 ```
 
 If the `linkPatterns()` is needed, use the `linkPatterns = TRUE` argument. See the `linkPatterns()` paragraph for more information about the function.
 ```{r include = TRUE}
 results <- identifyAndAnnotateClusters(x = testDataSet, 
-                                             maxDistance = 20000,
-                                             asTibble = FALSE,
-                                             linkPatterns = TRUE)
+                                       maxDistance = 20000,
+                                       asTibble = FALSE,
+                                       linkPatterns = TRUE)
 head(results[results$is.linked == T,])
 ```
 

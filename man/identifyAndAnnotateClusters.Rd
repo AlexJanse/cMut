@@ -4,7 +4,7 @@
 \alias{identifyAndAnnotateClusters}
 \title{identifyAndAnnotateClusters}
 \usage{
-identifyAndAnnotateClusters(x, maxDistance, asTibble = TRUE,
+identifyAndAnnotateClusters(dataTable, maxDistance, asTibble = TRUE,
   chromHeader = "chrom", sampleIdHeader = "sampleIDs",
   positionHeader = "start", refHeader = "ref", altHeader = "alt",
   contextHeader = "surrounding", mutationSymbol = ".",
@@ -12,12 +12,13 @@ identifyAndAnnotateClusters(x, maxDistance, asTibble = TRUE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-  searchReverseComplement = TRUE, patternsAsList = TRUE)
+  searchMutationSymbol = ".", searchReverseComplement = TRUE,
+  linkClustersOnly = TRUE)
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome name, sample ID and
-position information. The data cannot contain any NA. For an example use
-\code{\link{createRandomMutations}} function.}
+\item{dataTable}{A tibble that contains at least chromosome name, sample ID
+and position information. The data cannot contain any NA. For an example
+use \code{\link{createRandomMutations}} function.}
 
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}
@@ -50,8 +51,8 @@ searching for patterns. The \code{contextHeader} is irrelevant if
 nucleotide location in the \code{context}. (e.g. "." in "G.C")}
 
 \item{linkPatterns}{A Boolean to tell if it's necessary to try and link the
-mutations to patterns. If FALSE then the search... parameters are
-irrelevant.}
+mutations to patterns. If FALSE then the \code{search...} parameters and
+the \code{linkClustersOnly} parameter are irrelevant.}
 
 \item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
 \code{context} needed to be searched with the reverse complement.}
@@ -72,8 +73,15 @@ context nucleotide in the searchPatterns table.}
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
 
+\item{searchMutationSymbol}{A string with symbol that stands for the mutated
+nucleotide location in the column of the \code{searchContextHeader}. (e.g.
+"." in "G.C")}
+
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
+
+\item{linkClustersOnly}{A boolean if only the clustered mutations are needed
+to be linked with the patterns in the \code{searchPatterns} table.}
 }
 \value{
 The tibble that was sent as an argument for this fuction with extra
@@ -89,11 +97,11 @@ A function that finds and annotate clusters in a genomic data
 data <- testDataSet
 
 # Example for just clustering:
-results <- identifyAndAnnotateClusters(x = data,
+results <- identifyAndAnnotateClusters(dataTable = data,
                                        maxDistance = 20000)
 
 # Example for clustering and linking patterns with the default searchPattern table:
-results <- identifyAndAnnotateClusters(x = data,
+results <- identifyAndAnnotateClusters(dataTable = data,
                                                    maxDistance = 20000,
                                                    linkPatterns = TRUE)
 # See the getSearchPattern funtion for more information about it.
@@ -102,10 +110,8 @@ results <- identifyAndAnnotateClusters(x = data,
 cat(comment(results))
 }
 \seealso{
-\itemize{
-  \item \code{\link{createRandomMutations}} for an example
-  of data as input for parameter \code{x}
-  \item \code{\link{mutationPatterns}} for looking at the default pattern search
-  table
-  }
+\itemize{ \item \code{\link{createRandomMutations}} for an example
+  of data as input for parameter \code{dataTable} \item
+  \code{\link{mutationPatterns}} for looking at the default pattern search
+  table }
 }

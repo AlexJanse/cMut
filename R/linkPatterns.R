@@ -20,6 +20,9 @@
 #'   alternative nucleotide in the searchPatterns table.
 #' @param searchContextHeader A string with the column name of the one with the
 #'   context nucleotide in the searchPatterns table.
+#' @param searchMutationSymbol A string with symbol that stands for the mutated
+#'   nucleotide location in the column of the \code{searchContextHeader}. (e.g.
+#'   "." in "G.C")
 #' @param searchSource A string with the column name of the ID of the known
 #'   pattern.
 #' @param searchDistanceHeader A string with the column name of the one with the
@@ -41,7 +44,7 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                          searchPatterns = mutationPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-                         searchReverseComplement = TRUE){
+                         searchMutationSymbol = ".",searchReverseComplement = TRUE){
   # check and adjust parameters ---------------------------------------------------------------
   stopifnot(grepl(mutationSymbol,context))
   stopifnot(nchar(ref) == 1 & nchar(alt) == 1)
@@ -82,13 +85,15 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   context <- dplyr::enquo(context)
 
   mutationSymbol <- dplyr::enquo(mutationSymbol)
+  searchMutationSymbol <- as.character(searchMutationSymbol)
+  searchMutationSymbol <- dplyr::enquo(searchMutationSymbol)
   # Create results -----------------------------------------------------------------
   results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
                                                                   getAlphaMatches(!!ref,!!dnaSymbols)))
   results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
                                                                                 getAlphaMatches(!!alt,!!dnaSymbols)))
 
-  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols))
+  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols, searchMutationSymbol))
   results <- results[results$match == T,]
   if(!is.null(distance)){
     results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),function(x){ifelse(is.na(x),TRUE,x >= distance)}))
@@ -109,9 +114,7 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
 #' @param nucleotide A string with a single nucleotide
 #' @param symbols A data frame with the symbols to match with the nucleotide
 compare <- function(nucleotide,symbols){
-  result <- symbols[symbols$symbol == nucleotide,]
-
-  if(nrow(result) == 0){
+  if(nrow(symbols[symbols$symbol == nucleotide,]) == 0){
     return(FALSE)
   } else {
     return(TRUE)
@@ -127,16 +130,18 @@ compare <- function(nucleotide,symbols){
 #'   (e.g. "." for C.G)
 #' @param alphabet A tibble with the nucleotides and their symbols
 #' @return Boolean if the contexts match or not
-compareContext <- function(context2, context1, mutationSymbol, alphabet){
+compareContext <- function(context2, context1, mutationSymbol, alphabet,searchMutationSymbol){
   context1 <- rlang::get_expr(context1)
   context2 <- rlang::get_expr(context2)
   mutationSymbol <- rlang::get_expr(mutationSymbol)
+
   alphabet <- rlang::get_expr(alphabet)
   context1List <- strsplit(context1,paste0("\\",mutationSymbol))
   context1Before <- context1List[[1]][1]
   context1After <- context1List[[1]][2]
 
-  context2List <- strsplit(context2,paste0("\\",mutationSymbol))
+  searchMutationSymbol <- rlang::get_expr(searchMutationSymbol)
+  context2List <- strsplit(context2,paste0("\\",searchMutationSymbol))
   context2Before <- context2List[[1]][1]
   context2After <- context2List[[1]][2]
 
@@ -199,3 +204,8 @@ getAlphaMatches <- function(nuc, alphabet){
   return(alphabet[grepl(nuc,alphabet$represent),1])
 }
 
+#' getReverseComplement
+#' @description A function to get the reverse complement of a sequence
+getReverseComplement <- function(x){
+  return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
+}

@@ -5,22 +5,31 @@
 \title{createRandomMutations}
 \usage{
 createRandomMutations(nMut = 500, sampleName = "testSample",
-  tibble = TRUE, sizeSur = 2, refGenomeHg19 = TRUE)
+  asTibble = TRUE, sizeSur = 2, refGenomeHg19 = TRUE,
+  useChrom = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7",
+  "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15",
+  "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX",
+  "chrY"))
 }
 \arguments{
 \item{nMut}{The number of mutations that needed to be generated.}
 
 \item{sampleName}{A name for the test sample.}
 
-\item{tibble}{A Boolean if the returned table needs to be a tibble.}
+\item{asTibble}{A Boolean if the returned table needs to be a tibble. Returns
+a data.table when FALSE.}
 
 \item{sizeSur}{A number with the ammount of nucleotides left and right of the
 mutation. (e.g. sizeSur = 2 --> "CC.GT")}
 
-\item{refGenome}{A boolean with the prefered reference genome. If TRUE: the reference will be hg19. if FALSE: HG38.}
+\item{useChrom}{A vector with the chromosomes that are used. Make sure that
+the names are notated as e.g. "chr1".}
+
+\item{refGenome}{A boolean with the prefered reference genome. If TRUE: the
+reference will be hg19. if FALSE: HG38.}
 }
 \value{
-A tibble with mutation information
+A tibble or data.table with random mutation information.
 }
 \description{
 Function to generate random data in a tibble with DNA mutation
@@ -31,6 +40,14 @@ Function to generate random data in a tibble with DNA mutation
 x <- createRandomMutations(nMut = 100,
                            sampleName = "test",
                            sizeSur = 3)
+
+# Proper way of using all the parameters:
+createRandomMutations(nMut = 10,
+                      sampleName = "name",
+                      asTibble = FALSE,
+                      sizeSur = 4,
+                      refGenomeHg19 = F,
+                      useChrom = c("chr1","chr2"))
 
 # See explanation of table columns
 cat(comment(x))

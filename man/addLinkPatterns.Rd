@@ -9,14 +9,11 @@ addLinkPatterns(x, refHeader = "ref", altHeader = "alt",
   reverseComplement = FALSE, searchPatterns = NULL,
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchReverseComplement = TRUE, checkHeader = "is.clustered",
-  searchDistanceHeader = "maxDistance")
+  searchReverseComplement = TRUE, searchMutationSymbol = ".",
+  checkHeader = "is.clustered", searchDistanceHeader = "maxDistance",
+  linkClustersOnly = TRUE)
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome name, sample ID and
-position information. The data cannot contain any NA. For an example use
-\code{\link{createRandomMutations}} function.}
-
 \item{refHeader}{Contains the name of the column with the reference
 nucleotides.}
 
@@ -51,9 +48,16 @@ context nucleotide in the searchPatterns table.}
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
+\item{searchMutationSymbol}{A string with symbol that stands for the mutated
+nucleotide location in the column of the \code{searchContextHeader}. (e.g.
+"." in "G.C")}
+
 \item{searchDistanceHeader}{A string with the column name of the one with the
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
+
+\item{linkClustersOnly}{A boolean if only the clustered mutations are needed
+to be linked with the patterns in the \code{searchPatterns} table.}
 }
 \description{
 addLinkPatterns

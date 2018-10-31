@@ -8,10 +8,6 @@ identifyClusters(x, maxDistance, chromHeader = "Chr",
   sampleIdHeader = "sampleID", positionHeader = "Pos")
 }
 \arguments{
-\item{x}{A tibble that contains at least chromosome name, sample ID and
-position information. The data cannot contain any NA. For an example use
-\code{\link{createRandomMutations}} function.}
-
 \item{maxDistance}{A number; The maximum distance between DNA mutations that
 count as clustered.}
 

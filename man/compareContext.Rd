@@ -4,7 +4,8 @@
 \alias{compareContext}
 \title{compareContext}
 \usage{
-compareContext(context2, context1, mutationSymbol, alphabet)
+compareContext(context2, context1, mutationSymbol, alphabet,
+  searchMutationSymbol)
 }
 \arguments{
 \item{context2}{A string with a context (e.g. C.G) This one will act as the
