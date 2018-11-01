@@ -58,11 +58,15 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   stopifnot(any(grepl(searchRefHeader,names(searchPatterns))))
   stopifnot(any(grepl(searchContextHeader,names(searchPatterns))))
   searchPatterns <- convertFactor(searchPatterns)
-  searchPatterns <- searchPatterns[nchar(searchPatterns$ref) == 1,]
+  searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns,searchRefHeader)) == 1,]
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
   if(searchReverseComplement){
-    searchPatterns <- rbind(searchPatterns,getRevComTable(searchPatterns,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader))
+    searchPatterns <- dplyr::bind_rows(searchPatterns,getRevComTable(table = searchPatterns,
+                                                          refHeader = searchRefHeader,
+                                                          altHeader = searchAltHeader,
+                                                          contextHeader = searchContextHeader,
+                                                          idHeader = searchIdHeader))
   }
 
   # Use the reverse complement of the unknown mutation ---------------------------------------------------------------
@@ -77,9 +81,11 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
 
   ref <- casefold(ref,upper = T)
   ref <- dplyr::enquo(ref)
+  refSymbols <- getAlphaMatches(ref,dnaSymbols)
 
   alt <- casefold(alt, upper = T)
   alt <- dplyr::enquo(alt)
+  altSymbols <- getAlphaMatches(alt,dnaSymbols)
 
   context <- casefold(context, upper = T)
   context <- dplyr::enquo(context)
@@ -88,12 +94,16 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   searchMutationSymbol <- as.character(searchMutationSymbol)
   searchMutationSymbol <- dplyr::enquo(searchMutationSymbol)
   # Create results -----------------------------------------------------------------
-  results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),compare,
-                                                                  getAlphaMatches(!!ref,!!dnaSymbols)))
-  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),compare,
-                                                                                getAlphaMatches(!!alt,!!dnaSymbols)))
+  results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),function(x){
+                                                                  compare(x,refSymbols)
+                                                                  }))
+  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),function(x){
+                                                                                compare(x,altSymbols)
+                                                                                }))
 
-  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader), compareContext, context, mutationSymbol, dnaSymbols, searchMutationSymbol))
+  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader),function(x){
+                                                                                compareContext(x,context, mutationSymbol, dnaSymbols, searchMutationSymbol)}
+                                                                                ))
   results <- results[results$match == T,]
   if(!is.null(distance)){
     results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),function(x){ifelse(is.na(x),TRUE,x >= distance)}))
@@ -201,6 +211,8 @@ getNnuc <- function(context1,context2){
 #' getAlphaMatches
 #' @description A function the symbols that contains the nucleotide
 getAlphaMatches <- function(nuc, alphabet){
+  nuc <- rlang::get_expr(nuc)
+  alphabet <- rlang::get_expr(alphabet)
   return(alphabet[grepl(nuc,alphabet$represent),1])
 }
 

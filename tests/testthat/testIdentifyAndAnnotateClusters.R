@@ -102,6 +102,6 @@ testResults2 <- identifyAndAnnotateClusters(dataTable = x,
                                             searchReverseComplement = T,
                                             linkClustersOnly = T)
 names(testResults2) <- names(testResults)
-test_that("Check if using the default gives the same results as setting",
-          expect_equal(all.equal(testResults[,-11],testResults2[,-11]))
+test_that("Check if using the default gives the same results as setting own parameters.",
+          expect_equal(all(testResults[,-c(7,11)] == testResults2[,-c(7,11)]))
           )
