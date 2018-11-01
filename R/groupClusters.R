@@ -3,8 +3,8 @@
 #'   consensus back.
 #' @param table A table with columns containing cluster IDs, reference and
 #'   alternative nucleotide. See the output of the
-#'   \code{\link{identifyAndAnnotateClusters}} function for more information about the
-#'   table.
+#'   \code{\link{identifyAndAnnotateClusters}} function for more information
+#'   about the table.
 #' @param clusterIdHeader Contains the name of the column with the cluster IDs.
 #' @param refHeader Contains the name of the column with the reference
 #'   nucleotides.
@@ -12,12 +12,14 @@
 #'   nucleotides.
 #' @param patternIntersect A Boolean if the table contains patterns and these
 #'   needed to be processed aswell.
-#' @param patternHeader A string with the column name of the patterns. Only in
+#' @param patternHeader A string with the column name of the column with the
+#'   found patterns from the \code{\link{identifyAndAnnotateClusters}}. Only in
 #'   use when patternIntersect is TRUE.
 #' @param showWarning A Boolean if there need to be a warning if nrow is 0.
 #' @param searchClusterPatterns A Boolean if it's needed to search to cluster
 #'   patterns (e.g. GA > TT).
 #' @inheritParams identifyAndAnnotateClusters
+#' @inheritParams linkPatterns
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -59,12 +61,13 @@ groupClusters <- function(table,
                           clusterIdHeader = "clusterId",
                           refHeader = "ref",
                           altHeader = "alt",
-                          tibble = TRUE,
+                          asTibble = TRUE,
                           patternIntersect = FALSE,
                           searchClusterPatterns = FALSE,
                           patternHeader = "linkedPatterns",
                           showWarning = TRUE,
-                          searchPatterns = NULL, searchRefHeader = "ref",
+                          searchPatterns = NULL,
+                          searchRefHeader = "ref",
                           searchAltHeader = "alt",
                           searchIdHeader = "process",
                           searchDistanceHeader = "maxDistance",
@@ -78,7 +81,7 @@ groupClusters <- function(table,
   table <- convertFactor(table)
   table <- dplyr::group_by_(table, clusterIdHeader)
   table <- tidyr::nest(table, .key = "cMuts")
-  table <- dplyr::filter(table, clusterId!="")
+  table <- dplyr::filter(table, rlang::sym(clusterIdHeader) != "")
   table <- dplyr::mutate(table, refs = purrr::map(cMuts, ~as.character(dplyr::pull(., refHeader))),
            alts = purrr::map(cMuts, ~as.character(dplyr::pull(., altHeader))))
   table <- dplyr::mutate(table, refs = purrr::map_chr(refs, function(x){paste0(x,collapse = "")}),
@@ -102,8 +105,14 @@ groupClusters <- function(table,
     }
     if(is.null(searchPatterns)){
       searchPatterns <- getSearchPatterns(searchReverseComplement)
-      searchPatterns <- searchPatterns[nchar(searchPatterns$ref) > 1 | nchar(searchPatterns$ref) == 0,]
+    } else if(searchReverseComplement){
+      searchPatterns <- dplyr::bind_rows(searchPatterns,getRevComTable(table = searchPatterns,
+                                                                       refHeader = searchRefHeader,
+                                                                       altHeader = searchAltHeader,
+                                                                       idHeader = searchIdHeader))
     }
+    searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns, searchRefHeader)) > 1 |
+                                       nchar(dplyr::pull(searchPatterns, searchRefHeader)) == 0,]
     table <- searchClusterPatterns(table,
                                     searchPatterns,
                                     searchRefHeader,
@@ -144,7 +153,7 @@ groupClusters <- function(table,
                             cluster patterns found.
      "
 
-  if(tibble){
+  if(asTibble){
     return(tibble::as.tibble(table))
   } else {
     return(as.data.frame(table))

@@ -74,15 +74,14 @@ head(results[results$is.linked == T,])
 ```
 
 When using a dataset with column names or others that do not match with the default use make sure to change the corresponding parameters.
-```{r include = FALSE}
+```{r include = TRUE}
+# testDataSet with different column names
 x <- testDataSet
 names(x) <- c("chr","pos","endPos","reference","variant","id","sur")
 x$sur <- gsub("\\.","-",x$sur)
-```
-```{r include = TRUE}
-# testDataSet with different column names
 x
-results <- identifyAndAnnotateClusters(dataTable = x, 
+
+results2 <- identifyAndAnnotateClusters(dataTable = x, 
                                        maxDistance = 20000,
                                        altHeader = "variant",
                                        refHeader = "reference",
@@ -91,26 +90,40 @@ results <- identifyAndAnnotateClusters(dataTable = x,
                                        sampleIdHeader = "id",
                                        contextHeader = "sur",
                                        chromHeader = "chr",
-                                       linkPatterns = TRUE)
-head(results[results$is.linked == T,])
+                                       linkPatterns = TRUE,
+                                       asTibble = F)
+
+# Results
+head(results2[results2$is.linked == T,])
+```
+
+When using a pattern table with column names or others that do not match with the default use make sure to change the corresponding parameters.
+```{r include = TRUE}
+testPatterns <- data.frame(id = c("testPat1","testPat2"),
+                           reference = c("A","G"),
+                           alternative = c("T","C"), 
+                           dist = c(NA,NA),
+                           sur = c("-","-"))
+testPatterns
+
+results2 <- identifyAndAnnotateClusters(dataTable = testDataSet, 
+                                       maxDistance = 20000,
+                                       asTibble = FALSE,
+                                       linkPatterns = TRUE,
+                                       searchPatterns = testPatterns,
+                                       searchIdHeader = "id",
+                                       searchRefHeader = "reference",
+                                       searchAltHeader = "alternative",
+                                       searchDistanceHeader = "dist",
+                                       searchContextHeader = "sur",
+                                       searchMutationSymbol = "-",
+                                       searchReverseComplement = FALSE)
+head(results2[results2$is.linked,])
 ```
 
 for more information about the added clusters use:
 ```{r include = TRUE}
 cat(comment(results))
-```
-
-## identifyClusters.R
-The `identifyCluster()` function finds clusters in a table and returns a vector with cluster IDs.
-A cluster is defined as mutations that lie within the maximum distance of each other within a chromosome.
-
-```{r include = TRUE}
-resultVector <- identifyClusters(x = testDataSet,
-                 maxDistance = 20000,
-                 chromHeader = "chrom",
-                 positionHeader = "start",
-                 sampleIdHeader = "sampleIDs")
-tail(resultVector)
 ```
 
 ## linkPatterns
@@ -119,23 +132,20 @@ If no table is sent the default table is used with only the patterns with single
 
 A proper way of using this function with the default table:
 ```{r include = TRUE}
-linkPatterns("A","T","TA.T")
+linkPatterns(ref = "A",
+             alt = "T",
+             context = "TA.T")
 ```
 
 If distance is important, use the `distance` parameter to tell the distance to the nearest mutation within a cluster. Make sure that the search pattern table has a column with the maximum distance.
 ```{r include = T}
-linkPatterns("A","T","TA.T",550)
-linkPatterns("A","T","TA.T",50)
+linkPatterns(ref = "A", alt = "T", context = "TA.T", distance = 550)
+linkPatterns(ref = "A", alt = "T", context = "TA.T", distance = 50)
 ```
 
 As visible in the default table, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation:
 ```{r include = TRUE, error = TRUE}
-linkPatterns("C","D","A.A")
-```
-
-It is possible that the reference nucleotide is an N. In this case no match is possible because the N represent for every nucleotide. In this case the function shall simply give an empty list back:
-```{r include = TRUE}
-linkPatterns("N","C","TT.")
+linkPatterns(ref = "C", alt = "D", context = "A.A")
 ```
 
 
@@ -143,32 +153,39 @@ linkPatterns("N","C","TT.")
 The `groupClusters()` function is best used as a followup function for `identifyAndAnnotateClusters()`. This function will group the data based on the cluster IDs. 
 ```{r include = TRUE}
 groups <- groupClusters(table = results,
-                    tibble = FALSE)
+                        asTibble = FALSE)
 
-# The cMuts column contains lists of mutations that belong to the cluster.
-# It's excluded in the preview because it messed up the format.
+# The cMuts column contains tables of mutations that belong to the cluster.
+# It's excluded in the preview because it messed up the format. 
 head(groups[,-which(names(groups) == "cMuts")])
 ```
 
 If the `linkPatterns = TRUE` argument is used during the `identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` argument in the `groupClusters()` to add a column with the intersection of the patterns per cluster.
 ```{r include = TRUE}
 groups <- groupClusters(table = results,
-                    patternIntersect = TRUE)
+                        patternIntersect = TRUE,
+                        asTibble = FALSE)
 
-# The cMuts column contains lists of mutations that belong to the cluster.
+# The cMuts column contains tables of mutations that belong to the cluster.
 # It's excluded because it messed up the format.
 head(groups[,-which(names(groups) == "cMuts")])
 
 # Because multiple patterns might matched the results, the patterns are put into a list.
-groups[groups$has.intersect == T,]$foundPatterns
+groups[groups$has.intersect == T,"foundPatterns"][[1]]
 ```
 
 It is also possible to search for cluster mutation patterns. See the `Default mutation patterns` chapter above for more information about these patterns.
 ```{r include = TRUE}
 groups <- groupClusters(table = results,
-                        searchClusterPatterns = TRUE)
-head(groups)
-groups[groups$has.clusterPatterns == T,]$foundPatterns
+                        searchClusterPatterns = TRUE,
+                        asTibble = FALSE)
+
+# The cMuts column contains tables of mutations that belong to the cluster.
+# It's excluded because it messed up the format.
+head(groups[,-which(names(groups) == "cMuts")])
+
+# Because multiple patterns might matched the results, the patterns are put into a list.
+groups[groups$has.clusterPatterns == T,"foundPatterns"][[1]]
 ```
 
 When combined with the `patternIntersect`:
@@ -176,8 +193,10 @@ When combined with the `patternIntersect`:
 groups <- groupClusters(table = results,
                         patternIntersect = TRUE,
                         searchClusterPatterns = TRUE)
-head(groups)
-groups[groups$has.clusterPatterns == T | groups$has.intersect == T,]$foundPatterns
+
+head(groups[,-which(names(groups) == "cMuts")])
+
+groups[groups$has.clusterPatterns == T | groups$has.intersect == T,"foundPatterns"][[1]]
 ```
 
 for more information about the columns of the group function, use:

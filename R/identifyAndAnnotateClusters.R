@@ -86,7 +86,6 @@ identifyAndAnnotateClusters <- function(dataTable, maxDistance, asTibble = TRUE,
                  )
          )
 
-
   # Add distance to nearest mutation information to the GRange object -------
   ranges <- addDistance(ranges,maxDistance)
 

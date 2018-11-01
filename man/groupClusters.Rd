@@ -5,7 +5,7 @@
 \title{groupClusters}
 \usage{
 groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
-  altHeader = "alt", tibble = TRUE, patternIntersect = FALSE,
+  altHeader = "alt", asTibble = TRUE, patternIntersect = FALSE,
   searchClusterPatterns = FALSE, patternHeader = "linkedPatterns",
   showWarning = TRUE, searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchIdHeader = "process",
@@ -25,6 +25,8 @@ nucleotides.}
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
+\item{asTibble}{A boolean if the result table has to be a tibble}
+
 \item{patternIntersect}{A Boolean if the table contains patterns and these
 needed to be processed aswell.}
 
@@ -35,6 +37,22 @@ patterns (e.g. GA > TT).}
 use when patternIntersect is TRUE.}
 
 \item{showWarning}{A Boolean if there need to be a warning if nrow is 0.}
+
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+\code{\link{mutationPatterns}} is the default search table.}
+
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
+
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
+
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
 }
 \description{
 A function that will group the clusters and give the mutation

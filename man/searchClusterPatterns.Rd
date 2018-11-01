@@ -11,6 +11,19 @@ searchClusterPatterns(groupedClusters, searchPatterns = mutationPatterns,
 \arguments{
 \item{groupedClusters}{Table gained by using the \code{\link{groupClusters}}
 function.}
+
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+\code{\link{mutationPatterns}} is the default search table.}
+
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
+
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
 }
 \description{
 A function to search cluster patterns based on reference,

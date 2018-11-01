@@ -1,12 +1,12 @@
 context("Check shuffleMutation")
 
-test <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T)
+test <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2)
 while(test[test$process == "Unidentified","percentage"][[1]] == 100){
-  test <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T)
+  test <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2)
 }
-test2 <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = F)
+test2 <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = F, no.cores = 2)
 while(test2[test2$process == "Unidentified","percentage"][[1]] == 100){
-  test2 <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = F)
+  test2 <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = F, no.cores = 2)
 }
 test_that("Check if percentage is correct",{
   expect_equal(sum(test2$percentage) >= 100,

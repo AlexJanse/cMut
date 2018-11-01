@@ -31,6 +31,9 @@ searchClusterPatterns <- function(groupedClusters,
     for(pattIndex in 1:nrow(searchPatterns)){
       id <- searchPatterns[pattIndex, searchIdHeader]
       refPat <- searchPatterns[pattIndex,searchRefHeader]
+      if(is.na(refPat)){
+        refPat <- ""
+      }
       altPat <- searchPatterns[pattIndex,searchAltHeader]
       maxDistance <- searchPatterns[pattIndex, searchDistanceHeader]
       if(grepl(refPat,row$refs) & grepl(altPat,row$alts)){

@@ -11,13 +11,8 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.0
 Depends: R (>= 3.5) 
-Imports: AnnotationHub ,
-         GenomicRanges ,
-         igraph ,
+Imports: igraph ,
          tidyverse ,
-         BSgenome.Hsapiens.UCSC.hg19 ,
-         BSgenome.Hsapiens.UCSC.hg38 ,
-         VariantAnnotation ,
          foreach ,
          data.table ,
          doParallel ,
@@ -26,4 +21,9 @@ Imports: AnnotationHub ,
 Suggests: testthat,
           knitr,
           rmarkdown
+BiocViews:  AnnotationHub ,
+            GenomicRanges ,
+            BSgenome.Hsapiens.UCSC.hg19 ,
+            BSgenome.Hsapiens.UCSC.hg38 ,
+            VariantAnnotation
 VignetteBuilder: knitr
