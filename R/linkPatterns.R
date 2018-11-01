@@ -30,6 +30,7 @@
 #'   parameter is NULL. NA's within this column are allowed.
 #' @param searchReverseComplement A boolean to also search the patterns in the
 #'   reverse complement of the searchPatterns tibble.
+#' @param showWarning A Boolean if warnings about the parameters are alowed.
 #' @return list or string with the matched patterns. If nothing's found, return
 #'   an empty list.
 #' @export
@@ -44,14 +45,17 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                          searchPatterns = mutationPatterns, searchRefHeader = "ref",
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-                         searchMutationSymbol = ".",searchReverseComplement = TRUE){
+                         searchMutationSymbol = ".",searchReverseComplement = TRUE,
+                         showWarning = TRUE){
   # check and adjust parameters ---------------------------------------------------------------
-  stopifnot(grepl(mutationSymbol,context))
-  stopifnot(nchar(ref) == 1 & nchar(alt) == 1)
-  stopifnot(is.null(distance) | is.numeric(distance))
-  stopifnot(is.character(ref) & is.character(alt) & is.character(context))
+  searchPatterns <- convertFactor(searchPatterns)
+  checkLinkPatternsParameters(ref, alt, context, distance, mutationSymbol, reverseComplement,
+                              searchPatterns, searchRefHeader,
+                              searchAltHeader, searchContextHeader,
+                              searchIdHeader, searchDistanceHeader,
+                              searchMutationSymbol,searchReverseComplement,
+                              showWarning)
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
-  stopifnot(grepl("[ACGTacgt]",alt))
 
   # check if the assigned headers are present in the given table
   stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
@@ -220,4 +224,38 @@ getAlphaMatches <- function(nuc, alphabet){
 #' @description A function to get the reverse complement of a sequence
 getReverseComplement <- function(x){
   return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
+}
+
+#' checkLinkPatternsParameters
+#' @description A function to check the parameters of linkPatterns
+checkLinkPatternsParameters <- function(ref, alt, context, distance, mutationSymbol, reverseComplement,
+                                        searchPatterns, searchRefHeader,
+                                        searchAltHeader, searchContextHeader,
+                                        searchIdHeader, searchDistanceHeader,
+                                        searchMutationSymbol,searchReverseComplement, showWarning){
+  if(!all(grepl(paste0("\\",mutationSymbol),context))){
+    stop("Please check if the mutationSymbol match with
+         the symbol used in the context.")
+  }
+  if(!all(grepl(paste0("\\",searchMutationSymbol),
+                dplyr::pull(
+                  searchPatterns[nchar(dplyr::pull(searchPatterns,searchContextHeader)) > 0,],
+                  searchContextHeader)
+  )
+  )
+  ){
+    stop("Please check if the searchMutationSymbol match with
+         the symbol used in the context column of the searchPatterns table.")
+  }
+  stopifnot(nchar(ref) == 1 & nchar(alt) == 1)
+  stopifnot(is.null(distance) | is.numeric(distance))
+  stopifnot(is.character(ref) & is.character(alt) & is.character(context))
+  if(showWarning){
+    if(grepl(paste0("[^ACGTacgt\\",mutationSymbol,"]"), context)){
+      warning(paste0("The context contain the symbol \"",stringr::str_extract(context, paste0("[^ACGTacgt\\",mutationSymbol,"]")),
+              "\", this is not an A,C,G or T or match with the mutationSymbol: \"",mutationSymbol,"\".
+              The results might therefore not be as expected."))
+    }
+  }
+  stopifnot(grepl("[ACGTacgt]",alt) & grepl("[ACGTacgt]",ref))
 }

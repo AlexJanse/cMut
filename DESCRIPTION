@@ -21,7 +21,8 @@ Imports: AnnotationHub ,
          foreach ,
          data.table ,
          doParallel ,
-         magrittr
+         magrittr ,
+         stringr
 Suggests: testthat,
           knitr,
           rmarkdown

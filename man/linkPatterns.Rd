@@ -9,7 +9,7 @@ linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
   searchDistanceHeader = "maxDistance", searchMutationSymbol = ".",
-  searchReverseComplement = TRUE)
+  searchReverseComplement = TRUE, showWarning = TRUE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide. (e.g. "C")}
@@ -51,6 +51,8 @@ nucleotide location in the column of the \code{searchContextHeader}. (e.g.
 
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
+
+\item{showWarning}{A Boolean if warnings about the parameters are alowed.}
 
 \item{searchSource}{A string with the column name of the ID of the known
 pattern.}

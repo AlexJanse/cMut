@@ -3,7 +3,7 @@
 #'   nucleotides. Then it will use the \code{\link{identifyAndAnnotateClusters}}
 #'   and \code{\link{groupClusters}} functions and returns a summary of the
 #'   frequency of found patterns.
-#' @param x A table with the reference, alternative and surrounding nucleotides.
+#' @param dataTable A table with the reference, alternative and surrounding nucleotides.
 #'   The best data to use is the output of the
 #'   \code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
 #'   TRUE.
@@ -39,7 +39,7 @@
 #'                                    nBootstrap = 5,
 #'                                    searchClusterPatterns = T)
 #'
-shuffleMutations <- function(x,chromHeader = "chrom",
+shuffleMutations <- function(dataTable,chromHeader = "chrom",
                              positionHeader = "start",
                              refHeader = "ref",
                              altHeader = "alt",
@@ -86,7 +86,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
   }
 
 
-  x <- convertFactor(x)
+  dataTable <- convertFactor(dataTable)
 
   # Add a frequence column to fill up during bootstrapping
   resultTable[nrow(resultTable)+1,searchIdHeader] <- "Unidentified"
@@ -102,8 +102,9 @@ shuffleMutations <- function(x,chromHeader = "chrom",
 
   # Preform bootstrap ------------------------------------------------------------
   resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %dopar% {
+
     # Create a table with shuffled mutations and contexts ------------------------
-    shuffleTable <- createShuffleTable(x,chromHeader,
+    shuffleTable <- createShuffleTable(dataTable,chromHeader,
                                        positionHeader,
                                        refHeader,
                                        altHeader,
@@ -111,7 +112,7 @@ shuffleMutations <- function(x,chromHeader = "chrom",
                                        sampleIdHeader)
 
     # Identify, annotate and group clustered mutations --------------------------
-    clusterTablePerMut <- identifyAndAnnotateClusters(x = shuffleTable,
+    clusterTablePerMut <- identifyAndAnnotateClusters(dataTable = shuffleTable,
                                                       maxDistance = maxDistance,
                                                       positionHeader = "pos",
                                                       linkPatterns = TRUE,

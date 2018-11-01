@@ -4,8 +4,8 @@
 \alias{shuffleMutations}
 \title{shuffleMutations}
 \usage{
-shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
-  refHeader = "ref", altHeader = "alt",
+shuffleMutations(dataTable, chromHeader = "chrom",
+  positionHeader = "start", refHeader = "ref", altHeader = "alt",
   surroundingHeader = "surrounding", sampleIdHeader = "sampleIDs",
   nBootstrap = 1000, maxDistance = 20000, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
@@ -16,7 +16,7 @@ shuffleMutations(x, chromHeader = "chrom", positionHeader = "start",
   searchClusterPatterns = FALSE, no.cores = parallel::detectCores())
 }
 \arguments{
-\item{x}{A table with the reference, alternative and surrounding nucleotides.
+\item{dataTable}{A table with the reference, alternative and surrounding nucleotides.
 The best data to use is the output of the
 \code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
 TRUE.}

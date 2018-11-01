@@ -1,7 +1,7 @@
 context("Identify and annotate clusters")
 
 testResults <- identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T)
-validationResults <- identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = 2, patternsAsList = F)
+validationResults <- identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = 2)
 test_that("Check if the linked patterns are as expected",{
   expect_equal(
     nrow(testResults[testResults$is.linked == T, ]) == 26,
@@ -62,19 +62,20 @@ testResults2 <- identifyAndAnnotateClusters(dataTable = as.data.frame(x),
                                            searchContextHeader = "sur",
                                            searchRefHeader = "reference",
                                            searchIdHeader = "id",
+                                           searchMutationSymbol = "-",
                                            searchDistanceHeader = "dist",
                                            searchReverseComplement = F,
                                            linkClustersOnly = F)
 test_that("Check if the parameters works",{
-          expect_equal(nrow(testResults),
+          expect_equal(nrow(testResults2),
                        1873)
-          expect_equal(nrow(testResults[testResults$is.linked,]),
+          expect_equal(nrow(testResults2[testResults2$is.linked,]),
                        326)
-          expect_equal(all(testResults[grepl("testPat1",testResults$linkedPatterns),]$ref == "T"),
+          expect_equal(all(testResults2[grepl("testPat1",testResults2$linkedPatterns),]$ref == "T"),
                        TRUE)
-          expect_equal(class(testResults),
+          expect_equal(class(testResults2),
                        class(data.frame()))
-          expect_equal(all(testResults[testResults$is.clustered,"distance"] <= 20000),
+          expect_equal(all(testResults2[testResults2$is.clustered,"distance"] <= 20000),
                        TRUE)
           })
 
@@ -103,5 +104,6 @@ testResults2 <- identifyAndAnnotateClusters(dataTable = x,
                                             linkClustersOnly = T)
 names(testResults2) <- names(testResults)
 test_that("Check if using the default gives the same results as setting own parameters.",
-          expect_equal(all(testResults[,-c(7,11)] == testResults2[,-c(7,11)]))
+          expect_equal(all(testResults[,-c(7,11)] == testResults2[,-c(7,11)]),
+                       TRUE)
           )

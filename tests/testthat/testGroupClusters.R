@@ -1,7 +1,7 @@
 context("Group clusters and show mutation symbols")
 
 testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T),patternIntersect = T)
-validationGroups <- groupClusters(identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = 2, patternsAsList = F),patternIntersect = T)
+validationGroups <- groupClusters(identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = 2),patternIntersect = T)
 test_that("Check if the patterns match with the expected results",{
           expect_equal(
             testGroupClusters[grepl("TEST",testGroupClusters$clusterId),][1,9][[1]],

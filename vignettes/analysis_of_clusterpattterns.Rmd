@@ -44,22 +44,53 @@ createRandomMutations(nMut = 10,
                       useChrom = c("chr1","chr2"))
 ```
 
+## Default mutation patterns
+The following functions use a search table to see if it is possible to match the mutation with certain mutation patterns. If no search table is sent through the parameters, the default is used:
+```{r echo = FALSE}
+print(mutationPatterns)
+```
+As seen in the table, there are two kinds of patterns:
+* Patterns with 1 reference, 1 alternative, with surrounding nucleotides and a maximum distance with a number or NA. These are used in the `identifyAndAnnotateClusters()` and `linkPatterns()` functions.
+* Patterns with more than 1 or no reference, more than 1 alternative, no surrounding nucleotides and always a maximum distance. These are used in the `groupClusters()` function. These are separated evaluated from the other patterns because these patterns depend on the order and distance of the mutations within a cluster.
+
 
 ## identifyAndAnnotateClusters
-The `identifyAndAnnotateClusters()` searchs for clusters by looking per sample per chromosome if there are mutations within the range of the maximum distance and (if wanted) applies `linkPatterns()` to every row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with Booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
+The `identifyAndAnnotateClusters()` searchs for clusters by looking per sample per chromosome if there are mutations within the range of the maximum distance and (if wanted) applies `linkPatterns()` to every clsutered mutation row of the sent table (to link every row, use the `linkClustersOnly = FALSE` parameter). Beside those functions, it will also add the distance towards the nearest mutations and columns with Booleans whether or not the function it referring to gave results. Make sure that the default arguments for column names correspond with the column headers of the sent table or change it if needed.
 
 ```{r include = TRUE}
-results <- identifyAndAnnotateClusters(x = testDataSet, 
+results <- identifyAndAnnotateClusters(dataTable = testDataSet, 
                                        maxDistance = 20000,
                                        asTibble = FALSE)
-results[results$is.clustered == T,][1:10,]
+head(results[results$is.clustered == T,])
 ```
 
 If the `linkPatterns()` is needed, use the `linkPatterns = TRUE` argument. See the `linkPatterns()` paragraph for more information about the function.
 ```{r include = TRUE}
-results <- identifyAndAnnotateClusters(x = testDataSet, 
+results <- identifyAndAnnotateClusters(dataTable = testDataSet, 
                                        maxDistance = 20000,
                                        asTibble = FALSE,
+                                       linkPatterns = TRUE)
+head(results[results$is.linked == T,])
+```
+
+When using a dataset with column names or others that do not match with the default use make sure to change the corresponding parameters.
+```{r include = FALSE}
+x <- testDataSet
+names(x) <- c("chr","pos","endPos","reference","variant","id","sur")
+x$sur <- gsub("\\.","-",x$sur)
+```
+```{r include = TRUE}
+# testDataSet with different column names
+x
+results <- identifyAndAnnotateClusters(dataTable = x, 
+                                       maxDistance = 20000,
+                                       altHeader = "variant",
+                                       refHeader = "reference",
+                                       mutationSymbol = "-",
+                                       positionHeader = "pos",
+                                       sampleIdHeader = "id",
+                                       contextHeader = "sur",
+                                       chromHeader = "chr",
                                        linkPatterns = TRUE)
 head(results[results$is.linked == T,])
 ```
@@ -81,17 +112,6 @@ resultVector <- identifyClusters(x = testDataSet,
                  sampleIdHeader = "sampleIDs")
 tail(resultVector)
 ```
-
-
-## Default mutation patterns
-The following functions (can) search for patterns that match with the mutations (clusters). If no pattern table is sent through the parameters, the default is used:
-```{r echo = FALSE}
-print(mutationPatterns)
-```
-As seen in the table, there are two kinds of patterns:
-* Patterns with 1 reference, 1 alternative, with surrounding nucleotides and a maximum distance with a number or NA. These are used in the `identifyAndAnnotateClusters` and `linkPatterns` functions.
-* Patterns with more than 1 or no reference, more than 1 alternative, no surrounding nucleotides and always a maximum distance. These are used in the `groupClusters` function. These are separated evaluated from the other patterns because these patterns depend on the order and distance of the mutations within a cluster.
-
 
 ## linkPatterns
 The `linkPatterns()` function will check if the provided mutation can be matched with known mutation patterns in a table and returns the ID of the match.
