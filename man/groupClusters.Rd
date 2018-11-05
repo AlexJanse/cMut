@@ -14,8 +14,8 @@ groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
 \arguments{
 \item{table}{A table with columns containing cluster IDs, reference and
 alternative nucleotide. See the output of the
-\code{\link{identifyAndAnnotateClusters}} function for more information about the
-table.}
+\code{\link{identifyAndAnnotateClusters}} function for more information
+about the table.}
 
 \item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
 
@@ -33,7 +33,8 @@ needed to be processed aswell.}
 \item{searchClusterPatterns}{A Boolean if it's needed to search to cluster
 patterns (e.g. GA > TT).}
 
-\item{patternHeader}{A string with the column name of the patterns. Only in
+\item{patternHeader}{A string with the column name of the column with the
+found patterns from the \code{\link{identifyAndAnnotateClusters}}. Only in
 use when patternIntersect is TRUE.}
 
 \item{showWarning}{A Boolean if there need to be a warning if nrow is 0.}

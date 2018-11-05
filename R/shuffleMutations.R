@@ -27,6 +27,7 @@
 #' @import foreach
 #' @import doParallel
 #' @import compiler
+#' @import doSNOW
 #' @export
 #' @examples
 #' identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = T)
@@ -98,10 +99,17 @@ shuffleMutations <- function(dataTable,chromHeader = "chrom",
    stop("The no.cores parameter is higher than amount of clusters present.")
   }
   clusters <- parallel::makeCluster(no.cores)
-  doParallel::registerDoParallel(clusters)
+  doSNOW::registerDoSNOW(clusters)
+  bar <- txtProgressBar(max = nBootstrap, style = 3)
+  progress <- function(x){setTxtProgressBar(bar,x)}
+  opts <- list(progress = progress)
 
   # Preform bootstrap ------------------------------------------------------------
-  resultTables <- foreach::foreach(iterators::icount(nBootstrap)) %dopar% {
+  resultTables <- foreach::foreach(iterators::icount(nBootstrap),
+                                   .verbose = T,
+                                   .packages = c("magrittr","cMut"),
+                                   .export = c("createShuffleTable"),
+                                   .options.snow = opts) %dopar% {
 
     # Create a table with shuffled mutations and contexts ------------------------
     shuffleTable <- createShuffleTable(dataTable,chromHeader,

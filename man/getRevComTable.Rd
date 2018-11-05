@@ -4,7 +4,8 @@
 \alias{getRevComTable}
 \title{getRevComTable}
 \usage{
-getRevComTable(table, refHeader, altHeader, contextHeader, idHeader)
+getRevComTable(table, refHeader, altHeader, contextHeader = NULL,
+  idHeader)
 }
 \description{
 A function to get the reverse complement of the known mutations
