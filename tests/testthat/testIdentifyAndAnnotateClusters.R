@@ -4,7 +4,7 @@ testResults <- identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T)
 validationResults <- identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = 2)
 test_that("Check if the linked patterns are as expected",{
   expect_equal(
-    nrow(testResults[testResults$is.linked == T, ]) == 26,
+    nrow(testResults[testResults$is.linked == T, ]) == 24,
     TRUE,
     TRUE)
   expect_equal(
@@ -68,7 +68,7 @@ testResults2 <- identifyAndAnnotateClusters(dataTable = as.data.frame(x),
                                            linkClustersOnly = F)
 test_that("Check if the parameters works",{
           expect_equal(nrow(testResults2),
-                       1873)
+                       1871)
           expect_equal(nrow(testResults2[testResults2$is.linked,]),
                        326)
           expect_equal(all(testResults2[grepl("testPat1",testResults2$linkedPatterns),]$ref == "T"),

@@ -17,7 +17,8 @@ Imports: igraph ,
          data.table ,
          doParallel ,
          magrittr ,
-         stringr
+         stringr ,
+         doSNOW
 Suggests: testthat,
           knitr,
           rmarkdown

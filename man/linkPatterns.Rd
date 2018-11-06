@@ -58,7 +58,7 @@ reverse complement of the searchPatterns tibble.}
 pattern.}
 }
 \value{
-list or string with the matched patterns. If nothing's found, return
+list with the matched patterns. If nothing's found, return
   an empty list.
 }
 \description{

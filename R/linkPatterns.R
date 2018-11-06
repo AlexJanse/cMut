@@ -31,7 +31,7 @@
 #' @param searchReverseComplement A boolean to also search the patterns in the
 #'   reverse complement of the searchPatterns tibble.
 #' @param showWarning A Boolean if warnings about the parameters are alowed.
-#' @return list or string with the matched patterns. If nothing's found, return
+#' @return list with the matched patterns. If nothing's found, return
 #'   an empty list.
 #' @export
 #' @import magrittr
@@ -55,6 +55,7 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                               searchIdHeader, searchDistanceHeader,
                               searchMutationSymbol,searchReverseComplement,
                               showWarning)
+
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
 
   # check if the assigned headers are present in the given table
@@ -105,7 +106,8 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                                                                                 compare(x,altSymbols)
                                                                                 }))
 
-  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader),function(x){
+  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader),
+                                                                                function(x){
                                                                                 compareContext(x,context, mutationSymbol, dnaSymbols, searchMutationSymbol)}
                                                                                 ))
   results <- results[results$match == T,]

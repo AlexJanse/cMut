@@ -5,16 +5,32 @@
 \title{getSummaryPatterns}
 \usage{
 getSummaryPatterns(groupedClusters, searchPatterns = NULL,
-  searchIdHeader = "process", searchReverseComplement = TRUE)
+  searchIdHeader = "process", asTibble = T)
 }
 \arguments{
+\item{groupedClusters}{A table generated from the
+\code{\link{groupClusters}}.}
+
 \item{searchPatterns}{A tibble with the known mutation patterns. The
 \code{\link{mutationPatterns}} is the default search table.}
+
+\item{asTibble}{A Boolean if the returned table needs to be a tibble or a
+data.frame}
 }
 \description{
-A function to summarise the found patterns
+A optional folowup function to summarize the results in the
+  \code{foundPatterns} column from \code{\link{groupClusters}}.
+}
+\note{
+If the \code{groupedClusters} table contains patterns that are not
+  present in the \code{searchPattern} table, then it will be marked as
+  unidentified together with clusters without patterns.
 }
 \examples{
 data <- testDataSet
-results <- identifyAndAnnotateclusters(data,20000,linkPatterns == T)
+results <- identifyAndAnnotateClusters(data,20000,linkPatterns = T)
+groupResults <- groupClusters(results,
+                              searchClusterPatterns = T,
+                              patternIntersect = T)
+summary <- getSummaryPatterns(groupResults)
 }

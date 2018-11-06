@@ -11,13 +11,13 @@ shuffleMutations(dataTable, chromHeader = "chrom",
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-  searchReverseComplement = TRUE, tibble = TRUE,
-  saveEachBootstrap = FALSE, saveFileName = NULL,
-  searchClusterPatterns = FALSE, no.cores = parallel::detectCores())
+  searchReverseComplement = TRUE, asTibble = TRUE,
+  returnEachBootstrap = FALSE, searchClusterPatterns = FALSE,
+  no.cores = parallel::detectCores())
 }
 \arguments{
-\item{dataTable}{A table with the reference, alternative and surrounding nucleotides.
-The best data to use is the output of the
+\item{dataTable}{A table with the reference, alternative and surrounding
+nucleotides. The best data to use is the output of the
 \code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
 TRUE.}
 
@@ -66,15 +66,14 @@ parameter is NULL. NA's within this column are allowed.}
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
-\item{saveEachBootstrap}{A Boolean if the summaries per bootstrap are needed
-to be saved}
+\item{asTibble}{A boolean if the result table has to be a tibble}
 
-\item{saveFileName}{A string with the name and location of the file that
-contains the idivudual summaries. Only needed if saveEachBootstrap is TRUE.}
+\item{returnEachBootstrap}{A Boolean if the summaries per bootstrap are
+needed to be returned. If TRUE then the return value will be a list with a
+summary of each bootstrap.}
 
-\item{no.cores}{A number with the amount of clusters that is allowed to
-use during shuffle. Default is maximum amount of cores present on the
-system.}
+\item{no.cores}{A number with the amount of clusters that is allowed to use
+during shuffle. Default is maximum amount of cores present on the system.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding
@@ -86,10 +85,10 @@ A function to shuffle the reference, alternative and surrounding
 identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = T)
 
 # If only the mutation patterns are needed searched:
-shuffleResults <- shuffleMutations(identResults,nBootstrap = 5)
+shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],nBootstrap = 5)
 
 # If also the cluster patterns are needed to be added:
-shuffleResults <- shuffleMutations(identResults,
+shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
                                    nBootstrap = 5,
                                    searchClusterPatterns = T)
 

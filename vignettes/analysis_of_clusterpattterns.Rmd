@@ -40,7 +40,7 @@ It is also possible to change the number of surrounding nucleotides with the `si
 createRandomMutations(nMut = 10, 
                       asTibble = FALSE,
                       sizeSur = 4,
-                      refGenomeHg19 = F,
+                      refGenomeHg19 = FALSE,
                       useChrom = c("chr1","chr2"))
 ```
 
@@ -50,6 +50,7 @@ The following functions use a search table to see if it is possible to match the
 print(mutationPatterns)
 ```
 As seen in the table, there are two kinds of patterns:
+
 * Patterns with 1 reference, 1 alternative, with surrounding nucleotides and a maximum distance with a number or NA. These are used in the `identifyAndAnnotateClusters()` and `linkPatterns()` functions.
 * Patterns with more than 1 or no reference, more than 1 alternative, no surrounding nucleotides and always a maximum distance. These are used in the `groupClusters()` function. These are separated evaluated from the other patterns because these patterns depend on the order and distance of the mutations within a cluster.
 
@@ -61,7 +62,7 @@ The `identifyAndAnnotateClusters()` searchs for clusters by looking per sample p
 results <- identifyAndAnnotateClusters(dataTable = testDataSet, 
                                        maxDistance = 20000,
                                        asTibble = FALSE)
-head(results[results$is.clustered == T,])
+head(results[results$is.clustered,])
 ```
 
 If the `linkPatterns()` is needed, use the `linkPatterns = TRUE` argument. See the `linkPatterns()` paragraph for more information about the function.
@@ -70,7 +71,7 @@ results <- identifyAndAnnotateClusters(dataTable = testDataSet,
                                        maxDistance = 20000,
                                        asTibble = FALSE,
                                        linkPatterns = TRUE)
-head(results[results$is.linked == T,])
+head(results[results$is.linked,])
 ```
 
 When using a dataset with column names or others that do not match with the default use make sure to change the corresponding parameters.
@@ -91,10 +92,10 @@ results2 <- identifyAndAnnotateClusters(dataTable = x,
                                        contextHeader = "sur",
                                        chromHeader = "chr",
                                        linkPatterns = TRUE,
-                                       asTibble = F)
+                                       asTibble = FALSE)
 
 # Results
-head(results2[results2$is.linked == T,])
+head(results2[results2$is.linked,])
 ```
 
 When using a pattern table with column names or others that do not match with the default use make sure to change the corresponding parameters.
@@ -133,14 +134,14 @@ If no table is sent the default table is used with only the patterns with single
 A proper way of using this function with the default table:
 ```{r include = TRUE}
 linkPatterns(ref = "A",
-             alt = "T",
+             alt = "G",
              context = "TA.T")
 ```
 
 If distance is important, use the `distance` parameter to tell the distance to the nearest mutation within a cluster. Make sure that the search pattern table has a column with the maximum distance.
 ```{r include = T}
-linkPatterns(ref = "A", alt = "T", context = "TA.T", distance = 550)
-linkPatterns(ref = "A", alt = "T", context = "TA.T", distance = 50)
+linkPatterns(ref = "A", alt = "G", context = "TA.T", distance = 550)
+linkPatterns(ref = "A", alt = "G", context = "TA.T", distance = 50)
 ```
 
 As visible in the default table, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation:
@@ -157,7 +158,7 @@ groups <- groupClusters(table = results,
 
 # The cMuts column contains tables of mutations that belong to the cluster.
 # It's excluded in the preview because it messed up the format. 
-head(groups[,-which(names(groups) == "cMuts")])
+head(groups[groups$clusterId != "",-which(names(groups) == "cMuts")])
 ```
 
 If the `linkPatterns = TRUE` argument is used during the `identifyAndAnnotateClusters()` function or the custom table have a similar column then it is possible to use the `patternIntersect = TRUE` argument in the `groupClusters()` to add a column with the intersection of the patterns per cluster.
@@ -168,10 +169,10 @@ groups <- groupClusters(table = results,
 
 # The cMuts column contains tables of mutations that belong to the cluster.
 # It's excluded because it messed up the format.
-head(groups[,-which(names(groups) == "cMuts")])
+head(groups[groups$clusterId != "",-which(names(groups) == "cMuts")])
 
 # Because multiple patterns might matched the results, the patterns are put into a list.
-groups[groups$has.intersect == T,"foundPatterns"][[1]]
+groups[groups$has.intersect,"foundPatterns"][[1]]
 ```
 
 It is also possible to search for cluster mutation patterns. See the `Default mutation patterns` chapter above for more information about these patterns.
@@ -182,10 +183,10 @@ groups <- groupClusters(table = results,
 
 # The cMuts column contains tables of mutations that belong to the cluster.
 # It's excluded because it messed up the format.
-head(groups[,-which(names(groups) == "cMuts")])
+head(groups[groups$clusterId != "",-which(names(groups) == "cMuts")])
 
 # Because multiple patterns might matched the results, the patterns are put into a list.
-groups[groups$has.clusterPatterns == T,"foundPatterns"][[1]]
+groups[groups$has.clusterPatterns,"foundPatterns"][[1]]
 ```
 
 When combined with the `patternIntersect`:
@@ -194,9 +195,9 @@ groups <- groupClusters(table = results,
                         patternIntersect = TRUE,
                         searchClusterPatterns = TRUE)
 
-head(groups[,-which(names(groups) == "cMuts")])
+head(groups[groups$clusterId != "",-which(names(groups) == "cMuts")])
 
-groups[groups$has.clusterPatterns == T | groups$has.intersect == T,"foundPatterns"][[1]]
+groups[groups$has.clusterPatterns | groups$has.intersect,"foundPatterns"][[1]]
 ```
 
 for more information about the columns of the group function, use:
@@ -210,14 +211,23 @@ Because analyzing the results of the `groupClusters()` function might be a lot o
 getSummaryPatterns(groups)
 ```
 
+If the `groupedClusters` table contains patterns that are not present in the `searchPatterns` table, then it will be marked as unidentified together with clusters without patterns.
+```{r include = T}
+example <- getSearchPatterns()[1,]
+example
+
+getSummaryPatterns(groups,
+                   searchPatterns = example)
+```
 
 ## shuffleMutations
 Since the `getSummaryPatterns()` function is most likely the final function to use, it might be handy to know how likely those results with linked patterns might happen though chance alone. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it execute the `identifyAndAnnotateClusters()` and `groupCluster()` function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a proper indication.
-```{r include = TRUE}
+```{r echo = TRUE, results = 'hide'}
 clusteredMut <- results[results$is.clustered == TRUE,]
 shuffle <- shuffleMutations(clusteredMut,
                             nBootstrap = 5,
                             no.cores = 1)
+shuffle
 ```
 ```{r echo = FALSE}
 while(shuffle[8,"percentage"][[1]] == 100){
@@ -228,18 +238,19 @@ shuffle
 ```
 
 If cluster patterns are also needed to be evaluated:
-```{r include = TRUE}
+```{r echo = TRUE, results = 'hide'}
 clusteredMut <- results[results$is.clustered == TRUE,]
 shuffle <- shuffleMutations(clusteredMut,
                             nBootstrap = 5,
-                            searchClusterPatterns = T,
+                            searchClusterPatterns = TRUE,
                             no.cores = 1)
+shuffle
 ```
 ```{r echo = FALSE}
 while(shuffle[11,"percentage"][[1]] == 100){
   shuffle <- shuffleMutations(clusteredMut,
                               nBootstrap = 5,
-                            searchClusterPatterns = T,
+                            searchClusterPatterns = TRUE,
                             no.cores = 1)  
 }
 shuffle

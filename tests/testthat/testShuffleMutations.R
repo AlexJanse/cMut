@@ -18,3 +18,11 @@ test_that("Check if percentage is correct",{
   expect_equal(nrow(test) == 11,
                TRUE)
 })
+
+test_that("Check if non-default parameters are working",{
+  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 20))
+  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = -1))
+  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2, altHeader = "A"))
+  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2,searchAltHeader = "e"))
+
+})
