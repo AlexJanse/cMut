@@ -1,18 +1,16 @@
 #' createRandomMutations
-#' @description Function to generate random data in a tibble with DNA mutation
-#'   information. For explanation of the columns use cat(comment(<returned
-#'   object>))
+#' @description Function to generate random mutation data.
 #' @param nMut The number of mutations that needed to be generated.
 #' @param sampleName A name for the test sample.
 #' @param asTibble A Boolean if the returned table needs to be a tibble. Returns
-#'   a data.table when FALSE.
+#'   a data.frame when FALSE.
 #' @param sizeSur A number with the ammount of nucleotides left and right of the
 #'   mutation. (e.g. sizeSur = 2 --> "CC.GT")
-#' @param refGenome A boolean with the prefered reference genome. If TRUE: the
-#'   reference will be hg19. if FALSE: HG38.
+#' @param refGenome A Boolean the prefered reference genome has to be Hg19. Hg38
+#'   will be used when \code{refGenome = FALSE}.
 #' @param useChrom A vector with the chromosomes that are used. Make sure that
 #'   the names are notated as e.g. "chr1".
-#' @return A tibble or data.table with random mutation information.
+#' @return A tibble or data.frame with random mutation data.
 #' @export
 #' @import magrittr
 #' @examples
@@ -25,7 +23,7 @@
 #'                       sampleName = "name",
 #'                       asTibble = FALSE,
 #'                       sizeSur = 4,
-#'                       refGenomeHg19 = F,
+#'                       refGenomeHg19 = FALSE,
 #'                       useChrom = c("chr1","chr2"))
 #'
 #' # See explanation of table columns
@@ -107,7 +105,7 @@ createRandomMutations <- function(nMut = 500,
   if(asTibble){
     randomTable <- tibble::as.tibble(randomTable)
   } else{
-    randomTable <- data.table::as.data.table(randomTable)
+    randomTable <- as.data.frame(randomTable)
   }
 
   comment(randomTable) <-

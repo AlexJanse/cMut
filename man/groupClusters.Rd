@@ -56,8 +56,9 @@ parameter is NULL. NA's within this column are allowed.}
 reverse complement of the searchPatterns tibble.}
 }
 \description{
-A function that will group the clusters and give the mutation
-  consensus back.
+A function that will group the clusters and if wanted find the
+  intersection of patterns between the mutations within a cluster and is able
+  to search for cluster patterns.
 }
 \examples{
 # Example of a table containing the right columns and data for the
@@ -65,7 +66,7 @@ A function that will group the clusters and give the mutation
 test <- testDataSet
 
 # Example of using this function without linking it without patterns
-mutations <- identifyAndAnnotateClusters(x = test,
+mutations <- identifyAndAnnotateClusters(dataTable = test,
                                          maxDistance = 20000,
                                          chromHeader = "chrom",
                                          sampleIdHeader = "sampleIDs",
@@ -75,7 +76,7 @@ clusters <- groupClusters(table = mutations,
                           patternIntersect = FALSE)
 
 # Example of using this function with data that contain patterns:
-mutations <- identifyAndAnnotateClusters(x = test,
+mutations <- identifyAndAnnotateClusters(dataTable = test,
                                          maxDistance = 20000,
                                          chromHeader = "chrom",
                                          sampleIdHeader = "sampleIDs",
@@ -93,4 +94,8 @@ clusters <- groupClusters(table = mutations,
 
 # For more information about the table:
 cat(comment(clusters))
+}
+\seealso{
+See \code{\link{mutationPatterns}} help page for a full explanation
+of the differences between a mutation patterns and a cluster patterns.
 }

@@ -1,6 +1,7 @@
 #' groupClusters
-#' @description A function that will group the clusters and give the mutation
-#'   consensus back.
+#' @description A function that will group the clusters and if wanted find the
+#'   intersection of patterns between the mutations within a cluster and is able
+#'   to search for cluster patterns.
 #' @param table A table with columns containing cluster IDs, reference and
 #'   alternative nucleotide. See the output of the
 #'   \code{\link{identifyAndAnnotateClusters}} function for more information
@@ -23,13 +24,15 @@
 #' @export
 #' @import magrittr
 #' @import foreach
+#' @seealso See \code{\link{mutationPatterns}} help page for a full explanation
+#' of the differences between a mutation patterns and a cluster patterns.
 #' @examples
 #' # Example of a table containing the right columns and data for the
 #' # identifiAndAnnotateClusters function:
 #' test <- testDataSet
 #'
 #' # Example of using this function without linking it without patterns
-#' mutations <- identifyAndAnnotateClusters(x = test,
+#' mutations <- identifyAndAnnotateClusters(dataTable = test,
 #'                                          maxDistance = 20000,
 #'                                          chromHeader = "chrom",
 #'                                          sampleIdHeader = "sampleIDs",
@@ -39,7 +42,7 @@
 #'                           patternIntersect = FALSE)
 #'
 #' # Example of using this function with data that contain patterns:
-#' mutations <- identifyAndAnnotateClusters(x = test,
+#' mutations <- identifyAndAnnotateClusters(dataTable = test,
 #'                                          maxDistance = 20000,
 #'                                          chromHeader = "chrom",
 #'                                          sampleIdHeader = "sampleIDs",
@@ -52,7 +55,7 @@
 #' # cluster patterns. Use ?mutationPatterns to learn about the
 #' # difference between mutation patterns and cluster patterns.
 #' clusters <- groupClusters(table = mutations,
-#'                           patternsInterSect = TRUE,
+#'                           patternIntersect = TRUE,
 #'                           searchClusterPatterns = TRUE)
 #'
 #' # For more information about the table:
@@ -129,7 +132,7 @@ groupClusters <- function(table,
   }
 
   comment(table) <-
-    "Information about the columns:
+    paste0("Information about the columns:
      clusterID            : Column with the cluster ID.
      cMuts                : Column with the tables containing the
                             mutations annotation of that cluster.
@@ -140,18 +143,21 @@ groupClusters <- function(table,
      clusterType          : Column with the cluster type for better
                             comparison between cluster mutations.
      distance             : Column with the distances found between
-                            the mutations within the cluster.
-
-     (if the parameter patternIntersect and/or
-     searchClusterPatterns is TRUE:)
+                            the mutations within the cluster.",
+ifelse(patternIntersect | searchClusterPatterns,
+paste0("
      foundPatterns        : Column with the patterns that are
-                            connected with the cluster.
+                            connected with the cluster.",
+ ifelse(patternIntersect,"
      has.intersect        : Column with a Boolean if there were
                             patterns of the mutations within the
-                            cluster that overlap eachother.
-     has.clusterPatterns  : Colum with a Boolean if there were
-                            cluster patterns found.
+                            cluster that overlap eachother.",""),
+ ifelse(searchClusterPatterns,
      "
+     has.clusterPatterns  : Column with a Boolean if there were
+                            cluster patterns found.
+       ","")),
+""))
 
   if(asTibble){
     return(tibble::as.tibble(table))

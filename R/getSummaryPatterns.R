@@ -17,6 +17,7 @@
 #'                               searchClusterPatterns = T,
 #'                               patternIntersect = T)
 #' summary <- getSummaryPatterns(groupResults)
+#' summary
 getSummaryPatterns <- function(groupedClusters,
                              searchPatterns = NULL,
                              searchIdHeader = "process",

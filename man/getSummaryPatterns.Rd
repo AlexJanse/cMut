@@ -33,4 +33,5 @@ groupResults <- groupClusters(results,
                               searchClusterPatterns = T,
                               patternIntersect = T)
 summary <- getSummaryPatterns(groupResults)
+summary
 }

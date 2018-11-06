@@ -4,11 +4,18 @@
 \alias{getSearchPatterns}
 \title{getSearchPatterns}
 \usage{
-getSearchPatterns(reverse = TRUE, asTibble = T)
+getSearchPatterns(reverse = TRUE, asTibble = TRUE)
 }
 \arguments{
 \item{reverse}{A Boolean if the reverse complementend also needed to be added}
+
+\item{asTibble}{A Boolean if the returned table needs to be a tibble. Else it will
+sent a data.frame.}
 }
 \description{
 A function to get the default search pattern table
+}
+\seealso{
+See \code{\link{mutationPatterns}} help page for full description
+about the columns and values.
 }

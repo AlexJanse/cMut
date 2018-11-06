@@ -34,7 +34,7 @@ For more information about the table use:
 cat(comment(randomData))
 ```
 
-If a tibble is inconvenience, use the `asTibble = FALSE` argument to get a data table.
+If a tibble is inconvenience, use the `asTibble = FALSE` argument to get a data frame.
 It is also possible to change the number of surrounding nucleotides with the `sizeSur` parameter, the chromosomes that are needed to be used and change the reference genome from Hg19 to Hg38 with the `refGenomeHg19 = F` parameter:
 ```{r include = T}
 createRandomMutations(nMut = 10, 

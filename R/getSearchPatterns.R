@@ -1,8 +1,12 @@
 #' getSearchPatterns
 #' @description A function to get the default search pattern table
 #' @param reverse A Boolean if the reverse complementend also needed to be added
+#' @param asTibble A Boolean if the returned table needs to be a tibble. Else it will
+#'   sent a data.frame.
+#' @seealso See \code{\link{mutationPatterns}} help page for full description
+#' about the columns and values.
 #' @export
-getSearchPatterns <- function(reverse = TRUE, asTibble = T){
+getSearchPatterns <- function(reverse = TRUE, asTibble = TRUE){
   if (asTibble) {
     searchPatterns <- tibble::as.tibble(mutationPatterns)
   } else {
