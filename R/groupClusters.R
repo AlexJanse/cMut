@@ -74,7 +74,8 @@ groupClusters <- function(table,
                           searchAltHeader = "alt",
                           searchIdHeader = "process",
                           searchDistanceHeader = "maxDistance",
-                          searchReverseComplement = TRUE){
+                          searchReverseComplement = TRUE,
+                          renameReverse = FALSE){
 
   # Check data --------------------------------------------------------------------------------------------
   stopifnot(nrow(table) > 0)
@@ -107,12 +108,13 @@ groupClusters <- function(table,
       table <- dplyr::mutate(table, foundPatterns = c(""))
     }
     if(is.null(searchPatterns)){
-      searchPatterns <- getSearchPatterns(searchReverseComplement)
+      searchPatterns <- getSearchPatterns(searchReverseComplement, renameReverse = renameReverse)
     } else if(searchReverseComplement){
       searchPatterns <- dplyr::bind_rows(searchPatterns,getRevComTable(table = searchPatterns,
                                                                        refHeader = searchRefHeader,
                                                                        altHeader = searchAltHeader,
-                                                                       idHeader = searchIdHeader))
+                                                                       idHeader = searchIdHeader,
+                                                                       renameReverse = renameReverse))
     }
     searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns, searchRefHeader)) > 1 |
                                        nchar(dplyr::pull(searchPatterns, searchRefHeader)) == 0,]

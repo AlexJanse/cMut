@@ -47,7 +47,7 @@ createRandomMutations(nMut = 10,
 ## Default mutation patterns
 The following functions use a search table to see if it is possible to match the mutation with certain mutation patterns. If no search table is sent through the parameters, the default is used:
 ```{r echo = FALSE}
-print(mutationPatterns)
+getSearchPatterns()
 ```
 As seen in the table, there are two kinds of patterns:
 

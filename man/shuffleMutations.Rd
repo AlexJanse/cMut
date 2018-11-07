@@ -13,7 +13,7 @@ shuffleMutations(dataTable, chromHeader = "chrom",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
   searchReverseComplement = TRUE, asTibble = TRUE,
   returnEachBootstrap = FALSE, searchClusterPatterns = FALSE,
-  no.cores = parallel::detectCores())
+  no.cores = parallel::detectCores(), renameReverse = FALSE)
 }
 \arguments{
 \item{dataTable}{A table with the reference, alternative and surrounding
@@ -74,6 +74,11 @@ summary of each bootstrap.}
 
 \item{no.cores}{A number with the amount of clusters that is allowed to use
 during shuffle. Default is maximum amount of cores present on the system.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding

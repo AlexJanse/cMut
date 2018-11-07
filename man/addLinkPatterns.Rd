@@ -11,7 +11,7 @@ addLinkPatterns(x, refHeader = "ref", altHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
   searchReverseComplement = TRUE, searchMutationSymbol = ".",
   checkHeader = "is.clustered", searchDistanceHeader = "maxDistance",
-  linkClustersOnly = TRUE)
+  linkClustersOnly = TRUE, renameReverse)
 }
 \arguments{
 \item{refHeader}{Contains the name of the column with the reference
@@ -58,6 +58,11 @@ parameter is NULL. NA's within this column are allowed.}
 
 \item{linkClustersOnly}{A boolean if only the clustered mutations are needed
 to be linked with the patterns in the \code{searchPatterns} table.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
 }
 \description{
 addLinkPatterns

@@ -17,7 +17,7 @@ test_that("Check if parameters are correctly processed",{
   expect_equal(nchar(test[1,"surrounding"][[1]]),
                9)
   expect_equal(class(test),
-               class(data.table::data.table()))
+               class(data.frame()))
   expect_equal(test[1,"ref"][[1]],
                as.character(BSgenome::getSeq(
                  BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,

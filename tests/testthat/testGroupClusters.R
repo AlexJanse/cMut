@@ -94,3 +94,14 @@ test_that("check if changing the default parameters gives the same result",{
           expect_equal(testGroupClusters[,9][[1]][1],
                        "PolZetaPrimair")
 })
+
+testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T,renameReverse = T),
+                                   patternIntersect = T,
+                                   searchClusterPatterns = T,
+                                   asTibble = F,
+                                   renameReverse = T)
+test_that("Check if renamReverse works",
+          expect_equal(nrow(testGroupClusters[grepl("\\[Rev\\.Com\\.\\]",testGroupClusters$foundPatterns),]),
+                       1)
+          )
+

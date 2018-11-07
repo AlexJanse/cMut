@@ -13,7 +13,7 @@ identifyAndAnnotateClusters(dataTable, maxDistance, asTibble = TRUE,
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
   searchMutationSymbol = ".", searchReverseComplement = TRUE,
-  linkClustersOnly = TRUE)
+  linkClustersOnly = TRUE, renameReverse = FALSE)
 }
 \arguments{
 \item{dataTable}{A tibble that contains at least chromosome name, sample ID
@@ -82,6 +82,11 @@ reverse complement of the searchPatterns tibble.}
 
 \item{linkClustersOnly}{A boolean if only the clustered mutations are needed
 to be linked with the patterns in the \code{searchPatterns} table.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
 }
 \value{
 The tibble that was sent as an argument for this fuction with extra

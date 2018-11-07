@@ -5,7 +5,7 @@
 \title{getSummaryPatterns}
 \usage{
 getSummaryPatterns(groupedClusters, searchPatterns = NULL,
-  searchIdHeader = "process", asTibble = T)
+  searchIdHeader = "process", renameReverse = FALSE, asTibble = T)
 }
 \arguments{
 \item{groupedClusters}{A table generated from the
@@ -13,6 +13,11 @@ getSummaryPatterns(groupedClusters, searchPatterns = NULL,
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
 \code{\link{mutationPatterns}} is the default search table.}
+
+\item{renameReverse}{A Boolean if the pattern IDs from the searchPatterns
+also need to be used to find the patterns with " [Rev.Com.]". If FALSE and
+those patterns are available, then they will be counted in the Unidentified
+row. This parameter will be irrelevant if the \code{reverse} parameter is FALSE.}
 
 \item{asTibble}{A Boolean if the returned table needs to be a tibble or a
 data.frame}

@@ -66,6 +66,19 @@ testResults2 <- identifyAndAnnotateClusters(dataTable = as.data.frame(x),
                                            searchDistanceHeader = "dist",
                                            searchReverseComplement = F,
                                            linkClustersOnly = F)
+testResults3 <- identifyAndAnnotateClusters(dataTable = as.data.frame(x),
+                                            chromHeader = "chr",
+                                            positionHeader = "pos",
+                                            refHeader = "reference",
+                                            altHeader = "variant",
+                                            sampleIdHeader = "id",
+                                            contextHeader = "sur",
+                                            mutationSymbol = "-",
+                                            maxDistance = 20000,
+                                            asTibble = F,
+                                            linkPatterns = T,
+                                            searchReverseComplement = T,
+                                            renameReverse = T)
 test_that("Check if the parameters works",{
           expect_equal(nrow(testResults2),
                        1871)
@@ -77,6 +90,8 @@ test_that("Check if the parameters works",{
                        class(data.frame()))
           expect_equal(all(testResults2[testResults2$is.clustered,"distance"] <= 20000),
                        TRUE)
+          expect_equal(nrow(testResults3[grepl("\\[Rev\\.Com\\.\\]",testResults3$linkedPatterns),]),
+                       5)
           })
 
 testPatterns <- mutationPatterns

@@ -9,7 +9,8 @@ groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
   searchClusterPatterns = FALSE, patternHeader = "linkedPatterns",
   showWarning = TRUE, searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchIdHeader = "process",
-  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE)
+  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
+  renameReverse = FALSE)
 }
 \arguments{
 \item{table}{A table with columns containing cluster IDs, reference and
@@ -54,6 +55,11 @@ parameter is NULL. NA's within this column are allowed.}
 
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
 }
 \description{
 A function that will group the clusters and if wanted find the
@@ -89,7 +95,7 @@ clusters <- groupClusters(table = mutations,
 # cluster patterns. Use ?mutationPatterns to learn about the
 # difference between mutation patterns and cluster patterns.
 clusters <- groupClusters(table = mutations,
-                          patternsInterSect = TRUE,
+                          patternIntersect = TRUE,
                           searchClusterPatterns = TRUE)
 
 # For more information about the table:

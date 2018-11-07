@@ -7,7 +7,8 @@
 checkLinkPatternsParameters(ref, alt, context, distance, mutationSymbol,
   reverseComplement, searchPatterns, searchRefHeader, searchAltHeader,
   searchContextHeader, searchIdHeader, searchDistanceHeader,
-  searchMutationSymbol, searchReverseComplement, showWarning)
+  searchMutationSymbol, searchReverseComplement, showWarning,
+  renameReverse)
 }
 \description{
 A function to check the parameters of linkPatterns

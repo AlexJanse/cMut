@@ -6,6 +6,10 @@
 #' @inheritParams createSummaryPatterns
 #' @param asTibble A Boolean if the returned table needs to be a tibble or a
 #'   data.frame
+#' @param renameReverse A Boolean if the pattern IDs from the searchPatterns
+#'   also need to be used to find the patterns with " [Rev.Com.]". If FALSE and
+#'   those patterns are available, then they will be counted in the Unidentified
+#'   row. This parameter will be irrelevant if the \code{reverse} parameter is FALSE.
 #' @export
 #' @note If the \code{groupedClusters} table contains patterns that are not
 #'   present in the \code{searchPattern} table, then it will be marked as
@@ -19,9 +23,10 @@
 #' summary <- getSummaryPatterns(groupResults)
 #' summary
 getSummaryPatterns <- function(groupedClusters,
-                             searchPatterns = NULL,
-                             searchIdHeader = "process",
-                             asTibble = T){
+                               searchPatterns = NULL,
+                               searchIdHeader = "process",
+                               renameReverse = FALSE,
+                               asTibble = T){
 
   # get or check the searchPatterns table -----------------------------------
   if(is.null(searchPatterns)){
@@ -34,6 +39,10 @@ getSummaryPatterns <- function(groupedClusters,
     searchPatterns <- tibble::as.tibble(data.frame(process = unique(searchPatterns[,searchIdHeader])
                                                    ,stringsAsFactors = F))
 
+  }
+
+  if(renameReverse){
+    searchPatterns <- dplyr::bind_rows(searchPatterns,dplyr::mutate(searchPatterns, process = paste0(process," [Rev.Com.]")))
   }
 
   # Add a unidientified column and a frequence column to fill up during bootstrapping

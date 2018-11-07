@@ -31,6 +31,10 @@
 #' @param searchReverseComplement A boolean to also search the patterns in the
 #'   reverse complement of the searchPatterns tibble.
 #' @param showWarning A Boolean if warnings about the parameters are alowed.
+#' @param renameReverse A Boolean if the id of the process needs to be renamed.
+#'   This has the effect on the cMut functions that it will no longer treat the
+#'   reverse complement and non reverse complement as the same. This parameter
+#'   will irrelevant if \code{searchReverseComplement} is FALSE.
 #' @return list with the matched patterns. If nothing's found, return
 #'   an empty list.
 #' @export
@@ -46,7 +50,7 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                          searchAltHeader = "alt", searchContextHeader = "surrounding",
                          searchIdHeader = "process", searchDistanceHeader = "maxDistance",
                          searchMutationSymbol = ".",searchReverseComplement = TRUE,
-                         showWarning = TRUE){
+                         showWarning = TRUE, renameReverse = FALSE){
   # check and adjust parameters ---------------------------------------------------------------
   searchPatterns <- convertFactor(searchPatterns)
   checkLinkPatternsParameters(ref, alt, context, distance, mutationSymbol, reverseComplement,
@@ -54,7 +58,7 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                               searchAltHeader, searchContextHeader,
                               searchIdHeader, searchDistanceHeader,
                               searchMutationSymbol,searchReverseComplement,
-                              showWarning)
+                              showWarning, renameReverse)
 
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
 
@@ -71,7 +75,8 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                                                           refHeader = searchRefHeader,
                                                           altHeader = searchAltHeader,
                                                           contextHeader = searchContextHeader,
-                                                          idHeader = searchIdHeader))
+                                                          idHeader = searchIdHeader,
+                                                          renameReverse = renameReverse))
   }
 
   # Use the reverse complement of the unknown mutation ---------------------------------------------------------------
@@ -234,7 +239,8 @@ checkLinkPatternsParameters <- function(ref, alt, context, distance, mutationSym
                                         searchPatterns, searchRefHeader,
                                         searchAltHeader, searchContextHeader,
                                         searchIdHeader, searchDistanceHeader,
-                                        searchMutationSymbol,searchReverseComplement, showWarning){
+                                        searchMutationSymbol,searchReverseComplement,
+                                        showWarning, renameReverse){
   if(!all(grepl(paste0("\\",mutationSymbol),context))){
     stop("Please check if the mutationSymbol match with
          the symbol used in the context.")
@@ -257,6 +263,9 @@ checkLinkPatternsParameters <- function(ref, alt, context, distance, mutationSym
       warning(paste0("The context contain the symbol \"",stringr::str_extract(context, paste0("[^ACGTacgt\\",mutationSymbol,"]")),
               "\", this is not an A,C,G or T or match with the mutationSymbol: \"",mutationSymbol,"\".
               The results might therefore not be as expected."))
+    }
+    if(!searchReverseComplement & renameReverse){
+      warning("Note that the renameReverse parameter is irrelevant if the searchReverseComplement is FALSE.")
     }
   }
   stopifnot(grepl("[ACGTacgt]",alt) & grepl("[ACGTacgt]",ref))

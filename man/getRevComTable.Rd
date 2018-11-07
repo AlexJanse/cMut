@@ -5,7 +5,7 @@
 \title{getRevComTable}
 \usage{
 getRevComTable(table, refHeader, altHeader, contextHeader = NULL,
-  idHeader)
+  idHeader, renameReverse)
 }
 \description{
 A function to get the reverse complement of the known mutations

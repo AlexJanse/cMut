@@ -57,7 +57,8 @@ shuffleMutations <- function(dataTable,chromHeader = "chrom",
                              asTibble = TRUE,
                              returnEachBootstrap = FALSE,
                              searchClusterPatterns = FALSE,
-                             no.cores = parallel::detectCores()){
+                             no.cores = parallel::detectCores(),
+                             renameReverse = FALSE){
 
 
   # Get the search table with known mutation patterns -------------------------------
@@ -86,9 +87,14 @@ shuffleMutations <- function(dataTable,chromHeader = "chrom",
 
   # Add the reverse complement of the known table to the search table -----------------------------------------------
   if(searchReverseComplement){
-    i <- getRevComTable(resultTable,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader)
+    i <- getRevComTable(resultTable,searchRefHeader,searchAltHeader,
+                        searchContextHeader,searchIdHeader,
+                        renameReverse = renameReverse)
     resultTable <- rbind(resultTable,i)
-    searchPatterns <- dplyr::bind_rows(searchPatterns, getRevComTable(searchPatterns,searchRefHeader,searchAltHeader,searchContextHeader,searchIdHeader))
+    searchPatterns <- dplyr::bind_rows(searchPatterns,
+                                       getRevComTable(searchPatterns,searchRefHeader,
+                                                      searchAltHeader,searchContextHeader,
+                                                      searchIdHeader, renameReverse = renameReverse))
   }
 
 

@@ -9,7 +9,8 @@ linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
   searchRefHeader = "ref", searchAltHeader = "alt",
   searchContextHeader = "surrounding", searchIdHeader = "process",
   searchDistanceHeader = "maxDistance", searchMutationSymbol = ".",
-  searchReverseComplement = TRUE, showWarning = TRUE)
+  searchReverseComplement = TRUE, showWarning = TRUE,
+  renameReverse = FALSE)
 }
 \arguments{
 \item{ref}{A string containing the reference nucleotide. (e.g. "C")}
@@ -53,6 +54,11 @@ nucleotide location in the column of the \code{searchContextHeader}. (e.g.
 reverse complement of the searchPatterns tibble.}
 
 \item{showWarning}{A Boolean if warnings about the parameters are alowed.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
 
 \item{searchSource}{A string with the column name of the ID of the known
 pattern.}
