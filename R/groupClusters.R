@@ -85,7 +85,7 @@ groupClusters <- function(table,
   table <- convertFactor(table)
   table <- dplyr::group_by_(table, clusterIdHeader)
   table <- tidyr::nest(table, .key = "cMuts")
-  table <- dplyr::filter(table, rlang::sym(clusterIdHeader) != "")
+  table <- dplyr::filter(table, !!rlang::sym(clusterIdHeader) != "")
   table <- dplyr::mutate(table, refs = purrr::map(cMuts, ~as.character(dplyr::pull(., refHeader))),
            alts = purrr::map(cMuts, ~as.character(dplyr::pull(., altHeader))))
   table <- dplyr::mutate(table, refs = purrr::map_chr(refs, function(x){paste0(x,collapse = "")}),
