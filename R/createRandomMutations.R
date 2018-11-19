@@ -199,9 +199,9 @@ createRandomTable <- function(nMut,
 
   randomTable <- data.table::data.table(chrom = sample(useChrom,
                                                        nMut,
-                                                       replace = T,
+                                                       replace = TRUE,
                                                        prob = probability),
-                                        stringsAsFactors = F)
+                                        stringsAsFactors = FALSE)
   randomTable <- dplyr::mutate(randomTable, chromLen = lenChrom[chrom])
   randomTable <- dplyr::mutate(randomTable, start = purrr::map_int(chromLen, ~sample(., 1)))
   randomTable <- dplyr::mutate(randomTable, stop = start)

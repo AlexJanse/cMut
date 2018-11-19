@@ -33,10 +33,10 @@ If the \code{groupedClusters} table contains patterns that are not
 }
 \examples{
 data <- testDataSet
-results <- identifyAndAnnotateClusters(data,20000,linkPatterns = T)
+results <- identifyAndAnnotateClusters(data,20000,linkPatterns = TRUE)
 groupResults <- groupClusters(results,
-                              searchClusterPatterns = T,
-                              patternIntersect = T)
+                              searchClusterPatterns = TRUE,
+                              patternIntersect = TRUE)
 summary <- getSummaryPatterns(groupResults)
 summary
 }

@@ -87,14 +87,17 @@ A function to shuffle the reference, alternative and surrounding
   frequency of found patterns.
 }
 \examples{
-identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = T)
+identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = TRUE)
 
 # If only the mutation patterns are needed searched:
-shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],nBootstrap = 5)
+shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
+                                   nBootstrap = 5,
+                                   no.cores = 2)
 
 # If also the cluster patterns are needed to be added:
 shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
                                    nBootstrap = 5,
-                                   searchClusterPatterns = T)
-
+                                   searchClusterPatterns = TRUE,
+                                   no.cores = 2)
+# The no.cores is set to 2 because of CRAN limits when testing the examples.
 }

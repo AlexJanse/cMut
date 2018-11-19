@@ -92,7 +92,9 @@ test_that("check if changing the default parameters gives the same result",{
           expect_equal(class(testGroupClusters2),
                        class(data.frame()))
           expect_equal(testGroupClusters[,9][[1]][1],
-                       "PolZetaPrimair")
+                       "PolZeta.endOnly")
+          expect_equal(nrow(testGroupClusters[testGroupClusters$clusterId == "",]),
+                       0)
 })
 
 testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T,renameReverse = T),
@@ -100,7 +102,7 @@ testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000
                                    searchClusterPatterns = T,
                                    asTibble = F,
                                    renameReverse = T)
-test_that("Check if renamReverse works",
+test_that("Check if renameReverse works",
           expect_equal(nrow(testGroupClusters[grepl("\\[Rev\\.Com\\.\\]",testGroupClusters$foundPatterns),]),
                        1)
           )

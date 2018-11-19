@@ -15,10 +15,10 @@ test_that("Check if the results match with the expectation",{
                2)
   expect_equal(testSummary[testSummary$process == "MMR","frequency"][[1]],
                2)
-  expect_equal(testSummary[testSummary$process == "PolZetaPrimair","frequency"][[1]],
-               2)
-  expect_equal(testSummary[testSummary$process == "PolZetaSecundair","frequency"][[1]],
+  expect_equal(testSummary[testSummary$process == "PolZeta","frequency"][[1]],
+               0)
+  expect_equal(testSummary[testSummary$process == "PolZeta.endOnly","frequency"][[1]],
                2)
   expect_equal(nrow(testSummary),
-               11)
+               10)
 })

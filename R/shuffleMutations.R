@@ -28,16 +28,19 @@
 #' @import doSNOW
 #' @export
 #' @examples
-#' identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = T)
+#' identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = TRUE)
 #'
 #' # If only the mutation patterns are needed searched:
-#' shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],nBootstrap = 5)
+#' shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
+#'                                    nBootstrap = 5,
+#'                                    no.cores = 2)
 #'
 #' # If also the cluster patterns are needed to be added:
 #' shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
 #'                                    nBootstrap = 5,
-#'                                    searchClusterPatterns = T)
-#'
+#'                                    searchClusterPatterns = TRUE,
+#'                                    no.cores = 2)
+#' # The no.cores is set to 2 because of CRAN limits when testing the examples.
 shuffleMutations <- function(dataTable,chromHeader = "chrom",
                              positionHeader = "start",
                              refHeader = "ref",
@@ -64,8 +67,8 @@ shuffleMutations <- function(dataTable,chromHeader = "chrom",
   # Get the search table with known mutation patterns -------------------------------
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
-    resultTable <- getSearchPatterns(reverse = F, asTibble = F)
-    searchPatterns <- getSearchPatterns(reverse = F, asTibble = F)
+    resultTable <- getSearchPatterns(reverse = FALSE, asTibble = FALSE)
+    searchPatterns <- getSearchPatterns(reverse = FALSE, asTibble = FALSE)
   } else {
     resultTable <- convertFactor(as.data.frame(searchPatterns))
     searchPatterns <- convertFactor(as.data.frame(searchPatterns))
@@ -272,7 +275,7 @@ createSummaryPatterns <- function(clusterTable,
         } else {
           addFreq <- nrow(clusterTable[index,"cMuts"][[1]])
         }
-        if(any(grepl(pattern,dplyr::pull(searchPatterns,searchIdHeader)))){
+        if(any(grepl(pattern,dplyr::pull(searchPatterns,searchIdHeader),fixed = TRUE))){
           frequency <- searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"][[1]]
           searchPatterns[searchPatterns[,grep(searchIdHeader, names(searchPatterns))] == pattern,"frequency"] <- frequency + addFreq
 
@@ -362,7 +365,7 @@ shuffleParallel <- function(dataTable,chromHeader, positionHeader,
 
   # Preform bootstrap ------------------------------------------------------------
   resultTables <- foreach::foreach(iterators::icount(nBootstrap),
-                                   .verbose = T,
+                                   .verbose = TRUE,
                                    .packages = c("magrittr","cMut"),
                                    .export = c("createShuffleTable"),
                                    .options.snow = opts) %dopar% {
@@ -390,7 +393,7 @@ shuffleParallel <- function(dataTable,chromHeader, positionHeader,
 
                                      clusterTable <- groupClusters(clusterTablePerMut,
                                                                    patternIntersect = TRUE,
-                                                                   showWarning = F,
+                                                                   showWarning = FALSE,
                                                                    searchClusterPatterns = searchClusterPatterns,
                                                                    searchPatterns = searchPatterns[nchar(dplyr::pull(searchPatterns,searchRefHeader)) > 1,],
                                                                    searchRefHeader = searchRefHeader,
@@ -405,9 +408,9 @@ shuffleParallel <- function(dataTable,chromHeader, positionHeader,
                                      subResultTable <- createSummaryPatterns(clusterTable,
                                                                              searchPatterns = subResultTable,
                                                                              searchIdHeader,
-                                                                             random = T)
+                                                                             random = TRUE)
 
-                                     total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == T,]))
+                                     total <- list("total",nrow(clusterTablePerMut[clusterTablePerMut$is.clustered == TRUE,]))
                                      subResultTable <- rbind(subResultTable,total)
                                    }
   parallel::stopCluster(clusters)

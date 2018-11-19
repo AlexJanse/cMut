@@ -247,7 +247,7 @@ shuffle <- shuffleMutations(clusteredMut,
 shuffle
 ```
 ```{r echo = FALSE}
-while(shuffle[11,"percentage"][[1]] == 100){
+while(shuffle[10,"percentage"][[1]] == 100){
   shuffle <- shuffleMutations(clusteredMut,
                               nBootstrap = 5,
                             searchClusterPatterns = TRUE,

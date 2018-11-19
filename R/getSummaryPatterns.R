@@ -16,10 +16,10 @@
 #'   unidentified together with clusters without patterns.
 #' @examples
 #' data <- testDataSet
-#' results <- identifyAndAnnotateClusters(data,20000,linkPatterns = T)
+#' results <- identifyAndAnnotateClusters(data,20000,linkPatterns = TRUE)
 #' groupResults <- groupClusters(results,
-#'                               searchClusterPatterns = T,
-#'                               patternIntersect = T)
+#'                               searchClusterPatterns = TRUE,
+#'                               patternIntersect = TRUE)
 #' summary <- getSummaryPatterns(groupResults)
 #' summary
 getSummaryPatterns <- function(groupedClusters,
@@ -32,12 +32,12 @@ getSummaryPatterns <- function(groupedClusters,
   if(is.null(searchPatterns)){
     # Get default table if nothing is sent
     searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[,"process"])
-                                                ,stringsAsFactors = F))
+                                                ,stringsAsFactors = FALSE))
   } else {
     # check if the assigned headers are present in the given table
     stopifnot(any(grepl(searchIdHeader,names(searchPatterns))))
     searchPatterns <- tibble::as.tibble(data.frame(process = unique(searchPatterns[,searchIdHeader])
-                                                   ,stringsAsFactors = F))
+                                                   ,stringsAsFactors = FALSE))
 
   }
 
@@ -52,7 +52,7 @@ getSummaryPatterns <- function(groupedClusters,
   # Count the amount of mutations per pattern per cluster ------------------------
   table <- createSummaryPatterns(groupedClusters,
                                  searchPatterns,
-                                 searchIdHeader, random = F)
+                                 searchIdHeader, random = FALSE)
 
   # Determine the total clustered mutations --------------------------------------
   total <- 0

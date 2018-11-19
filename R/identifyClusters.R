@@ -5,10 +5,6 @@
 #' @inheritParams identifyAndAnnotateClusters
 #' @return A atomic character vector; contains per index the chromosoom nr,
 #'   sample naam and any cluster ID's. For example: Chr1 testSample 1
-#' @examples
-#' data <- testDataSet
-#' dataClusters <- identifyClusters(x = data,
-#'                                  maxDistance = 20000)
 identifyClusters <- function(x,
                              maxDistance,
                              chromHeader="Chr",

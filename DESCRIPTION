@@ -1,6 +1,6 @@
 Package: cMut
 Type: Package
-Title: Identify and annotate clustered mutations and link to patterns.
+Title: Identify and annotate clustered mutations and link to patterns
 Version: 0.1.0
 Authors@R: person("Alex", "Janse", email = "alex.janse@radboudumc.nl", role = c("aut", "cre"))
 Description: cMut is capable to find clusters and link them to mutation patterns. 
@@ -9,7 +9,7 @@ Description: cMut is capable to find clusters and link them to mutation patterns
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 Depends: R (>= 3.5) 
 Imports: igraph ,
          tidyverse ,
@@ -22,7 +22,7 @@ Imports: igraph ,
 Suggests: testthat,
           knitr,
           rmarkdown
-BiocViews:  AnnotationHub ,
+BiocViews: AnnotationHub ,
             GenomicRanges ,
             BSgenome.Hsapiens.UCSC.hg19 ,
             BSgenome.Hsapiens.UCSC.hg38 ,

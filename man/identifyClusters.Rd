@@ -29,8 +29,3 @@ A function that is able to search for clusters in DNA mutation
   table (as explained by argument x) in a single chromosoom for a single
   sample.
 }
-\examples{
-data <- testDataSet
-dataClusters <- identifyClusters(x = data,
-                                 maxDistance = 20000)
-}

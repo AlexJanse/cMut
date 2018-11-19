@@ -63,9 +63,9 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   if(grepl("[^ACGTacgt]",ref)){return(list(""))}
 
   # check if the assigned headers are present in the given table
-  stopifnot(any(grepl(searchAltHeader,names(searchPatterns))))
-  stopifnot(any(grepl(searchRefHeader,names(searchPatterns))))
-  stopifnot(any(grepl(searchContextHeader,names(searchPatterns))))
+  stopifnot(any(grepl(searchAltHeader,names(searchPatterns),fixed = T)))
+  stopifnot(any(grepl(searchRefHeader,names(searchPatterns),fixed = T)))
+  stopifnot(any(grepl(searchContextHeader,names(searchPatterns),fixed = T)))
   searchPatterns <- convertFactor(searchPatterns)
   searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns,searchRefHeader)) == 1,]
 
@@ -89,15 +89,15 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   dnaSymbols <- dplyr::enquo(dnaSymbols)
 
 
-  ref <- casefold(ref,upper = T)
+  ref <- casefold(ref,upper = TRUE)
   ref <- dplyr::enquo(ref)
   refSymbols <- getAlphaMatches(ref,dnaSymbols)
 
-  alt <- casefold(alt, upper = T)
+  alt <- casefold(alt, upper = TRUE)
   alt <- dplyr::enquo(alt)
   altSymbols <- getAlphaMatches(alt,dnaSymbols)
 
-  context <- casefold(context, upper = T)
+  context <- casefold(context, upper = TRUE)
   context <- dplyr::enquo(context)
 
   mutationSymbol <- dplyr::enquo(mutationSymbol)
@@ -107,18 +107,18 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
   results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),function(x){
                                                                   compare(x,refSymbols)
                                                                   }))
-  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),function(x){
+  results <- dplyr::mutate(results[results$match == TRUE,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),function(x){
                                                                                 compare(x,altSymbols)
                                                                                 }))
 
-  results <- dplyr::mutate(results[results$match == T,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader),
+  results <- dplyr::mutate(results[results$match == TRUE,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader),
                                                                                 function(x){
                                                                                 compareContext(x,context, mutationSymbol, dnaSymbols, searchMutationSymbol)}
                                                                                 ))
-  results <- results[results$match == T,]
+  results <- results[results$match == TRUE,]
   if(!is.null(distance)){
     results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),function(x){ifelse(is.na(x),TRUE,x >= distance)}))
-    results <- results[results$match == T,]
+    results <- results[results$match == TRUE,]
   }
 
   if(nrow(results) > 0){

@@ -15,7 +15,7 @@ test_that("Check if percentage is correct",{
                TRUE)
   expect_equal(sum(test$percentage) >= 100,
                TRUE)
-  expect_equal(nrow(test) == 11,
+  expect_equal(nrow(test) == 10,
                TRUE)
 })
 
@@ -33,5 +33,5 @@ test_that("Check if returnEachBootstrap and renameReverse are working properly",
   expect_equal(class(test),
                class(list()))
   expect_equal(nrow(test[[1]]),
-               22)
+               20)
 })
