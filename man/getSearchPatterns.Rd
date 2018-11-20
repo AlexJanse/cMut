@@ -21,6 +21,12 @@ will sent a data.frame.}
 \description{
 A function to get the default search pattern table
 }
+\note{
+Please note that if there are patterns where the reverse complement is
+  the same as the original sequence then the reverse complement won't be
+  made. This is done to avoid double counting when \code{renameReverse =
+  TRUE} is used.
+}
 \seealso{
 See \code{\link{mutationPatterns}} help page for full description
   about the columns and values.

@@ -7,6 +7,10 @@
 #' @param renameReverse A Boolean if the id of the process needs to be renamed.
 #'   This has the effect on the cMut functions that it will no longer treat the
 #'   reverse complement and non reverse complement as the same.
+#' @note Please note that if there are patterns where the reverse complement is
+#'   the same as the original sequence then the reverse complement won't be
+#'   made. This is done to avoid double counting when \code{renameReverse =
+#'   TRUE} is used.
 #' @seealso See \code{\link{mutationPatterns}} help page for full description
 #'   about the columns and values.
 #' @export
@@ -32,18 +36,24 @@ getSearchPatterns <- function(reverse = TRUE, renameReverse = FALSE ,asTibble = 
 #' getRevComTable
 #' @description A function to get the reverse complement of the known mutations
 getRevComTable <- function(table, refHeader, altHeader, contextHeader = NULL, idHeader, renameReverse){
-  table <- dplyr::mutate(table, !!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),function(x){ifelse(nchar(x) == 1,revNuc[x],as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))}))
-  table <- dplyr::mutate(table, !!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),function(x){ifelse(nchar(x) == 1,revNuc[x],as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))}))
+  revCom <- dplyr::mutate(table, !!rlang::sym(refHeader) := purrr::map_chr(!!rlang::sym(refHeader),function(x){ifelse(nchar(x) == 1,revNuc[x],as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))}))
+  revCom <- dplyr::mutate(revCom, !!rlang::sym(altHeader) := purrr::map_chr(!!rlang::sym(altHeader),function(x){ifelse(nchar(x) == 1,revNuc[x],as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))}))
   if(!is.null(contextHeader)){
-    table <- dplyr::mutate(table, !!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),function(x){
+    revCom <- dplyr::mutate(revCom, !!rlang::sym(contextHeader) := purrr::map_chr(!!rlang::sym(contextHeader),function(x){
       as.character(Biostrings::reverseComplement(Biostrings::DNAString(x)))
       }))
   }
+  revCom <- dplyr::mutate(revCom, !!rlang::sym(idHeader) := !!rlang::sym(idHeader))
+  revCom <- setdiff.data.frame(revCom,table)
   if(renameReverse){
-    table <- dplyr::mutate(table, !!rlang::sym(idHeader) := paste0(!!rlang::sym(idHeader)," [Rev.Com.]"))
-  } else {
-    table <- dplyr::mutate(table, !!rlang::sym(idHeader) := !!rlang::sym(idHeader))
+    revCom <- dplyr::mutate(revCom, !!rlang::sym(idHeader) := paste0(!!rlang::sym(idHeader)," [Rev.Com.]"))
   }
 
-  return(table)
+  return(revCom)
 }
+
+#' setdiff.data.frame
+#' @description Quick function to apply \code{\link{setdiff}} on dataframes
+setdiff.data.frame <- function(x,y){
+  x[!duplicated(rbind(y,x))[-seq_len(nrow(y))], ]
+  }
