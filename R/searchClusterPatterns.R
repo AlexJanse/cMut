@@ -10,7 +10,8 @@ searchClusterPatterns <- function(groupedClusters,
                                   searchRefHeader      = "ref",
                                   searchAltHeader      = "alt",
                                   searchDistanceHeader = "maxDistance",
-                                  searchIdHeader       = "process") {
+                                  searchIdHeader       = "process",
+                                  reverseComplement    = FALSE) {
 
   # Check parameters -----------------------------------------------
   stopifnot(all(nchar(searchPatterns[ ,searchRefHeader]) >  1 |
@@ -29,7 +30,6 @@ searchClusterPatterns <- function(groupedClusters,
   # Convert search table to the correct class --------------------
   searchPatterns <- as.data.frame(searchPatterns)
 
-
   # Try to find cluster patterns in the table --------------------
 
   # Create list to fill in the results:
@@ -37,7 +37,24 @@ searchClusterPatterns <- function(groupedClusters,
 
   # Loop over the sent data:
   for (index in 1:nrow(groupedClusters)) {
-    row <- groupedClusters[index, ]
+    row     <- groupedClusters[index, ]
+    rowRefs <- row$refs
+    rowAlts <- row$alts
+
+    # Get reverse complement if
+    if(reverseComplement){
+      rowRefs <- lapply(rowRefs,
+                        function(x) {
+                          Biostrings::reverseComplement(
+                            Biostrings::DNAString(x))
+                          })
+      rowAlts <- lapply(rowAlts,
+                        function(x) {
+                          Biostrings::reverseComplement(
+                            Biostrings::DNAString(x))
+                        })
+    }
+
     subclusterPatterns <- c()
 
     for (pattIndex in 1:nrow(searchPatterns)) {
@@ -53,7 +70,7 @@ searchClusterPatterns <- function(groupedClusters,
 
       # Check if the data from the search table match with the data
       #   in the sent data row:
-      if ((refPat == row$refs | refPat == "") & altPat == row$alts) {
+      if ((refPat == rowRefs | refPat == "") & altPat == rowAlts) {
         clusterDistance <- max(row$distance[[1]])
 
         if (clusterDistance <= maxDistance) {

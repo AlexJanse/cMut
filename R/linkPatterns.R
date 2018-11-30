@@ -9,7 +9,8 @@
 #'   table has a distance column and it's needed to be take into account while
 #'   comparing.
 #' @param reverseComplement A Boolean to tell if the \code{ref}, \code{alt} and
-#'   \code{context} needed to be searched with the reverse complement.
+#'   \code{context} needs to be searched with the reverse complement. Irrelevant
+#'   if \code{searchReverseComplement = TRUE}.
 #' @param mutationSymbol A string with the symbol that stands for the mutated
 #'   nucleotide location in the \code{context}. (e.g. "." in "G.C")
 #' @param searchPatterns A tibble with the known mutation patterns. The

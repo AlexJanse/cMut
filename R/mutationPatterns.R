@@ -10,12 +10,14 @@
 #'   \item Patterns with 1 reference, 1 alternative, with surrounding
 #'   nucleotides and a maximum distance with a number or NA. These are used in
 #'   the \code{\link{identifyAndAnnotateClusters}} and \code{\link{linkPatterns}}
-#'   functions.
+#'   functions. These patterns will be called mutation patterns in the
+#'   documentation of this package.
 #'   \item Patterns with more than 1 or no reference, more than 1 alternative,
 #'   no surrounding nucleotides and always a maximum distance. These are used in
 #'   the \code{\link{groupClusters}} function. These are separated evaluated
 #'   from the other patterns because these patterns depend on the order and
-#'   distance of the mutations within a cluster.
+#'   distance of the mutations within a cluster. These patterns will be called
+#'   cluster patterns in the documentation of this package.
 #' }
 #'
 #' @format A data frame with 15 rows and 5 columns \describe{

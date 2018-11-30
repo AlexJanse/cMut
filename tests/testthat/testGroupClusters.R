@@ -103,9 +103,9 @@ testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000
                                    searchClusterPatterns = T,
                                    asTibble = F,
                                    renameReverse = T)
-# TODO: pas testdata aan zodat deze test kan worden uitgevoerd!!
+
 test_that("Check if renameReverse works",
           expect_equal(nrow(testGroupClusters[grepl("\\[Rev\\.Com\\.\\]",testGroupClusters$foundPatterns),]),
-                       0)
+                       2)
           )
 

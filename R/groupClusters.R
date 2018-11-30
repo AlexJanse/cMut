@@ -21,6 +21,10 @@
 #'   patterns (e.g. GA > TT).
 #' @inheritParams identifyAndAnnotateClusters
 #' @inheritParams linkPatterns
+#' @param reverseComplement A Boolean to tell if the \code{ref}, \code{alt}
+#'   needs to be searched with the reverse complement. Irrelevant if
+#'   \code{searchClusterPatterns = FALSE} or \code{searchReverseComplement =
+#'   TRUE}.
 #' @export
 #' @import magrittr
 #' @import foreach
@@ -68,7 +72,8 @@ groupClusters <- function(table,                                   clusterIdHead
                           showWarning             = TRUE,          searchPatterns       = NULL,
                           searchRefHeader         = "ref",         searchAltHeader      = "alt",
                           searchIdHeader          = "process",     searchDistanceHeader = "maxDistance",
-                          searchReverseComplement = TRUE,          renameReverse        = FALSE) {
+                          searchReverseComplement = TRUE,          renameReverse        = FALSE,
+                          reverseComplement       = FALSE) {
 
 
   # Check data --------------------------------------------------------------

@@ -47,17 +47,18 @@
 #'                                    searchClusterPatterns = TRUE,
 #'                                    no.cores   = 2)
 #' # The no.cores is set to 2 because of CRAN limits when testing the examples.
-shuffleMutations <- function(dataTable,                             chromHeader           = "chrom",
-                             positionHeader          = "start",     refHeader             = "ref",
-                             altHeader               = "alt",       contextHeader         = "surrounding",
-                             sampleIdHeader          = "sampleIDs", nBootstrap            = 1000,
-                             maxDistance             = 20000,       reverseComplement     = FALSE,
-                             searchPatterns          = NULL,        searchRefHeader       = "ref",
-                             searchAltHeader         = "alt",       searchContextHeader   = "surrounding",
-                             searchIdHeader          = "process",   searchDistanceHeader  = "maxDistance",
-                             searchReverseComplement = TRUE,        asTibble              = TRUE,
-                             returnEachBootstrap     = FALSE,       searchClusterPatterns = FALSE,
-                             renameReverse           = FALSE,       no.cores              = parallel::detectCores()) {
+shuffleMutations <- function(dataTable,                             chromHeader             = "chrom",
+                             positionHeader        = "start",       refHeader               = "ref",
+                             altHeader             = "alt",         contextHeader           = "surrounding",
+                             sampleIdHeader        = "sampleIDs",   nBootstrap              = 1000,
+                             maxDistance           = 20000,         linkPatterns            = TRUE,
+                             reverseComplement     = FALSE,         searchPatterns          = NULL,
+                             searchRefHeader       = "ref",         searchAltHeader         = "alt",
+                             searchContextHeader   = "surrounding", searchIdHeader          = "process",
+                             searchDistanceHeader  = "maxDistance", searchReverseComplement = TRUE,
+                             asTibble              = TRUE,          returnEachBootstrap     = FALSE,
+                             searchClusterPatterns = FALSE,         renameReverse           = FALSE,
+                             no.cores              = parallel::detectCores()) {
 
 
 
@@ -82,7 +83,7 @@ shuffleMutations <- function(dataTable,                             chromHeader 
                                   searchIdHeader          = searchIdHeader,          searchDistanceHeader  = searchDistanceHeader,
                                   searchReverseComplement = searchReverseComplement, asTibble              = asTibble,
                                   returnEachBootstrap     = returnEachBootstrap,     searchClusterPatterns = searchClusterPatterns,
-                                  no.cores                = no.cores)
+                                  no.cores                = no.cores,                linkPatterns          = linkPatterns)
 
   if (!searchClusterPatterns) {
     searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns,
@@ -125,7 +126,8 @@ shuffleMutations <- function(dataTable,                             chromHeader 
                                   searchAltHeader = searchAltHeader, searchContextHeader     = searchContextHeader,
                                   searchIdHeader  = searchIdHeader,  searchDistanceHeader    = searchDistanceHeader,
                                   resultTable     = resultTable,     searchClusterPatterns   = searchClusterPatterns,
-                                  no.cores        = no.cores,        searchReverseComplement = searchReverseComplement)
+                                  no.cores        = no.cores,        searchReverseComplement = searchReverseComplement,
+                                  linkPatterns    = linkPatterns)
 
 
   # Prepare to return the results -------------------------------------------
@@ -135,9 +137,10 @@ shuffleMutations <- function(dataTable,                             chromHeader 
   }
 
   # Summarize the results and add comment about the summary:
-  results <- summarizeBootstrap(resultTable    = resultTable, resultTables = resultTables,
+  results <- summarizeBootstrap(resultTable    = resultTable,
+                                resultTables   = resultTables,
                                 searchIdHeader = searchIdHeader)
-  results <- addShuffleMutationComment(results)
+  results <- addShuffleMutationComment(results, searchIdHeader)
 
   # Return the results in the desired class:
   if (asTibble) {
@@ -268,7 +271,7 @@ checkParametersShuffleMutations <- function(dataTable,               chromHeader
                                             searchIdHeader,          searchDistanceHeader,
                                             searchReverseComplement, asTibble,
                                             returnEachBootstrap,     searchClusterPatterns,
-                                            no.cores){
+                                            no.cores,                linkPatterns){
 
 
   # Check headers -----------------------------------------------------------
@@ -305,6 +308,10 @@ checkParametersShuffleMutations <- function(dataTable,               chromHeader
   stopifnot(is.logical(searchClusterPatterns) &
             is.logical(reverseComplement) &
             is.logical(searchReverseComplement))
+  if(!searchClusterPatterns & !linkPatterns){
+    stop ("Error: Both linkPatterns and searchClusterPatterns are FALSE.
+          So no patterns will be searched and no results can be made.")
+  }
 }
 
 
@@ -319,7 +326,8 @@ shuffleParallel <- function(dataTable,               chromHeader,
                             searchAltHeader,         searchContextHeader,
                             searchIdHeader,          searchDistanceHeader,
                             searchReverseComplement, searchClusterPatterns,
-                            no.cores,                resultTable){
+                            no.cores,                resultTable,
+                            linkPatterns){
 
   # Prepare for parallel loop -----------------------------------------------
   clusters <- parallel::makeCluster(no.cores)
@@ -345,7 +353,7 @@ shuffleParallel <- function(dataTable,               chromHeader,
 
                                      # Identify, annotate and group clustered mutations --------------------------
                                      clusterTablePerMut <- identifyAndAnnotateClusters(dataTable               = shuffleTable,    maxDistance          = maxDistance,
-                                                                                       positionHeader          = "pos",           linkPatterns         = TRUE,
+                                                                                       positionHeader          = "pos",           linkPatterns         = linkPatterns,
                                                                                        searchPatterns          = searchPatterns,  searchRefHeader      = searchRefHeader,
                                                                                        searchAltHeader         = searchAltHeader, searchContextHeader  = searchContextHeader,
                                                                                        searchIdHeader          = searchIdHeader,  searchDistanceHeader = searchDistanceHeader,
@@ -417,11 +425,11 @@ summarizeBootstrap <- function(resultTable,  resultTables,
 
 #' addShuffleMutationComment
 #' @description A function to add comment about the result table.
-addShuffleMutationComment <- function(results) {
+addShuffleMutationComment <- function(results, searchIdHeader) {
   comment(results) <-
-    "
+    paste0("
     Information about the summary table columns:
-    *searchIdHeader*     : Column with the pattern IDs from
+    ",searchIdHeader,"     : Column with the pattern IDs from
                            the searchPatterns table.
     frequency            : Column with the number of mutations
                            that had this pattern ID as intersect
@@ -433,6 +441,6 @@ addShuffleMutationComment <- function(results) {
                            linked with multiple patterns. However
                            the total percentage should never be
                            below 100%.
-  "
+  ")
   return(results)
 }
