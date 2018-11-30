@@ -23,8 +23,9 @@ Suggests: testthat,
           knitr,
           rmarkdown
 BiocViews: AnnotationHub ,
-            GenomicRanges ,
-            BSgenome.Hsapiens.UCSC.hg19 ,
-            BSgenome.Hsapiens.UCSC.hg38 ,
-            VariantAnnotation
+           GenomicRanges ,
+           BSgenome.Hsapiens.UCSC.hg19 ,
+           BSgenome.Hsapiens.UCSC.hg38 ,
+           BSgenome ,
+           VariantAnnotation
 VignetteBuilder: knitr

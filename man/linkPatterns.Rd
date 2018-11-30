@@ -21,7 +21,7 @@ linkPatterns(ref, alt, context, distance = NULL, mutationSymbol = ".",
 
 \item{distance}{A number that tells the distance to the nearest mutation in a
 cluster. This parameter should stay NULL unless the \code{searchPatterns}
-table has a distance column and it's needed to be take into acount while
+table has a distance column and it's needed to be take into account while
 comparing.}
 
 \item{mutationSymbol}{A string with the symbol that stands for the mutated
@@ -42,6 +42,9 @@ alternative nucleotide in the searchPatterns table.}
 \item{searchContextHeader}{A string with the column name of the one with the
 context nucleotide in the searchPatterns table.}
 
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
 \item{searchDistanceHeader}{A string with the column name of the one with the
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
@@ -53,26 +56,25 @@ nucleotide location in the column of the \code{searchContextHeader}. (e.g.
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
-\item{showWarning}{A Boolean if warnings about the parameters are alowed.}
+\item{showWarning}{A Boolean if warnings about the parameters are allowed.}
 
 \item{renameReverse}{A Boolean if the id of the process needs to be renamed.
 This has the effect on the cMut functions that it will no longer treat the
 reverse complement and non reverse complement as the same. This parameter
 will irrelevant if \code{searchReverseComplement} is FALSE.}
-
-\item{searchSource}{A string with the column name of the ID of the known
-pattern.}
 }
 \value{
-list with the matched patterns. If nothing's found, return
-  an empty list.
+list with the matched patterns. If nothing's found, return an empty
+  list.
 }
 \description{
 A function that is able to find matches between a submitted
   unkown mutation and a known mutation pattern table.
 }
 \examples{
-results <- linkPatterns("C","T","TA.T")
+results <- linkPatterns(ref     = "C",
+                        alt     = "T",
+                        context = "TA.T")
 
 # To see the default searchPattern table and it's information:
 ?mutationPatterns

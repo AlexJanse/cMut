@@ -4,14 +4,11 @@
 \alias{addLinkPatterns}
 \title{addLinkPatterns}
 \usage{
-addLinkPatterns(x, refHeader = "ref", altHeader = "alt",
-  contextHeader = "surrounding", mutationSymbol = ".",
-  reverseComplement = FALSE, searchPatterns = NULL,
-  searchRefHeader = "ref", searchAltHeader = "alt",
-  searchContextHeader = "surrounding", searchIdHeader = "process",
-  searchReverseComplement = TRUE, searchMutationSymbol = ".",
-  checkHeader = "is.clustered", searchDistanceHeader = "maxDistance",
-  linkClustersOnly = TRUE, renameReverse)
+addLinkPatterns(table, refHeader, altHeader, contextHeader, mutationSymbol,
+  reverseComplement, searchPatterns, searchRefHeader, searchAltHeader,
+  searchContextHeader, searchIdHeader, searchReverseComplement,
+  searchMutationSymbol, checkHeader, searchDistanceHeader,
+  linkClustersOnly, renameReverse)
 }
 \arguments{
 \item{refHeader}{Contains the name of the column with the reference
@@ -23,7 +20,7 @@ nucleotides.}
 \item{contextHeader}{A string with the name of the column with the context.
 The data inside this column is e.g. "C.G" hereby stands the "." for the
 location of the mutation. What symbol is used to describe this location is
-irrelevant but be sure to adjust the \code{mutationSymbol} accordingly when
+arbitrary but be sure to adjust the \code{mutationSymbol} accordingly when
 searching for patterns. The \code{contextHeader} is irrelevant if
 \code{linkPatterns} is FALSE.}
 
@@ -45,6 +42,9 @@ alternative nucleotide in the searchPatterns table.}
 \item{searchContextHeader}{A string with the column name of the one with the
 context nucleotide in the searchPatterns table.}
 
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
@@ -56,8 +56,9 @@ nucleotide location in the column of the \code{searchContextHeader}. (e.g.
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
 
-\item{linkClustersOnly}{A boolean if only the clustered mutations are needed
-to be linked with the patterns in the \code{searchPatterns} table.}
+\item{linkClustersOnly}{A boolean to tell if only the clustered mutations are
+needed to be linked with the patterns in the \code{searchPatterns} table.
+When it is FALSE all the mutations will be used.}
 
 \item{renameReverse}{A Boolean if the id of the process needs to be renamed.
 This has the effect on the cMut functions that it will no longer treat the
@@ -65,5 +66,6 @@ reverse complement and non reverse complement as the same. This parameter
 will irrelevant if \code{searchReverseComplement} is FALSE.}
 }
 \description{
-addLinkPatterns
+A function to add columns to the sent table with information
+  gathered from the \code{\link{linkPatterns}} function.
 }

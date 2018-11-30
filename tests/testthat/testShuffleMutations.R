@@ -33,5 +33,5 @@ test_that("Check if returnEachBootstrap and renameReverse are working properly",
   expect_equal(class(test),
                class(list()))
   expect_equal(nrow(test[[1]]),
-               20)
+               19)
 })

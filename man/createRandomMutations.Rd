@@ -4,29 +4,28 @@
 \alias{createRandomMutations}
 \title{createRandomMutations}
 \usage{
-createRandomMutations(nMut = 500, sampleName = "testSample",
-  asTibble = TRUE, sizeSur = 2, refGenomeHg19 = TRUE,
-  useChrom = c("chr1", "chr2", "chr3", "chr4", "chr5", "chr6", "chr7",
-  "chr8", "chr9", "chr10", "chr11", "chr12", "chr13", "chr14", "chr15",
-  "chr16", "chr17", "chr18", "chr19", "chr20", "chr21", "chr22", "chrX",
-  "chrY"))
+createRandomMutations(nMut, sampleName = "testSample", asTibble = TRUE,
+  sizeSur = 2, refGenomeHg19 = TRUE, useChrom = c("chr1", "chr2",
+  "chr3", "chr4", "chr5", "chr6", "chr7", "chr8", "chr9", "chr10", "chr11",
+  "chr12", "chr13", "chr14", "chr15", "chr16", "chr17", "chr18", "chr19",
+  "chr20", "chr21", "chr22", "chrX", "chrY"))
 }
 \arguments{
 \item{nMut}{The number of mutations that needed to be generated.}
 
 \item{sampleName}{A name for the test sample.}
 
-\item{asTibble}{A Boolean if the returned table needs to be a tibble. Returns
-a data.frame when FALSE.}
+\item{asTibble}{A Boolean to tell if the returned table needs to be a tibble.
+Returns a data.frame when FALSE.}
 
-\item{sizeSur}{A number with the ammount of nucleotides left and right of the
+\item{sizeSur}{A number with the amount of nucleotides left and right of the
 mutation. (e.g. sizeSur = 2 --> "CC.GT")}
+
+\item{refGenomeHg19}{A Boolean to tell if the preferred reference genome has
+to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}
 
 \item{useChrom}{A vector with the chromosomes that are used. Make sure that
 the names are notated as e.g. "chr1".}
-
-\item{refGenome}{A Boolean the prefered reference genome has to be Hg19. Hg38
-will be used when \code{refGenome = FALSE}.}
 }
 \value{
 A tibble or data.frame with random mutation data.
@@ -35,17 +34,17 @@ A tibble or data.frame with random mutation data.
 Function to generate random mutation data.
 }
 \examples{
-x <- createRandomMutations(nMut = 100,
+x <- createRandomMutations(nMut       = 100,
                            sampleName = "test",
-                           sizeSur = 3)
+                           sizeSur    = 3)
 
 # Proper way of using all the parameters:
-createRandomMutations(nMut = 10,
-                      sampleName = "name",
-                      asTibble = FALSE,
-                      sizeSur = 4,
+createRandomMutations(nMut          = 10,
+                      sampleName    = "name",
+                      asTibble      = FALSE,
+                      sizeSur       = 4,
                       refGenomeHg19 = FALSE,
-                      useChrom = c("chr1","chr2"))
+                      useChrom      = c("chr1", "chr2"))
 
 # See explanation of table columns
 cat(comment(x))

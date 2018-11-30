@@ -1,16 +1,14 @@
 context("Identify and annotate clusters")
 
 testResults <- identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T)
-validationResults <- identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = 2)
+validationResults <- identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = T)
 test_that("Check if the linked patterns are as expected",{
   expect_equal(
-    nrow(testResults[testResults$is.linked == T, ]) == 24,
-    TRUE,
-    TRUE)
+    nrow(testResults[testResults$is.linked == T, ]),
+    24)
   expect_equal(
     testResults[testResults$sampleIDs == "TEST","linkedPatterns"][1,][[1]][[1]],
-    c("AID"),
-    TRUE)
+    "AID")
   expect_equal(
     nrow(validationResults[grepl("AID",validationResults$linkedPatterns),]),
     156
@@ -84,7 +82,7 @@ test_that("Check if the parameters works",{
                        1871)
           expect_equal(nrow(testResults2[testResults2$is.linked,]),
                        326)
-          expect_equal(all(testResults2[grepl("testPat1",testResults2$linkedPatterns),]$ref == "T"),
+          expect_equal(all(testResults2[grepl("testPat1",testResults2$linkedPatterns),]$reference == "T"),
                        TRUE)
           expect_equal(class(testResults2),
                        class(data.frame()))

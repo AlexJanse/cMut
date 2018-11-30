@@ -24,6 +24,9 @@ alternative nucleotide in the searchPatterns table.}
 \item{searchDistanceHeader}{A string with the column name of the one with the
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
+
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
 }
 \description{
 A function to search cluster patterns based on reference,

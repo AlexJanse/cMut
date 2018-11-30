@@ -5,7 +5,8 @@
 \title{groupClusters}
 \usage{
 groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
-  altHeader = "alt", asTibble = TRUE, patternIntersect = FALSE,
+  altHeader = "alt", contextHeader = "surrounding",
+  mutationSymbol = ".", asTibble = TRUE, patternIntersect = FALSE,
   searchClusterPatterns = FALSE, patternHeader = "linkedPatterns",
   showWarning = TRUE, searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchIdHeader = "process",
@@ -26,10 +27,21 @@ nucleotides.}
 \item{altHeader}{Contains the name of the column with the alternative
 nucleotides.}
 
-\item{asTibble}{A boolean if the result table has to be a tibble}
+\item{contextHeader}{A string with the name of the column with the context.
+The data inside this column is e.g. "C.G" hereby stands the "." for the
+location of the mutation. What symbol is used to describe this location is
+arbitrary but be sure to adjust the \code{mutationSymbol} accordingly when
+searching for patterns. The \code{contextHeader} is irrelevant if
+\code{linkPatterns} is FALSE.}
+
+\item{mutationSymbol}{A string with the symbol that stands for the mutated
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
+
+\item{asTibble}{A boolean to tell if the result table has to be a tibble.
+When it is FALSE it will return data.frame}
 
 \item{patternIntersect}{A Boolean if the table contains patterns and these
-needed to be processed aswell.}
+needed to be processed as well.}
 
 \item{searchClusterPatterns}{A Boolean if it's needed to search to cluster
 patterns (e.g. GA > TT).}
@@ -49,6 +61,9 @@ reference nucleotide in the searchPatterns table.}
 \item{searchAltHeader}{A string with the column name of the one with the
 alternative nucleotide in the searchPatterns table.}
 
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
 \item{searchDistanceHeader}{A string with the column name of the one with the
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
@@ -63,8 +78,8 @@ will irrelevant if \code{searchReverseComplement} is FALSE.}
 }
 \description{
 A function that will group the clusters and if wanted find the
-  intersection of patterns between the mutations within a cluster and is able
-  to search for cluster patterns.
+  intersection of patterns between the mutations within a cluster. And is
+  also able to search for cluster patterns.
 }
 \examples{
 # Example of a table containing the right columns and data for the
@@ -72,30 +87,30 @@ A function that will group the clusters and if wanted find the
 test <- testDataSet
 
 # Example of using this function without linking it without patterns
-mutations <- identifyAndAnnotateClusters(dataTable = test,
-                                         maxDistance = 20000,
-                                         chromHeader = "chrom",
+mutations <- identifyAndAnnotateClusters(dataTable      = test,
+                                         maxDistance    = 20000,
+                                         chromHeader    = "chrom",
                                          sampleIdHeader = "sampleIDs",
                                          positionHeader = "start",
-                                         linkPatterns = FALSE)
-clusters <- groupClusters(table = mutations,
+                                         linkPatterns   = FALSE)
+clusters <- groupClusters(table            = mutations,
                           patternIntersect = FALSE)
 
 # Example of using this function with data that contain patterns:
-mutations <- identifyAndAnnotateClusters(dataTable = test,
-                                         maxDistance = 20000,
-                                         chromHeader = "chrom",
+mutations <- identifyAndAnnotateClusters(dataTable      = test,
+                                         maxDistance    = 20000,
+                                         chromHeader    = "chrom",
                                          sampleIdHeader = "sampleIDs",
                                          positionHeader = "start",
-                                         linkPatterns = TRUE)
-clusters <- groupClusters(table = mutations,
+                                         linkPatterns   = TRUE)
+clusters <- groupClusters(table            = mutations,
                           patternIntersect = TRUE)
 
 # Example of using this function when it is needed to search for
 # cluster patterns. Use ?mutationPatterns to learn about the
 # difference between mutation patterns and cluster patterns.
-clusters <- groupClusters(table = mutations,
-                          patternIntersect = TRUE,
+clusters <- groupClusters(table                 = mutations,
+                          patternIntersect      = TRUE,
                           searchClusterPatterns = TRUE)
 
 # For more information about the table:
@@ -103,5 +118,5 @@ cat(comment(clusters))
 }
 \seealso{
 See \code{\link{mutationPatterns}} help page for a full explanation
-of the differences between a mutation patterns and a cluster patterns.
+  of the differences between mutation patterns and cluster patterns.
 }

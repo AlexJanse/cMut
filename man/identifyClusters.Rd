@@ -4,12 +4,16 @@
 \alias{identifyClusters}
 \title{identifyClusters}
 \usage{
-identifyClusters(x, maxDistance, chromHeader = "Chr",
+identifyClusters(dataTable, maxDistance, chromHeader = "Chr",
   sampleIdHeader = "sampleID", positionHeader = "Pos")
 }
 \arguments{
-\item{maxDistance}{A number; The maximum distance between DNA mutations that
-count as clustered.}
+\item{dataTable}{A data.frame or tibble that contains at least chromosome
+name, sample ID and position information. The data cannot contain any NA.
+For an example use \code{\link{testDataSet}}.}
+
+\item{maxDistance}{A number with the maximum distance between DNA mutations
+that are defined as being in a cluster.}
 
 \item{chromHeader}{A string with the name of the column with the chromosome
 name. (So the data in the column needs to be notated as e.g. "chr2")}
@@ -18,14 +22,14 @@ name. (So the data in the column needs to be notated as e.g. "chr2")}
 ID.}
 
 \item{positionHeader}{A string with the name of the column with the position
-of the mutation. The data in the column needs to be numberic.}
+of the mutation. (The data in the column needs to be nummeric.)}
 }
 \value{
-A atomic character vector; contains per index the chromosoom nr,
-  sample naam and any cluster ID's. For example: Chr1 testSample 1
+A atomic character vector; contains per index the chromosome nr,
+  sample name and any cluster ID's. For example: Chr1 testSample 1
 }
 \description{
 A function that is able to search for clusters in DNA mutation
-  table (as explained by argument x) in a single chromosoom for a single
+  table (as explained by argument dataTable) in a single chromosome for a single
   sample.
 }

@@ -5,7 +5,7 @@
 \title{shuffleParallel}
 \usage{
 shuffleParallel(dataTable, chromHeader, positionHeader, refHeader,
-  altHeader, surroundingHeader, sampleIdHeader, nBootstrap, maxDistance,
+  altHeader, contextHeader, sampleIdHeader, nBootstrap, maxDistance,
   reverseComplement, searchPatterns, searchRefHeader, searchAltHeader,
   searchContextHeader, searchIdHeader, searchDistanceHeader,
   searchReverseComplement, searchClusterPatterns, no.cores, resultTable)

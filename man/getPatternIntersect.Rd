@@ -7,7 +7,7 @@
 getPatternIntersect(clusterList, patternHeader)
 }
 \arguments{
-\item{clusterList}{A tibble with the mutations information.}
+\item{clusterList}{A tibble with the mutation information.}
 
 \item{patternHeader}{A string with the column header of the patterns.}
 }

@@ -5,7 +5,7 @@
 \title{getSummaryPatterns}
 \usage{
 getSummaryPatterns(groupedClusters, searchPatterns = NULL,
-  searchIdHeader = "process", renameReverse = FALSE, asTibble = T)
+  searchIdHeader = "process", renameReverse = FALSE, asTibble = TRUE)
 }
 \arguments{
 \item{groupedClusters}{A table generated from the
@@ -14,29 +14,42 @@ getSummaryPatterns(groupedClusters, searchPatterns = NULL,
 \item{searchPatterns}{A tibble with the known mutation patterns. The
 \code{\link{mutationPatterns}} is the default search table.}
 
-\item{renameReverse}{A Boolean if the pattern IDs from the searchPatterns
-also need to be used to find the patterns with " [Rev.Com.]". If FALSE and
-those patterns are available, then they will be counted in the Unidentified
-row. This parameter will be irrelevant if the \code{reverse} parameter is FALSE.}
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
 
-\item{asTibble}{A Boolean if the returned table needs to be a tibble or a
-data.frame}
+\item{renameReverse}{A Boolean to tell if the pattern IDs from the
+searchPatterns also needs to be used to find the patterns with "
+[Rev.Com.]". If FALSE and those patterns are available, then they will be
+counted in the Unidentified row.}
+
+\item{asTibble}{A Boolean to tell if the returned table needs to be a tibble
+or a data.frame.}
 }
 \description{
-A optional folowup function to summarize the results in the
+A optional follow-up function to summarize the results of the
   \code{foundPatterns} column from \code{\link{groupClusters}}.
 }
 \note{
 If the \code{groupedClusters} table contains patterns that are not
-  present in the \code{searchPattern} table, then it will be marked as
-  unidentified together with clusters without patterns.
+  present in the \code{searchPattern} table, then they will be marked as
+  \code{Unidentified} together with clusters without patterns.
 }
 \examples{
+# Example dataset
 data <- testDataSet
-results <- identifyAndAnnotateClusters(data,20000,linkPatterns = TRUE)
-groupResults <- groupClusters(results,
+
+# Use the following functions to get the necessary table
+results <- identifyAndAnnotateClusters(dataTable    = data,
+                                       maxDistance  = 20000,
+                                       linkPatterns = TRUE)
+groupResults <- groupClusters(table                 = results,
                               searchClusterPatterns = TRUE,
-                              patternIntersect = TRUE)
+                              patternIntersect      = TRUE)
+
+# Use the getSummaryPatterns function to see the summary of found patterns
 summary <- getSummaryPatterns(groupResults)
 summary
+
+# For more information about the columns use:
+cat(comment(summary))
 }

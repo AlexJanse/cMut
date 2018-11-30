@@ -5,7 +5,7 @@
 \title{checkParametersShuffleMutations}
 \usage{
 checkParametersShuffleMutations(dataTable, chromHeader, positionHeader,
-  refHeader, altHeader, surroundingHeader, sampleIdHeader, nBootstrap,
+  refHeader, altHeader, contextHeader, sampleIdHeader, nBootstrap,
   maxDistance, reverseComplement, searchPatterns, searchRefHeader,
   searchAltHeader, searchContextHeader, searchIdHeader,
   searchDistanceHeader, searchReverseComplement, asTibble,
@@ -13,5 +13,5 @@ checkParametersShuffleMutations(dataTable, chromHeader, positionHeader,
 }
 \description{
 A function to check if the parameters are correct of the
-  \code{\link{shuffleMuations}} function
+  \code{\link{shuffleMutations}} function
 }

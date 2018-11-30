@@ -7,7 +7,7 @@
 \format{A data frame with 15 rows and 5 columns \describe{
   \item{process}{*A process that is connected with the mutation pattern.}
   \item{ref}{*Nucleotide that is found in the reference genome.}
-  \item{alt}{*Nucleotide that the reference is transformed/mutated in.}
+  \item{alt}{*Nucleotide that is observed instead of the reference nucleotide.}
   \item{surrounding}{**The surrounding nucleotides where the mutation takes
   place. The "." represent the location of the mutation. The symbol itself
   can be anything as long as it's adjusted correctly when using functions
@@ -23,7 +23,7 @@ mutationPatterns
 \description{
 A small data set of mutationpatterns of known mutators in human DNA. If
 you're using this as a reference to build a searchPattern table, then be sure
-to include the * marked columns. The \*\* marked columns means that at least
+to include the * marked columns. The ** marked columns means that at least
 one of the two is needed. Hereby is the data itself important and not
 necessary the header name.
 As seen in the table, there are two kinds of patterns:
@@ -32,11 +32,11 @@ As seen in the table, there are two kinds of patterns:
   nucleotides and a maximum distance with a number or NA. These are used in
   the \code{\link{identifyAndAnnotateClusters}} and \code{\link{linkPatterns}}
   functions.
-  \item Patterns with more than 1 or no reference, more than 1 alternative, no
-  surrounding nucleotides and always a maximum distance. These are used in
-  the \code{\link{groupClusters}} function. These are seperated evalued from the
-  other patterns because these patterns depent on the order and distance of the
-  mutations within a cluster.
+  \item Patterns with more than 1 or no reference, more than 1 alternative,
+  no surrounding nucleotides and always a maximum distance. These are used in
+  the \code{\link{groupClusters}} function. These are separated evaluated
+  from the other patterns because these patterns depend on the order and
+  distance of the mutations within a cluster.
 }
 }
 \keyword{datasets}

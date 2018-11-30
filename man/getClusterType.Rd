@@ -12,5 +12,6 @@ getClusterType(plusStrand, minusStrand)
 \item{plusstrand}{A string with the plusStrand mutation description.}
 }
 \description{
-Function to sort and create a cluster type (e.g. C>G C>G / G>C G>C).
+Function to sort and create a cluster type (e.g. C>G C>G / G>C
+  G>C).
 }

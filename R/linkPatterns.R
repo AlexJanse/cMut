@@ -6,7 +6,7 @@
 #' @param context A string containing the surrounding nucleotides. (e.g. "G.C")
 #' @param distance A number that tells the distance to the nearest mutation in a
 #'   cluster. This parameter should stay NULL unless the \code{searchPatterns}
-#'   table has a distance column and it's needed to be take into acount while
+#'   table has a distance column and it's needed to be take into account while
 #'   comparing.
 #' @param reverseComplement A Boolean to tell if the \code{ref}, \code{alt} and
 #'   \code{context} needed to be searched with the reverse complement.
@@ -20,56 +20,54 @@
 #'   alternative nucleotide in the searchPatterns table.
 #' @param searchContextHeader A string with the column name of the one with the
 #'   context nucleotide in the searchPatterns table.
+#' @param searchIdHeader A string with the column name of the one with the
+#'   pattern IDs.
 #' @param searchMutationSymbol A string with symbol that stands for the mutated
 #'   nucleotide location in the column of the \code{searchContextHeader}. (e.g.
 #'   "." in "G.C")
-#' @param searchSource A string with the column name of the ID of the known
-#'   pattern.
 #' @param searchDistanceHeader A string with the column name of the one with the
 #'   maximum distance between clustered mutations. Not needed if the distance
 #'   parameter is NULL. NA's within this column are allowed.
 #' @param searchReverseComplement A boolean to also search the patterns in the
 #'   reverse complement of the searchPatterns tibble.
-#' @param showWarning A Boolean if warnings about the parameters are alowed.
+#' @param showWarning A Boolean if warnings about the parameters are allowed.
 #' @param renameReverse A Boolean if the id of the process needs to be renamed.
 #'   This has the effect on the cMut functions that it will no longer treat the
 #'   reverse complement and non reverse complement as the same. This parameter
 #'   will irrelevant if \code{searchReverseComplement} is FALSE.
-#' @return list with the matched patterns. If nothing's found, return
-#'   an empty list.
+#' @return list with the matched patterns. If nothing's found, return an empty
+#'   list.
 #' @export
 #' @import magrittr
 #' @examples
-#' results <- linkPatterns("C","T","TA.T")
+#' results <- linkPatterns(ref     = "C",
+#'                         alt     = "T",
+#'                         context = "TA.T")
 #'
 #' # To see the default searchPattern table and it's information:
 #' ?mutationPatterns
 #' mutationPatterns
-linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".", reverseComplement = FALSE,
-                         searchPatterns = mutationPatterns, searchRefHeader = "ref",
-                         searchAltHeader = "alt", searchContextHeader = "surrounding",
-                         searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-                         searchMutationSymbol = ".",searchReverseComplement = TRUE,
-                         showWarning = TRUE, renameReverse = FALSE){
+linkPatterns <- function(ref,                                     alt,
+                         context,                                 distance                = NULL,
+                         mutationSymbol       = ".",              reverseComplement       = FALSE,
+                         searchPatterns       = mutationPatterns, searchRefHeader         = "ref",
+                         searchAltHeader      = "alt",            searchContextHeader     = "surrounding",
+                         searchIdHeader       = "process",        searchDistanceHeader    = "maxDistance",
+                         searchMutationSymbol = ".",              searchReverseComplement = TRUE,
+                         showWarning          = TRUE,             renameReverse           = FALSE){
+
   # check and adjust parameters ---------------------------------------------------------------
   searchPatterns <- convertFactor(searchPatterns)
-  checkLinkPatternsParameters(ref, alt, context, distance, mutationSymbol, reverseComplement,
-                              searchPatterns, searchRefHeader,
-                              searchAltHeader, searchContextHeader,
-                              searchIdHeader, searchDistanceHeader,
-                              searchMutationSymbol,searchReverseComplement,
-                              showWarning, renameReverse)
+  checkLinkPatternsParameters(ref                  = ref,                  alt                     = alt,
+                              context              = context,              distance                = distance,
+                              mutationSymbol       = mutationSymbol,       reverseComplement       = reverseComplement,
+                              searchPatterns       = searchPatterns,       searchRefHeader         = searchRefHeader,
+                              searchAltHeader      = searchAltHeader,      searchContextHeader     = searchContextHeader,
+                              searchIdHeader       = searchIdHeader,       searchDistanceHeader    = searchDistanceHeader,
+                              searchMutationSymbol = searchMutationSymbol, searchReverseComplement = searchReverseComplement,
+                              showWarning          = showWarning,          renameReverse           = renameReverse)
 
-  if(grepl("[^ACGTacgt]",ref)){return(list(""))}
-
-  # check if the assigned headers are present in the given table
-  stopifnot(any(grepl(searchAltHeader,names(searchPatterns),fixed = T)))
-  stopifnot(any(grepl(searchRefHeader,names(searchPatterns),fixed = T)))
-  stopifnot(any(grepl(searchContextHeader,names(searchPatterns),fixed = T)))
-  searchPatterns <- convertFactor(searchPatterns)
-  searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns,searchRefHeader)) == 1,]
-
-  # Add the reverse complement of the known table to the search table -----------------------------------------------
+  # Add the reverse complement of the known table to the search table -------
   if(searchReverseComplement){
     searchPatterns <- dplyr::bind_rows(searchPatterns,getRevComTable(table = searchPatterns,
                                                           refHeader = searchRefHeader,
@@ -79,63 +77,85 @@ linkPatterns <- function(ref, alt, context, distance = NULL ,mutationSymbol = ".
                                                           renameReverse = renameReverse))
   }
 
-  # Use the reverse complement of the unknown mutation ---------------------------------------------------------------
+
+  # Use the reverse complement of the ref/alt/context if asked --------------
   if(reverseComplement){
     ref <- getReverseComplement(ref)
     alt <- getReverseComplement(alt)
     context <- getReverseComplement(context)
   }
+
+
   dnaSymbols <- tibble::as.tibble(dnaAlphabet)
-  dnaSymbols <- dplyr::enquo(dnaSymbols)
 
-
-  ref <- casefold(ref,upper = TRUE)
-  ref <- dplyr::enquo(ref)
+  ref        <- casefold(ref, upper = TRUE)
   refSymbols <- getAlphaMatches(ref,dnaSymbols)
 
-  alt <- casefold(alt, upper = TRUE)
-  alt <- dplyr::enquo(alt)
+  alt        <- casefold(alt, upper = TRUE)
   altSymbols <- getAlphaMatches(alt,dnaSymbols)
 
   context <- casefold(context, upper = TRUE)
-  context <- dplyr::enquo(context)
 
-  mutationSymbol <- dplyr::enquo(mutationSymbol)
   searchMutationSymbol <- as.character(searchMutationSymbol)
-  searchMutationSymbol <- dplyr::enquo(searchMutationSymbol)
-  # Create results -----------------------------------------------------------------
-  results <- dplyr::mutate(searchPatterns, match = purrr::map_lgl(!!rlang::sym(searchRefHeader),function(x){
-                                                                  compare(x,refSymbols)
-                                                                  }))
-  results <- dplyr::mutate(results[results$match == TRUE,], match = purrr::map_lgl(!!rlang::sym(searchAltHeader),function(x){
-                                                                                compare(x,altSymbols)
-                                                                                }))
 
-  results <- dplyr::mutate(results[results$match == TRUE,], match = purrr::map_lgl(!!rlang::sym(searchContextHeader),
-                                                                                function(x){
-                                                                                compareContext(x,context, mutationSymbol, dnaSymbols, searchMutationSymbol)}
-                                                                                ))
-  results <- results[results$match == TRUE,]
-  if(!is.null(distance)){
-    results <- dplyr::mutate(results, match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),function(x){ifelse(is.na(x),TRUE,x >= distance)}))
-    results <- results[results$match == TRUE,]
+
+  # Create results ----------------------------------------------------------
+  # Check if the unknown mutation match with each column:
+  results <- dplyr::mutate(searchPatterns,
+                           match = purrr::map_lgl(!!rlang::sym(searchRefHeader),
+                                                  function(x) {
+                                                    compare(nucleotide = x,
+                                                            symbols    = refSymbols)
+                                                  }))
+  results <- dplyr::mutate(results[results$match == TRUE, ],
+                           match = purrr::map_lgl(!!rlang::sym(searchAltHeader),
+                                                  function(x) {
+                                                    compare(nucleotide = x,
+                                                            symbols    = altSymbols)
+                                                  }))
+
+  results <- dplyr::mutate(results[results$match == TRUE, ],
+                           match = purrr::map_lgl(!!rlang::sym(searchContextHeader),
+                                                  function(x) {
+                                                    compareContext(searchContext        = x,
+                                                                   findContext          = context,
+                                                                   mutationSymbol       = mutationSymbol,
+                                                                   alphabet             = dnaSymbols,
+                                                                   searchMutationSymbol = searchMutationSymbol)
+                                                  }))
+  results <- results[results$match == TRUE, ]
+
+
+  # Check distance if a distance is submited --------------------------------
+  if (!is.null(distance)) {
+    results <- dplyr::mutate(results,
+                             match = purrr::map_lgl(!!rlang::sym(searchDistanceHeader),
+                                                    function(x) {
+                                                      ifelse(is.na(x),
+                                                             TRUE,
+                                                             x >= distance)
+                                                      }))
+    results <- results[results$match == TRUE, ]
   }
 
-  if(nrow(results) > 0){
-    matchedPatterns <- list(unique(dplyr::pull(results,searchIdHeader)))
+
+  # Ckech if there are any results left -------------------------------------
+  if (nrow(results) > 0) {
+    return(list(unique(dplyr::pull(results, searchIdHeader))))
   } else {
     return(list(""))
   }
-  return(matchedPatterns)
+
 }
+
 
 #' compare
 #' @description A function to see if the nucleotide is present in the symbol
 #'   data frame
 #' @param nucleotide A string with a single nucleotide
 #' @param symbols A data frame with the symbols to match with the nucleotide
-compare <- function(nucleotide,symbols){
-  if(nrow(symbols[symbols$symbol == nucleotide,]) == 0){
+compare <- function(nucleotide, symbols){
+  if (nrow(symbols[symbols$symbol == nucleotide, ]) == 0){
     return(FALSE)
   } else {
     return(TRUE)
@@ -144,49 +164,61 @@ compare <- function(nucleotide,symbols){
 
 #' compareContext
 #' @description Function to compare nucleotides context
-#' @param context2 A string with a context (e.g. C.G) This one will act as the
+#' @param searchContext A string with a context (e.g. C.G) This one will act as the
 #'   known mutation context for linkPatterns function.
-#' @param context1 A string with a context (e.g.  C.C)
+#' @param findContext A string with a context (e.g.  C.C)
 #' @param mutationSymbol A character that stands for the mutation nucleotide
 #'   (e.g. "." for C.G)
 #' @param alphabet A tibble with the nucleotides and their symbols
 #' @return Boolean if the contexts match or not
-compareContext <- function(context2, context1, mutationSymbol, alphabet,searchMutationSymbol){
-  context1 <- rlang::get_expr(context1)
-  context2 <- rlang::get_expr(context2)
-  mutationSymbol <- rlang::get_expr(mutationSymbol)
+compareContext <- function(searchContext,  findContext,
+                           mutationSymbol, alphabet,
+                           searchMutationSymbol){
 
-  alphabet <- rlang::get_expr(alphabet)
-  context1List <- strsplit(context1,paste0("\\",mutationSymbol))
-  context1Before <- context1List[[1]][1]
-  context1After <- context1List[[1]][2]
 
-  searchMutationSymbol <- rlang::get_expr(searchMutationSymbol)
-  context2List <- strsplit(context2,paste0("\\",searchMutationSymbol))
-  context2Before <- context2List[[1]][1]
-  context2After <- context2List[[1]][2]
+  # Split the contexts by the corresponding mutation symbol -----------------
+  findContextList   <- strsplit(findContext,
+                                paste0("\\", mutationSymbol))
+  findContextBefore <- findContextList[[1]][1]
+  findContextAfter  <- findContextList[[1]][2]
 
+  searchContextList   <- strsplit(searchContext,
+                                  paste0("\\", searchMutationSymbol))
+  searchContextBefore <- searchContextList[[1]][1]
+  searchContextAfter  <- searchContextList[[1]][2]
+
+
+  # Compare the contexts and return the result ------------------------------
   counter = 0
-  for(context in list(c(context1Before,context2Before),c(context1After,context2After))){
-    counter <- counter+1
-    nNuc <- getNnuc(context[1],context[2])
-    if(nNuc == -1){
+  for (context in list(c(findContextBefore, searchContextBefore),
+                       c(findContextAfter,  searchContextAfter))) {
+    counter <- counter + 1
+    nNuc <- getNnuc(context[1], context[2])
+
+    if (nNuc == -1) {
       return(FALSE)
-    } else if(nNuc != 0){
-      for(index in seq.int(1,nNuc)){
+    } else if (nNuc != 0) {
+
+      for(index in seq.int(1, nNuc)){
 
         if(counter%%2 == 0){
-          indexContext1 <- index
-          indexContext2 <- index
+          indexFindContext   <- index
+          indexSearchContext <- index
         } else {
-          indexContext1 <- nchar(context1Before)+1-index
-          indexContext2 <- nchar(context2Before)+1-index
+          indexFindContext   <- nchar(findContextBefore)   + 1 - index
+          indexSearchContext <- nchar(searchContextBefore) + 1 - index
         }
 
-        symbols <- getAlphaMatches(substr(context[1],indexContext1,indexContext1), alphabet)
-        match <- compare(substr(context[2],indexContext2,indexContext2),symbols)
+        symbols <- getAlphaMatches(substr(context[1],
+                                          indexFindContext,
+                                          indexFindContext),
+                                   alphabet)
+        match <- compare(substr(context[2],
+                                indexSearchContext,
+                                indexSearchContext),
+                         symbols)
 
-        if(!match){
+        if (!match) {
           return(FALSE)
         }
       }
@@ -204,43 +236,44 @@ getNnuc <- function(context1,context2){
     return(0)                   # Because the known mutation doesn't have a nucleotide so nothing can be compared
   } else if(is.na(context1)){
     return(-1)                  # Because the known mutation does have nucleotides
-                                # but the unkown muation doesn't it can't be compared
-                                # and will need to be treated as a mismatch because
-                                # the unkown muation only have non nucleotides if the
-                                # mutation has reach the end or the beginning of a
-                                # chromosoom so match can't be possible
+                                #  but the unkown muation doesn't it can't be compared
+                                #  and will need to be treated as a mismatch because
+                                #  the unkown muation only have non nucleotides if the
+                                #  mutation has reach the end or the beginning of a
+                                #  chromosoom so match can't be possible
   } else if (nchar(context2) <= nchar(context1)){
     return(nchar(context2))
   } else {
     return(-1)                  # If the kown muation is bigger than the unkown
-                                # muation it is not possible to succesfully compair
-                                # the two as you would need to cut down the known
-                                # mutation which could lead to false positives
+                                #  muation it is not possible to succesfully compair
+                                #  the two as you would need to cut down the known
+                                #  mutation which could lead to false positives
   }
 }
 
 #' getAlphaMatches
 #' @description A function the symbols that contains the nucleotide
 getAlphaMatches <- function(nuc, alphabet){
-  nuc <- rlang::get_expr(nuc)
-  alphabet <- rlang::get_expr(alphabet)
   return(alphabet[grepl(nuc,alphabet$represent),1])
 }
 
 #' getReverseComplement
 #' @description A function to get the reverse complement of a sequence
-getReverseComplement <- function(x){
+getReverseComplement <- function(x) {
   return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
 }
 
 #' checkLinkPatternsParameters
 #' @description A function to check the parameters of linkPatterns
-checkLinkPatternsParameters <- function(ref, alt, context, distance, mutationSymbol, reverseComplement,
-                                        searchPatterns, searchRefHeader,
-                                        searchAltHeader, searchContextHeader,
-                                        searchIdHeader, searchDistanceHeader,
-                                        searchMutationSymbol,searchReverseComplement,
-                                        showWarning, renameReverse){
+checkLinkPatternsParameters <- function(ref,                  alt,
+                                        context,              distance,
+                                        mutationSymbol,       reverseComplement,
+                                        searchPatterns,       searchRefHeader,
+                                        searchAltHeader,      searchContextHeader,
+                                        searchIdHeader,       searchDistanceHeader,
+                                        searchMutationSymbol, searchReverseComplement,
+                                        showWarning,          renameReverse) {
+
   if(!all(grepl(paste0("\\",mutationSymbol),context))){
     stop("Please check if the mutationSymbol match with
          the symbol used in the context.")
@@ -269,4 +302,11 @@ checkLinkPatternsParameters <- function(ref, alt, context, distance, mutationSym
     }
   }
   stopifnot(grepl("[ACGTacgt]",alt) & grepl("[ACGTacgt]",ref))
+
+  # check if the assigned headers are present in the given table
+  stopifnot(any(grepl(searchAltHeader, names(searchPatterns),fixed = T)))
+  stopifnot(any(grepl(searchRefHeader,names(searchPatterns),fixed = T)))
+  stopifnot(any(grepl(searchContextHeader,names(searchPatterns),fixed = T)))
+  searchPatterns <- convertFactor(searchPatterns)
+  searchPatterns <- searchPatterns[nchar(dplyr::pull(searchPatterns,searchRefHeader)) == 1,]
 }

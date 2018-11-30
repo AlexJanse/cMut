@@ -4,14 +4,14 @@
 \alias{compareContext}
 \title{compareContext}
 \usage{
-compareContext(context2, context1, mutationSymbol, alphabet,
+compareContext(searchContext, findContext, mutationSymbol, alphabet,
   searchMutationSymbol)
 }
 \arguments{
-\item{context2}{A string with a context (e.g. C.G) This one will act as the
+\item{searchContext}{A string with a context (e.g. C.G) This one will act as the
 known mutation context for linkPatterns function.}
 
-\item{context1}{A string with a context (e.g.  C.C)}
+\item{findContext}{A string with a context (e.g.  C.C)}
 
 \item{mutationSymbol}{A character that stands for the mutation nucleotide
 (e.g. "." for C.G)}

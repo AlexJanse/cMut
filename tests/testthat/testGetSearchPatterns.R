@@ -11,7 +11,7 @@ test_that("See if the function returns the expected tables",{
                dplyr::all_equal(test4, mutationPatterns))
   expect_equal(nrow(test1),
                nrow(test3))
-  expect_equal(nrow(test2),
-               nrow(test3[grepl("\\[Rev\\.Com\\.\\]",test3$process),]))
+  expect_equal(nrow(test2)+11,
+               nrow(test3))
 
 })

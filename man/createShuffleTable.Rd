@@ -4,22 +4,27 @@
 \alias{createShuffleTable}
 \title{createShuffleTable}
 \usage{
-createShuffleTable(x, chromHeader, positionHeader, refHeader, altHeader,
-  surroundingHeader, sampleIdHeader)
+createShuffleTable(dataTable, chromHeader, positionHeader, refHeader,
+  altHeader, contextHeader, sampleIdHeader)
 }
 \arguments{
+\item{dataTable}{A table with the reference, alternative and surrounding
+nucleotides. The best data to use is the output of the
+\code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
+TRUE.}
+
 \item{chromHeader}{A string with the name of the column with the chromosome
 name. (So the data in the column needs to be notated as e.g. "chr2")}
 
 \item{positionHeader}{A string with the name of the column with the position
-of the mutation. The data in the column needs to be numberic.}
+of the mutation. (The data in the column needs to be nummeric.)}
 
 \item{refHeader}{A string with the column header of the reference nucleotide.}
 
 \item{altHeader}{A string with the column header of the alternative
 nucleotide.}
 
-\item{surroundingHeader}{A string with the column header of the surrounding
+\item{contextHeader}{A string with the column header of the context
 nucleotides.}
 
 \item{sampleIdHeader}{A string with the name of the column with the sample

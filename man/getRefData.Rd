@@ -7,17 +7,21 @@
 getRefData(chr, pos, sizeSur, lenChrom, refGenomeHg19)
 }
 \arguments{
-\item{chr}{A string with the chromosome name}
+\item{chr}{A string with the chromosome name.}
 
-\item{pos}{A number with the mutation location}
+\item{pos}{A number with the mutation location.}
 
 \item{sizeSur}{A number with the amount of nucleotides there has to be
-arround the mutation.}
+around the mutation.}
 
 \item{lenChrom}{A vector with chromosomes length}
 
 \item{table}{A table containing the mutation information}
 }
+\value{
+A string with the surrounding and mutated position reference
+  nucleotides of a mutation. Each part separated with "-"
+}
 \description{
-Function to get the surrounding of a mutation
+Function to get the reference nucleotides of a mutation.
 }

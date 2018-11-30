@@ -1,74 +1,112 @@
 #' getSummaryPatterns
-#' @description A optional folowup function to summarize the results in the
+#' @description A optional follow-up function to summarize the results of the
 #'   \code{foundPatterns} column from \code{\link{groupClusters}}.
 #' @param groupedClusters A table generated from the
 #'   \code{\link{groupClusters}}.
-#' @inheritParams createSummaryPatterns
-#' @param asTibble A Boolean if the returned table needs to be a tibble or a
-#'   data.frame
-#' @param renameReverse A Boolean if the pattern IDs from the searchPatterns
-#'   also need to be used to find the patterns with " [Rev.Com.]". If FALSE and
-#'   those patterns are available, then they will be counted in the Unidentified
-#'   row. This parameter will be irrelevant if the \code{reverse} parameter is FALSE.
+#' @inheritParams linkPatterns
+#' @param asTibble A Boolean to tell if the returned table needs to be a tibble
+#'   or a data.frame.
+#' @param renameReverse A Boolean to tell if the pattern IDs from the
+#'   searchPatterns also needs to be used to find the patterns with "
+#'   [Rev.Com.]". If FALSE and those patterns are available, then they will be
+#'   counted in the Unidentified row.
 #' @export
 #' @note If the \code{groupedClusters} table contains patterns that are not
-#'   present in the \code{searchPattern} table, then it will be marked as
-#'   unidentified together with clusters without patterns.
+#'   present in the \code{searchPattern} table, then they will be marked as
+#'   \code{Unidentified} together with clusters without patterns.
 #' @examples
+#' # Example dataset
 #' data <- testDataSet
-#' results <- identifyAndAnnotateClusters(data,20000,linkPatterns = TRUE)
-#' groupResults <- groupClusters(results,
+#'
+#' # Use the following functions to get the necessary table
+#' results <- identifyAndAnnotateClusters(dataTable    = data,
+#'                                        maxDistance  = 20000,
+#'                                        linkPatterns = TRUE)
+#' groupResults <- groupClusters(table                 = results,
 #'                               searchClusterPatterns = TRUE,
-#'                               patternIntersect = TRUE)
+#'                               patternIntersect      = TRUE)
+#'
+#' # Use the getSummaryPatterns function to see the summary of found patterns
 #' summary <- getSummaryPatterns(groupResults)
 #' summary
+#'
+#' # For more information about the columns use:
+#' cat(comment(summary))
 getSummaryPatterns <- function(groupedClusters,
                                searchPatterns = NULL,
                                searchIdHeader = "process",
-                               renameReverse = FALSE,
-                               asTibble = T){
+                               renameReverse  = FALSE,
+                               asTibble       = TRUE) {
 
-  # get or check the searchPatterns table -----------------------------------
-  if(is.null(searchPatterns)){
-    # Get default table if nothing is sent
-    searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[,"process"])
-                                                ,stringsAsFactors = FALSE))
+
+  # Get or check the searchPatterns table -----------------------------------
+  if (is.null(searchPatterns)) {
+    # Get the default pattern IDs if nothing is sent:
+    searchPatterns <- tibble::as.tibble(data.frame(process = unique(mutationPatterns[ ,"process"]),
+                                                   stringsAsFactors = FALSE))
   } else {
-    # check if the assigned headers are present in the given table
-    stopifnot(any(grepl(searchIdHeader,names(searchPatterns))))
-    searchPatterns <- tibble::as.tibble(data.frame(process = unique(searchPatterns[,searchIdHeader])
-                                                   ,stringsAsFactors = FALSE))
+    # Check if the assigned headers are present in the given table:
+    stopifnot(any(grepl(searchIdHeader, names(searchPatterns))))
+
+    # Get the pattern IDs:
+    searchPatterns <- tibble::as.tibble(data.frame(process = unique(searchPatterns[ ,searchIdHeader]),
+                                                   stringsAsFactors = FALSE))
 
   }
 
-  if(renameReverse){
-    searchPatterns <- dplyr::bind_rows(searchPatterns,dplyr::mutate(searchPatterns, process = paste0(process," [Rev.Com.]")))
+  # Add the reverse complement ID's if asked --------------------------------
+  if (renameReverse) {
+    searchPatterns <- dplyr::bind_rows(searchPatterns,
+                                       dplyr::mutate(searchPatterns,
+                                                     process = paste0(process,
+                                                                      " [Rev.Com.]")))
   }
 
-  # Add a unidientified column and a frequence column to fill up during bootstrapping
-  searchPatterns[nrow(searchPatterns)+1,searchIdHeader] <- "Unidentified"
-  searchPatterns <- dplyr::mutate(searchPatterns, frequency = rep.int(0,nrow(searchPatterns)))
+  # Add an unidentified column and a frequence column to fill up during bootstrapping
+  searchPatterns[nrow(searchPatterns) + 1, searchIdHeader] <- "Unidentified"
+  searchPatterns <- dplyr::mutate(searchPatterns,
+                                  frequency = rep.int(x     = 0,
+                                                      times = nrow(searchPatterns)))
 
-  # Count the amount of mutations per pattern per cluster ------------------------
-  table <- createSummaryPatterns(groupedClusters,
-                                 searchPatterns,
-                                 searchIdHeader, random = FALSE)
+  # Count the amount of mutations per pattern per cluster -------------------
+  table <- createSummaryPatterns(clusterTable   = groupedClusters,
+                                 searchPatterns = searchPatterns,
+                                 searchIdHeader = searchIdHeader)
 
-  # Determine the total clustered mutations --------------------------------------
+  # Determine the total clustered mutations ---------------------------------
   total <- 0
-  for(cMut in groupedClusters$cMuts){
-    total <- total+nrow(cMut)
+  for (cMut in groupedClusters$cMuts) {
+    total <- total + nrow(cMut)
   }
 
 
-  # Determine the percentage per pattern over the total --------------------------
-  if(total == 0){
-    table <- dplyr::mutate(table, percentage = rep.int(0,nrow(table)))
+  # Determine the percentage per pattern over the total ---------------------
+  if (total == 0) {
+    table <- dplyr::mutate(table,
+                           percentage = rep.int(x     = 0,
+                                                times = nrow(table)))
   } else {
-    table <- dplyr::mutate(table, percentage = purrr::map_dbl(frequency,function(x){x/total*100}))
+    table <- dplyr::mutate(table,
+                           percentage = purrr::map_dbl(frequency,
+                                                       function(x){
+                                                         x / total * 100
+                                                         }))
   }
 
-  if(asTibble){
+
+  # Explanation about the table ---------------------------------------------
+  comment(table) <-
+paste0("Information about the summary table columns:
+",searchIdHeader,"    : Column with the pattern IDs found
+             in sent the searchPattern table.
+frequency  : The number of clustered mutations
+             that were linked to this pattern ID.
+percentage : The frequency divided by the total
+             number of clustered mutations times 100.
+")
+
+  # return the table in the desired class -----------------------------------
+  if (asTibble) {
     return(tibble::as.tibble(table))
   } else {
     return(as.data.frame(table))

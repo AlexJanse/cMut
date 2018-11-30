@@ -12,11 +12,17 @@ createRandomTable(nMut, sampleName, sizeSur, refGenomeHg19, useChrom,
 
 \item{sampleName}{A name for the test sample.}
 
-\item{sizeSur}{A number with the ammount of nucleotides left and right of the
+\item{sizeSur}{A number with the amount of nucleotides left and right of the
 mutation. (e.g. sizeSur = 2 --> "CC.GT")}
+
+\item{refGenomeHg19}{A Boolean to tell if the preferred reference genome has
+to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}
 
 \item{useChrom}{A vector with the chromosomes that are used. Make sure that
 the names are notated as e.g. "chr1".}
+}
+\value{
+A table with random mutations
 }
 \description{
 Function to build the random mutation table and call supporting

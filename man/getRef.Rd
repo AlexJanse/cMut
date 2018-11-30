@@ -8,10 +8,13 @@ getRef(x, lenChrom, refGenomeHg19)
 }
 \arguments{
 \item{x}{A string that contains the chromosome name, start and stop location
-and is seperated by "-"}
+and is separated by "-".}
 
 \item{lenChrom}{A vector with chromosomes length}
 }
+\value{
+A string with the reference nucleotides.
+}
 \description{
-A function to get the reference nucleotide
+A function to get the reference nucleotide.
 }

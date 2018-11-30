@@ -8,5 +8,6 @@ getRevComTable(table, refHeader, altHeader, contextHeader = NULL,
   idHeader, renameReverse)
 }
 \description{
-A function to get the reverse complement of the known mutations
+A function to get the reverse complement of the sent pattern
+  table
 }

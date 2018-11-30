@@ -22,3 +22,11 @@ test_that("Check if the results match with the expectation",{
   expect_equal(nrow(testSummary),
                10)
 })
+
+
+#' convertFactor
+#' @description A function to convert factor columns to character
+convertFactor <- function(x){
+  x[sapply(x, is.factor)] <- lapply(x[sapply(x, is.factor)], as.character)
+  return(x)
+}

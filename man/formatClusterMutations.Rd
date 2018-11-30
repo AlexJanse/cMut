@@ -11,7 +11,8 @@ formatClusterMutations(refs, alts, convert = FALSE)
 
 \item{alts}{A list containing the alternative nucleotides.}
 
-\item{convert}{A boolean that tells if the nucleotides need to be converted to the reverse complement.}
+\item{convert}{A boolean that tells if the nucleotides need to be converted
+to the reverse complement.}
 }
 \description{
 Function to make a mutation description symbol (e.g. G>C).

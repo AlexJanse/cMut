@@ -6,14 +6,14 @@
 \usage{
 shuffleMutations(dataTable, chromHeader = "chrom",
   positionHeader = "start", refHeader = "ref", altHeader = "alt",
-  surroundingHeader = "surrounding", sampleIdHeader = "sampleIDs",
+  contextHeader = "surrounding", sampleIdHeader = "sampleIDs",
   nBootstrap = 1000, maxDistance = 20000, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
   searchReverseComplement = TRUE, asTibble = TRUE,
   returnEachBootstrap = FALSE, searchClusterPatterns = FALSE,
-  no.cores = parallel::detectCores(), renameReverse = FALSE)
+  renameReverse = FALSE, no.cores = parallel::detectCores())
 }
 \arguments{
 \item{dataTable}{A table with the reference, alternative and surrounding
@@ -25,24 +25,24 @@ TRUE.}
 name. (So the data in the column needs to be notated as e.g. "chr2")}
 
 \item{positionHeader}{A string with the name of the column with the position
-of the mutation. The data in the column needs to be numberic.}
+of the mutation. (The data in the column needs to be nummeric.)}
 
 \item{refHeader}{A string with the column header of the reference nucleotide.}
 
 \item{altHeader}{A string with the column header of the alternative
 nucleotide.}
 
-\item{surroundingHeader}{A string with the column header of the surrounding
+\item{contextHeader}{A string with the column header of the context
 nucleotides.}
 
 \item{sampleIdHeader}{A string with the name of the column with the sample
 ID.}
 
-\item{nBootstrap}{A number with the ammount of bootstraps there need to be
-excecuted.}
+\item{nBootstrap}{A number with the amount of bootstraps there need to be
+executed.}
 
-\item{maxDistance}{A number; The maximum distance between DNA mutations that
-count as clustered.}
+\item{maxDistance}{A number with the maximum distance between DNA mutations
+that are defined as being in a cluster.}
 
 \item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
 \code{context} needed to be searched with the reverse complement.}
@@ -59,6 +59,9 @@ alternative nucleotide in the searchPatterns table.}
 \item{searchContextHeader}{A string with the column name of the one with the
 context nucleotide in the searchPatterns table.}
 
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
 \item{searchDistanceHeader}{A string with the column name of the one with the
 maximum distance between clustered mutations. Not needed if the distance
 parameter is NULL. NA's within this column are allowed.}
@@ -66,19 +69,24 @@ parameter is NULL. NA's within this column are allowed.}
 \item{searchReverseComplement}{A boolean to also search the patterns in the
 reverse complement of the searchPatterns tibble.}
 
-\item{asTibble}{A boolean if the result table has to be a tibble}
+\item{asTibble}{A Boolean if the returned results needs to be a tibble. It
+will return a data.frame otherwise. Irrelevant if \code{returnEachBootstrap
+== TRUE}}
 
 \item{returnEachBootstrap}{A Boolean if the summaries per bootstrap are
 needed to be returned. If TRUE then the return value will be a list with a
 summary of each bootstrap.}
 
-\item{no.cores}{A number with the amount of clusters that is allowed to use
-during shuffle. Default is maximum amount of cores present on the system.}
+\item{searchClusterPatterns}{A Boolean if it's needed to search to cluster
+patterns (e.g. GA > TT).}
 
 \item{renameReverse}{A Boolean if the id of the process needs to be renamed.
 This has the effect on the cMut functions that it will no longer treat the
 reverse complement and non reverse complement as the same. This parameter
 will irrelevant if \code{searchReverseComplement} is FALSE.}
+
+\item{no.cores}{A number with the amount of clusters that is allowed to use
+during shuffle. Default is maximum amount of cores present on the system.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding
@@ -87,17 +95,19 @@ A function to shuffle the reference, alternative and surrounding
   frequency of found patterns.
 }
 \examples{
-identResults <- identifyAndAnnotateClusters(testDataSet,20000, linkPatterns = TRUE)
+identResults <- identifyAndAnnotateClusters(dataTable    = testDataSet,
+                                            maxDistance  = 20000,
+                                            linkPatterns = TRUE)
 
 # If only the mutation patterns are needed searched:
-shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
+shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
                                    nBootstrap = 5,
-                                   no.cores = 2)
+                                   no.cores   = 2)
 
 # If also the cluster patterns are needed to be added:
 shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
                                    nBootstrap = 5,
                                    searchClusterPatterns = TRUE,
-                                   no.cores = 2)
+                                   no.cores   = 2)
 # The no.cores is set to 2 because of CRAN limits when testing the examples.
 }
