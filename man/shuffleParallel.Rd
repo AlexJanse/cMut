@@ -8,7 +8,8 @@ shuffleParallel(dataTable, chromHeader, positionHeader, refHeader,
   altHeader, contextHeader, sampleIdHeader, nBootstrap, maxDistance,
   reverseComplement, searchPatterns, searchRefHeader, searchAltHeader,
   searchContextHeader, searchIdHeader, searchDistanceHeader,
-  searchReverseComplement, searchClusterPatterns, no.cores, resultTable)
+  searchReverseComplement, searchClusterPatterns, no.cores, resultTable,
+  linkPatterns)
 }
 \description{
 Function to preform the shuffling and annotating in parallel

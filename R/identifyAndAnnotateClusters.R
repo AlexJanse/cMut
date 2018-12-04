@@ -114,7 +114,6 @@ identifyAndAnnotateClusters <- function(dataTable,                              
 }
 
 
-
 #' addDistance
 #' @description A function that adds distances to nearest mutation to the tibble
 #'   of the identifyAndAnnotateClusters function

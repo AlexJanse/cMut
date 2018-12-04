@@ -11,7 +11,7 @@ groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
   showWarning = TRUE, searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchIdHeader = "process",
   searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
-  renameReverse = FALSE)
+  renameReverse = FALSE, reverseComplement = FALSE)
 }
 \arguments{
 \item{table}{A table with columns containing cluster IDs, reference and
@@ -75,6 +75,11 @@ reverse complement of the searchPatterns tibble.}
 This has the effect on the cMut functions that it will no longer treat the
 reverse complement and non reverse complement as the same. This parameter
 will irrelevant if \code{searchReverseComplement} is FALSE.}
+
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt}
+needs to be searched with the reverse complement. Irrelevant if
+\code{searchClusterPatterns = FALSE} or \code{searchReverseComplement =
+TRUE}.}
 }
 \description{
 A function that will group the clusters and if wanted find the

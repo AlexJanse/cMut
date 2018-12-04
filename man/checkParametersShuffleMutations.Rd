@@ -9,7 +9,7 @@ checkParametersShuffleMutations(dataTable, chromHeader, positionHeader,
   maxDistance, reverseComplement, searchPatterns, searchRefHeader,
   searchAltHeader, searchContextHeader, searchIdHeader,
   searchDistanceHeader, searchReverseComplement, asTibble,
-  returnEachBootstrap, searchClusterPatterns, no.cores)
+  returnEachBootstrap, searchClusterPatterns, no.cores, linkPatterns)
 }
 \description{
 A function to check if the parameters are correct of the

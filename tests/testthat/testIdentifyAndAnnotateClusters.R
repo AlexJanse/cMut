@@ -1,7 +1,7 @@
 context("Identify and annotate clusters")
 
-testResults <- identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T)
-validationResults <- identifyAndAnnotateClusters(validationTable,20000, sampleIdHeader = "id" ,linkPatterns = T)
+testResults <- identifyAndAnnotateClusters(testDataSet, 20000, linkPatterns = T)
+validationResults <- identifyAndAnnotateClusters(validationTable, 20000, sampleIdHeader = "id" ,linkPatterns = T)
 test_that("Check if the linked patterns are as expected",{
   expect_equal(
     nrow(testResults[testResults$is.linked == T, ]),

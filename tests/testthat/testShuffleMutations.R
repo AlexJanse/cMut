@@ -20,10 +20,10 @@ test_that("Check if percentage is correct",{
 })
 
 test_that("Check if parameters checked correctly",{
-  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 20))
-  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = -1))
-  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2, altHeader = "A"))
-  expect_error(shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2,searchAltHeader = "e"))
+  expect_error(shuffleMutations(testDataSet, nBootstrap = 5, searchClusterPatterns = T, no.cores = 20))
+  expect_error(shuffleMutations(testDataSet, nBootstrap = 5, searchClusterPatterns = T, no.cores = -1))
+  expect_error(shuffleMutations(testDataSet, nBootstrap = 5, searchClusterPatterns = T, no.cores = 2, altHeader = "A"))
+  expect_error(shuffleMutations(testDataSet, nBootstrap = 5, searchClusterPatterns = T, no.cores = 2, searchAltHeader = "e"))
 })
 
 test <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2, returnEachBootstrap = T, renameReverse = T)
@@ -34,4 +34,12 @@ test_that("Check if returnEachBootstrap and renameReverse are working properly",
                class(list()))
   expect_equal(nrow(test[[1]]),
                19)
+})
+
+set.seed(1)
+test <- shuffleMutations(testDataSet,nBootstrap = 5, searchClusterPatterns = T, no.cores = 2, returnEachBootstrap = T, renameReverse = T)
+testResults <- readRDS("extdata/shuffleTestResults.rds")
+test_that("Check if the results are reproducible",{
+  expect_equal(all.equal(test, testResults),
+               TRUE)
 })

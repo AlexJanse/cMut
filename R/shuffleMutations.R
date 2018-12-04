@@ -261,6 +261,7 @@ createShuffleTable <-  function(dataTable,      chromHeader,
 #' checkParametersShuffleMutations
 #' @description A function to check if the parameters are correct of the
 #'   \code{\link{shuffleMutations}} function
+#' @import doRNG
 checkParametersShuffleMutations <- function(dataTable,               chromHeader,
                                             positionHeader,          refHeader,
                                             altHeader,               contextHeader,
@@ -339,11 +340,11 @@ shuffleParallel <- function(dataTable,               chromHeader,
   opts     <- list(progress = progress)
 
   # Preform bootstrap --------------------------------------------------------
-  resultTables <- foreach::foreach(iterators::icount(nBootstrap),
+  resultTables <- foreach::foreach(i = iterators::icount(nBootstrap),
                                    .verbose      = TRUE,
                                    .packages     = c("magrittr", "cMut"),
                                    .export       = c("createShuffleTable"),
-                                   .options.snow = opts) %dopar% {
+                                   .options.snow = opts) %dorng% {
 
                                      # Create a table with shuffled mutations and contexts ------------------------
                                      shuffleTable <- createShuffleTable(dataTable      = dataTable,      chromHeader   = chromHeader,

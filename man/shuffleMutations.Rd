@@ -7,13 +7,14 @@
 shuffleMutations(dataTable, chromHeader = "chrom",
   positionHeader = "start", refHeader = "ref", altHeader = "alt",
   contextHeader = "surrounding", sampleIdHeader = "sampleIDs",
-  nBootstrap = 1000, maxDistance = 20000, reverseComplement = FALSE,
-  searchPatterns = NULL, searchRefHeader = "ref",
-  searchAltHeader = "alt", searchContextHeader = "surrounding",
-  searchIdHeader = "process", searchDistanceHeader = "maxDistance",
-  searchReverseComplement = TRUE, asTibble = TRUE,
-  returnEachBootstrap = FALSE, searchClusterPatterns = FALSE,
-  renameReverse = FALSE, no.cores = parallel::detectCores())
+  nBootstrap = 1000, maxDistance = 20000, linkPatterns = TRUE,
+  reverseComplement = FALSE, searchPatterns = NULL,
+  searchRefHeader = "ref", searchAltHeader = "alt",
+  searchContextHeader = "surrounding", searchIdHeader = "process",
+  searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
+  asTibble = TRUE, returnEachBootstrap = FALSE,
+  searchClusterPatterns = FALSE, renameReverse = FALSE,
+  no.cores = parallel::detectCores())
 }
 \arguments{
 \item{dataTable}{A table with the reference, alternative and surrounding
@@ -44,8 +45,14 @@ executed.}
 \item{maxDistance}{A number with the maximum distance between DNA mutations
 that are defined as being in a cluster.}
 
+\item{linkPatterns}{A Boolean to tell if it's necessary to try and link the
+mutations to patterns. If FALSE then the \code{search...} parameters and
+the \code{linkClustersOnly} parameter are irrelevant. For more information
+see \code{\link{linkPatterns}}.}
+
 \item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
-\code{context} needed to be searched with the reverse complement.}
+\code{context} needs to be searched with the reverse complement. Irrelevant
+if \code{searchReverseComplement = TRUE}.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
 \code{\link{mutationPatterns}} is the default search table.}

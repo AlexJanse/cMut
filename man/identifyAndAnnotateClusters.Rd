@@ -54,7 +54,8 @@ the \code{linkClustersOnly} parameter are irrelevant. For more information
 see \code{\link{linkPatterns}}.}
 
 \item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
-\code{context} needed to be searched with the reverse complement.}
+\code{context} needs to be searched with the reverse complement. Irrelevant
+if \code{searchReverseComplement = TRUE}.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
 \code{\link{mutationPatterns}} is the default search table.}

@@ -6,7 +6,8 @@
 \usage{
 searchClusterPatterns(groupedClusters, searchPatterns = mutationPatterns,
   searchRefHeader = "ref", searchAltHeader = "alt",
-  searchDistanceHeader = "maxDistance", searchIdHeader = "process")
+  searchDistanceHeader = "maxDistance", searchIdHeader = "process",
+  reverseComplement = FALSE)
 }
 \arguments{
 \item{groupedClusters}{Table gained by using the \code{\link{groupClusters}}
@@ -27,6 +28,11 @@ parameter is NULL. NA's within this column are allowed.}
 
 \item{searchIdHeader}{A string with the column name of the one with the
 pattern IDs.}
+
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt}
+needs to be searched with the reverse complement. Irrelevant if
+\code{searchClusterPatterns = FALSE} or \code{searchReverseComplement =
+TRUE}.}
 }
 \description{
 A function to search cluster patterns based on reference,

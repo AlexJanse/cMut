@@ -18,7 +18,8 @@ Imports: igraph ,
          doParallel ,
          magrittr ,
          stringr ,
-         doSNOW
+         doSNOW ,
+         doRNG
 Suggests: testthat,
           knitr,
           rmarkdown

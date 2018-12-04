@@ -4,7 +4,7 @@
 \alias{addShuffleMutationComment}
 \title{addShuffleMutationComment}
 \usage{
-addShuffleMutationComment(results)
+addShuffleMutationComment(results, searchIdHeader)
 }
 \description{
 A function to add comment about the result table.
