@@ -28,7 +28,7 @@ searching for patterns. The \code{contextHeader} is irrelevant if
 nucleotide location in the \code{context}. (e.g. "." in "G.C")}
 
 \item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
-\code{context} needs to be searched with the reverse complement. Irrelevant
+\code{context} needed to be searched with the reverse complement. Irrelevant
 if \code{searchReverseComplement = TRUE}.}
 
 \item{searchPatterns}{A tibble with the known mutation patterns. The
@@ -70,4 +70,3 @@ will irrelevant if \code{searchReverseComplement} is FALSE.}
 A function to add columns to the sent table with information
   gathered from the \code{\link{linkPatterns}} function.
 }
-\keyword{internal}
