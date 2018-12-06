@@ -5,7 +5,7 @@ validationResults <- identifyAndAnnotateClusters(validationTable, 20000, sampleI
 test_that("Check if the linked patterns are as expected",{
   expect_equal(
     nrow(testResults[testResults$is.linked == T, ]),
-    31)
+    61)
   expect_equal(
     testResults[testResults$sampleIDs == "TEST","linkedPatterns"][1,][[1]][[1]],
     "AID")
@@ -79,9 +79,9 @@ testResults3 <- identifyAndAnnotateClusters(dataTable = as.data.frame(x),
                                             renameReverse = T)
 test_that("Check if the parameters works",{
           expect_equal(nrow(testResults2),
-                       1879)
+                       1979)
           expect_equal(nrow(testResults2[testResults2$is.linked,]),
-                       325)
+                       342)
           expect_equal(all(testResults2[grepl("testPat1",testResults2$linkedPatterns),]$reference == "T"),
                        TRUE)
           expect_equal(class(testResults2),
@@ -89,7 +89,7 @@ test_that("Check if the parameters works",{
           expect_equal(all(testResults2[testResults2$is.clustered,"distance"] <= 20000),
                        TRUE)
           expect_equal(nrow(testResults3[grepl("\\[Rev\\.Com\\.\\]",testResults3$linkedPatterns),]),
-                       9)
+                       21)
           })
 
 testPatterns <- mutationPatterns

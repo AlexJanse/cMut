@@ -10,15 +10,15 @@ test_that("Check if the results match with the expectation",{
   expect_equal(any(testSummary$process == "Unidentified"),
                TRUE)
   expect_equal(testSummary[testSummary$process == "AID","frequency"][[1]],
-               4)
+               28)
   expect_equal(testSummary[testSummary$process == "A3F","frequency"][[1]],
                2)
   expect_equal(testSummary[testSummary$process == "MMR","frequency"][[1]],
                2)
   expect_equal(testSummary[testSummary$process == "PolZeta","frequency"][[1]],
-               2)
-  expect_equal(testSummary[testSummary$process == "PolZeta.endOnly","frequency"][[1]],
                6)
+  expect_equal(testSummary[testSummary$process == "PolZeta.endOnly","frequency"][[1]],
+               12)
   expect_equal(nrow(testSummary),
                10)
 })

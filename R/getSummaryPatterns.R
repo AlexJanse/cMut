@@ -22,7 +22,7 @@
 #' results <- identifyAndAnnotateClusters(dataTable    = data,
 #'                                        maxDistance  = 20000,
 #'                                        linkPatterns = TRUE)
-#' groupResults <- groupClusters(table                 = results,
+#' groupResults <- groupClusters(dataTable             = results,
 #'                               searchClusterPatterns = TRUE,
 #'                               patternIntersect      = TRUE)
 #'
