@@ -13,7 +13,7 @@ shuffleMutations(dataTable, chromHeader = "chrom",
   searchContextHeader = "surrounding", searchIdHeader = "process",
   searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
   asTibble = TRUE, returnEachBootstrap = FALSE,
-  searchClusterPatterns = FALSE, renameReverse = FALSE,
+  searchClusterPatterns = TRUE, renameReverse = FALSE,
   no.cores = parallel::detectCores())
 }
 \arguments{
@@ -107,14 +107,14 @@ identResults <- identifyAndAnnotateClusters(dataTable    = testDataSet,
                                             linkPatterns = TRUE)
 
 # If only the mutation patterns are needed searched:
-shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
-                                   nBootstrap = 5,
-                                   no.cores   = 2)
+shuffleResults <- shuffleMutations(dataTable             = identResults[identResults$is.clustered, ],
+                                   nBootstrap            = 5,
+                                   searchClusterPatterns = FALSE,
+                                   no.cores              = 2)
 
 # If also the cluster patterns are needed to be added:
-shuffleResults <- shuffleMutations(identResults[identResults$is.clustered,],
+shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
                                    nBootstrap = 5,
-                                   searchClusterPatterns = TRUE,
                                    no.cores   = 2)
 # The no.cores is set to 2 because of CRAN limits when testing the examples.
 }

@@ -4,20 +4,20 @@
 \alias{groupClusters}
 \title{groupClusters}
 \usage{
-groupClusters(table, clusterIdHeader = "clusterId", refHeader = "ref",
-  altHeader = "alt", contextHeader = "surrounding",
-  mutationSymbol = ".", asTibble = TRUE, patternIntersect = FALSE,
-  searchClusterPatterns = FALSE, patternHeader = "linkedPatterns",
+groupClusters(dataTable, clusterIdHeader = "clusterId",
+  refHeader = "ref", altHeader = "alt",
+  contextHeader = "surrounding", mutationSymbol = ".",
+  asTibble = TRUE, patternIntersect = TRUE,
+  searchClusterPatterns = TRUE, patternHeader = "linkedPatterns",
   showWarning = TRUE, searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchIdHeader = "process",
   searchDistanceHeader = "maxDistance", searchReverseComplement = TRUE,
   renameReverse = FALSE, reverseComplement = FALSE)
 }
 \arguments{
-\item{table}{A table with columns containing cluster IDs, reference and
-alternative nucleotide. See the output of the
-\code{\link{identifyAndAnnotateClusters}} function for more information
-about the table.}
+\item{dataTable}{A data.frame or tibble that contains at least chromosome
+name, sample ID and position information. The data cannot contain any NA.
+For an example use \code{\link{testDataSet}}.}
 
 \item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
 
@@ -80,6 +80,11 @@ will irrelevant if \code{searchReverseComplement} is FALSE.}
 needs to be searched with the reverse complement. Irrelevant if
 \code{searchClusterPatterns = FALSE} or \code{searchReverseComplement =
 TRUE}.}
+
+\item{table}{A table with columns containing cluster IDs, reference and
+alternative nucleotide. See the output of the
+\code{\link{identifyAndAnnotateClusters}} function for more information
+about the table.}
 }
 \description{
 A function that will group the clusters and if wanted find the
@@ -91,16 +96,6 @@ A function that will group the clusters and if wanted find the
 # identifiAndAnnotateClusters function:
 test <- testDataSet
 
-# Example of using this function without linking it without patterns
-mutations <- identifyAndAnnotateClusters(dataTable      = test,
-                                         maxDistance    = 20000,
-                                         chromHeader    = "chrom",
-                                         sampleIdHeader = "sampleIDs",
-                                         positionHeader = "start",
-                                         linkPatterns   = FALSE)
-clusters <- groupClusters(table            = mutations,
-                          patternIntersect = FALSE)
-
 # Example of using this function with data that contain patterns:
 mutations <- identifyAndAnnotateClusters(dataTable      = test,
                                          maxDistance    = 20000,
@@ -108,13 +103,16 @@ mutations <- identifyAndAnnotateClusters(dataTable      = test,
                                          sampleIdHeader = "sampleIDs",
                                          positionHeader = "start",
                                          linkPatterns   = TRUE)
-clusters <- groupClusters(table            = mutations,
-                          patternIntersect = TRUE)
+clusters <- groupClusters(dataTable             = mutations,
+                          patternIntersect      = TRUE,
+                          searchClusterPatterns = FALSE)
+# searchClusterPatterns = FALSE to emphasise the effect for the patterns from the identify function
+
 
 # Example of using this function when it is needed to search for
 # cluster patterns. Use ?mutationPatterns to learn about the
 # difference between mutation patterns and cluster patterns.
-clusters <- groupClusters(table                 = mutations,
+clusters <- groupClusters(dataTable             = mutations,
                           patternIntersect      = TRUE,
                           searchClusterPatterns = TRUE)
 

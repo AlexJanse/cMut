@@ -8,7 +8,7 @@ identifyAndAnnotateClusters(dataTable, maxDistance,
   chromHeader = "chrom", sampleIdHeader = "sampleIDs",
   positionHeader = "start", refHeader = "ref", altHeader = "alt",
   contextHeader = "surrounding", mutationSymbol = ".",
-  linkPatterns = FALSE, reverseComplement = FALSE,
+  linkPatterns = TRUE, reverseComplement = FALSE,
   searchPatterns = NULL, searchRefHeader = "ref",
   searchAltHeader = "alt", searchContextHeader = "surrounding",
   searchIdHeader = "process", searchDistanceHeader = "maxDistance",
@@ -110,7 +110,8 @@ data <- testDataSet
 
 # Example for just clustering:
 results <- identifyAndAnnotateClusters(dataTable   = data,
-                                       maxDistance = 20000)
+                                       maxDistance = 20000,
+                                       linkPatterns = FALSE)
 
 # Example for clustering and linking patterns with the default searchPattern table:
 results <- identifyAndAnnotateClusters(dataTable    = data,

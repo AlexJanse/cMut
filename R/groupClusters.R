@@ -35,16 +35,6 @@
 #' # identifiAndAnnotateClusters function:
 #' test <- testDataSet
 #'
-#' # Example of using this function without linking it without patterns
-#' mutations <- identifyAndAnnotateClusters(dataTable      = test,
-#'                                          maxDistance    = 20000,
-#'                                          chromHeader    = "chrom",
-#'                                          sampleIdHeader = "sampleIDs",
-#'                                          positionHeader = "start",
-#'                                          linkPatterns   = FALSE)
-#' clusters <- groupClusters(table            = mutations,
-#'                           patternIntersect = FALSE)
-#'
 #' # Example of using this function with data that contain patterns:
 #' mutations <- identifyAndAnnotateClusters(dataTable      = test,
 #'                                          maxDistance    = 20000,
@@ -52,23 +42,26 @@
 #'                                          sampleIdHeader = "sampleIDs",
 #'                                          positionHeader = "start",
 #'                                          linkPatterns   = TRUE)
-#' clusters <- groupClusters(table            = mutations,
-#'                           patternIntersect = TRUE)
+#' clusters <- groupClusters(dataTable             = mutations,
+#'                           patternIntersect      = TRUE,
+#'                           searchClusterPatterns = FALSE)
+#' # searchClusterPatterns = FALSE to emphasise the effect for the patterns from the identify function
+#'
 #'
 #' # Example of using this function when it is needed to search for
 #' # cluster patterns. Use ?mutationPatterns to learn about the
 #' # difference between mutation patterns and cluster patterns.
-#' clusters <- groupClusters(table                 = mutations,
+#' clusters <- groupClusters(dataTable             = mutations,
 #'                           patternIntersect      = TRUE,
 #'                           searchClusterPatterns = TRUE)
 #'
 #' # For more information about the table:
 #' cat(comment(clusters))
-groupClusters <- function(table,                                   clusterIdHeader      = "clusterId",
+groupClusters <- function(dataTable,                               clusterIdHeader      = "clusterId",
                           refHeader               = "ref",         altHeader            = "alt",
                           contextHeader           = "surrounding", mutationSymbol       = ".",
-                          asTibble                = TRUE,          patternIntersect     = FALSE,
-                          searchClusterPatterns   = FALSE,         patternHeader        = "linkedPatterns",
+                          asTibble                = TRUE,          patternIntersect     = TRUE,
+                          searchClusterPatterns   = TRUE,          patternHeader        = "linkedPatterns",
                           showWarning             = TRUE,          searchPatterns       = NULL,
                           searchRefHeader         = "ref",         searchAltHeader      = "alt",
                           searchIdHeader          = "process",     searchDistanceHeader = "maxDistance",
@@ -77,9 +70,9 @@ groupClusters <- function(table,                                   clusterIdHead
 
 
   # Check data --------------------------------------------------------------
-  stopifnot(nrow(table) > 0)
+  stopifnot(nrow(dataTable) > 0)
   if (length(setdiff(c(clusterIdHeader, refHeader, altHeader),
-                     names(table))) > 0){
+                     names(dataTable))) > 0){
     stop ("Error: Please check if the header parameters match with
           the column names of the sent table.")
   }
@@ -95,7 +88,7 @@ groupClusters <- function(table,                                   clusterIdHead
                          renameReverse,    searchReverseComplement)))
 
   # Build table -------------------------------------------------------------
-  table <- createGroupTable(table         = table,         clusterIdHeader = clusterIdHeader,
+  table <- createGroupTable(table         = dataTable,     clusterIdHeader = clusterIdHeader,
                             refHeader     = refHeader,     altHeader       = altHeader,
                             contextHeader = contextHeader, mutationSymbol  = mutationSymbol,
                             showWarning   = showWarning)
