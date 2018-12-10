@@ -253,7 +253,7 @@ getNnuc <- function(context1,context2){
 }
 
 #' getAlphaMatches
-#' @description A function the symbols that contains the nucleotide
+#' @description A function to find the symbols that contains the nucleotide
 getAlphaMatches <- function(nuc, alphabet){
   return(alphabet[grepl(nuc,alphabet$represents),1])
 }

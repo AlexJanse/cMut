@@ -37,7 +37,8 @@
 #'                                             linkPatterns = TRUE)
 #'
 #' # If only the mutation patterns are needed searched:
-#' shuffleResults <- shuffleMutations(dataTable             = identResults[identResults$is.clustered, ],
+#' clusteredMutations <- identResults[identResults$is.clustered, ]
+#' shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
 #'                                    nBootstrap            = 5,
 #'                                    searchClusterPatterns = FALSE,
 #'                                    no.cores              = 2)

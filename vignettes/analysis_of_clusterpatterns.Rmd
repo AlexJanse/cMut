@@ -32,39 +32,30 @@ abbr {
 The cMut (clustered mutation) package provide functions to find and annotate clustered mutations.
 In the following examples, the functions will be explained and used.
 
-# Context {#Context}
-* [Purpose of cMut](#Purpose)
-* [Create Random Mutations](#Create)
+# Contents {#Context}
+* [What can the cMut package do?](#What)
+* [Simulate Random Mutations](#Simulate)
 * [Default Mutation Patterns](#Default)
-* [Match Mutations to Mutation Patterns](#Match)
+* [Link Mutations to Mutation Patterns](#Link)
 * [Identify and Annotate Clusters](#Identify)
 * [Group Clusters and Find Cluster Patterns](#Group)
 * [Summarize the Found Patterns](#Summarize)
-* [Determine the Enrichment](#Determine)
-* [Interpretation of Results](#Interpretation)
+* [Determine the Enrichment of a Mutation Pattern](#Determine)
+* [Ways to adapt cMut for your analysis](#Ways)
 
 \pagebreak
 
-# Purpose of cMut {#Purpose}
-When learning about DNA, we've learned that all the cells in our body (that contain DNA) have the same DNA throughout the body. Although that is mostly true, when we get older the more variations arise in different cells due exposure to different mutators, error-prone replication and different speed of decay of the telomeres.  
-The variations are the best displayed when looking at the mutations in DNA sequence (sequence of nucleotides A, C, G and T in different orders and frequencies). These mutations can exist in many shapes and sizes; from single nucleotide variant (SNV) till large copy number variants (CNV).  
-In this package we're interested in finding and annotating clustered SNV (cSNV a.k.a. multi-nucleotide mutation; MNM). We also try to link them with known mutator patterns and check if the enrichment is valid.  
-  
-Therefore the following questions arise:  
-  
-* **Bioinformatics:**  
-  Is there an enrichment of clustered mutations that match with certain mutation patterns?
-* **Biology:**  
-  Which mutators are responsible for the clustered mutations?
-  
-With this package we hope to answer the bioinformatics question and therefore give a clue about the answer for the biology question.  
+# What can the cMut package do? {#What}  
+A subset of the mutations that happen in the human genome occur very close to each other. Such local enrichment of mutations are often called mutation clusters. It has been hypothesized that clustered mutations occur by mechanisms that are different from the mechanisms of non-clustered mutations, making this group particularly interesting to study.
+There are mutational influences that tend to cause mutations of very specific types. One example is the human protein APOBEC3A, which causes C > T mutations at nucleotide positions that are preceded by CT or TT nucleotides and followed by an A nucleotide at high specificity. APOBEC3A is suspected to cause a subset of clustered mutations.
+The cMut package analyses clustered SNV mutations for the presence of custom mutation patterns and can calculate whether these patterns are enriched.  
   
 ~[Back to Context](#Context)~  
 
 \pagebreak
 
-# Create Random Mutations {#Create}
-The `createRandomMutation()` function will create random single nucleotide variant (SNV) mutations in the human reference genome GRCh37/hg19 (or GRch38/hg38 if `refGenomeHg19 = FALSE`) and store them in a tibble (data.frame like object from the tidyverse package).
+# Simulate Mutations at Random Positions {#Simulate}
+The `createRandomMutation()` function simulates single nucleotide variant (SNV) mutations at random positions of the human reference genome GRCh37/hg19 (or GRch38/hg38 if `refGenomeHg19 = FALSE`) and store them in a tibble (data.frame like object from the tidyverse package).
 ```{r echo = TRUE, results = 'hide'}
 randomData <- createRandomMutations(nMut = 10)
 randomData
@@ -83,13 +74,13 @@ cat(comment(randomData))
 \pagebreak
 
 # Default Mutation Patterns {#Default}
-The following functions below use a search table to see if it is possible to match the mutation with certain mutation patterns. If no search table is sent through the <abbr title = 'The objects you sent along when calling a function like in "fun(x = 1)" , x is the argument.'>arguments</abbr>, a default table `mutationPatterns` by the package author is used.
+The following functions below use a search table to see if it is possible to match the mutation with certain mutation patterns. If no custom mutational patterns are supplied, cMut uses a standard search table of mutation patterns called `mutationPatterns`.
 
 In this table, there are two kinds of patterns:  
   
 ### Mutation Patterns
 ```{r echo = FALSE}
-knitr::kable(getSearchPatterns(F,F,F)[1:9,], algin = 'c')
+knitr::kable(mutationPatterns[1:9,], algin = 'c')
 ```  
   
 Patterns with 1 reference, 1 alternative, with surrounding nucleotides and a maximum distance with a number or NA. These are used in the [identifyAndAnnotateClusters()](#Identify) and [linkPatterns()](#Match) functions. These patterns will be called 'mutation patterns' in the documentation of this package.
@@ -110,14 +101,14 @@ dnaAlphabet
 knitr::kable(dnaAlphabet,align = 'c')
 ```
   
-For more information, see the <abbr title = 'International Union of Pure and Applied Chemistry'>IUPAC</abbr> annotations section of [this Wikipedia page](<https://en.wikipedia.org/wiki/Nucleic_acid_notation>).  
+For more information, see the [NC-IUB, 1984](<https://www.ncbi.nlm.nih.gov/pmc/articles/PMC322779/>) article for more information.  
   
 ~[Back to Context](#Context)~  
   
 \pagebreak
 
-# Match Mutations to Mutation Patterns {#Match}
-The `linkPatterns()` function will check if the provided mutation can be matched with the so called 'mutation patterns' from the search pattern table and returns the ID's of the match.
+# Link Mutations to Mutation Patterns {#Link}
+The `linkPatterns()` function will check if the provided mutation can be matched with the mutation patterns from the search pattern table and returns the ID's of the match.
 The default search table is used if no search pattern table is sent with the `searchPattern` argument.  
 See [Default mutation patterns](#Default) paragraph above for more information.  
   
@@ -128,13 +119,13 @@ linkPatterns(ref     = "C",
              context = "CT.AT")
 ```
   
-If distance is important, use the `distance` argument to tell the distance to the nearest mutation within a cluster. Make sure that the search pattern table has a column with the maximum distance for the specific pattern.
+If distance is important for the mutation pattern, use the `distance` argument to tell the distance to the nearest mutation within a cluster. Make sure that the search pattern table has a column with the maximum distance for the specific pattern.
 ```{r include = T}
 linkPatterns(ref = "A", alt = "G", context = "TA.TA", distance = 550)
 linkPatterns(ref = "A", alt = "G", context = "TA.TA", distance = 50)
 ```
 
-As seen in the [Default mutation patterns](#Default) paragraph, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation:
+As seen in the [Default mutation patterns](#Default) paragraph, it is possible to use alternative nucleotide symbols. However it is not possible to use these symbols in the look up mutation (So the one provided in the `ref`, `alt` and `context` arguments):
 ```{r include = TRUE, error = TRUE}
 linkPatterns(ref = "C", alt = "D", context = "A.A")
 ```
@@ -150,6 +141,8 @@ linkPatterns(ref     = "G",
              context = "AT.AG")
 ```
 There are a few arguments that involves in searching for the reverse complement:
+
+First, the `searchReverseComplement` argument tells if the search pattern table as needs to be used in the reverse complement version 
 ```{r include = TRUE}
 # Example search pattern table
 exampleSearch <- data.frame(stringsAsFactors = FALSE,
@@ -158,9 +151,7 @@ exampleSearch <- data.frame(stringsAsFactors = FALSE,
                             alt              = c("S","S"),
                             surrounding      = c("T.T","A."))
 exampleSearch
-```
-The `searchReverseComplement` argument tells if the search pattern table as needs to be used in the reverse complement version
-```{r include = TRUE}
+
 linkPatterns(ref                     = "A",
              alt                     = "G",
              context                 = "GT.TC",
@@ -173,7 +164,8 @@ linkPatterns(ref                     = "A",
              searchPatterns          = exampleSearch,
              searchReverseComplement = FALSE)
 ```
-The `reverseComplement` argument tells if the sent mutation (in this case A>G; GT.TC) needs to be converted to the reverse complement version of itself. Make sure that searchReverseComplement is FALSE otherwise it shall give the same results as above.
+  
+Second, the `reverseComplement` argument tells if the sent mutation (in this case A>G; GT.TC) needs to be converted to the reverse complement version of itself. Make sure that searchReverseComplement is FALSE otherwise it shall give the same results as above.
 ```{r include = TRUE}
 linkPatterns(ref                     = "A",
              alt                     = "G",
@@ -189,7 +181,8 @@ linkPatterns(ref                     = "A",
              searchReverseComplement = FALSE,
              reverseComplement       = FALSE)
 ```
-The last argument is `renameReverse`. This arguments tells if the IDs of the reverse complement version of search pattern table needs to be called differently: \*ID\* [Rev.Com.]. This is nice if you want to know if the match came from the reverse complement or not.
+
+Finally, the last argument is `renameReverse`. This arguments tells if the IDs of the reverse complement version of search pattern table needs to be called differently: \*ID\* [Rev.Com.]. This is nice if you want to know if the match came from the reverse complement or not.
 ```{r include = TRUE}
 linkPatterns(ref                     = "A",
              alt                     = "G",
@@ -205,14 +198,14 @@ linkPatterns(ref                     = "A",
              searchReverseComplement = TRUE,
              renameReverse           = FALSE)
 ```
-Besides the arguments `ref`, `alt` and `context`, all arguments for `linkPatterns()` function are also available in the [identifyAndAnnotateClusters()](#Identify) and [groupClusters()](#Group) functions.  
+Apart from  the arguments `ref`, `alt` and `context`, all arguments for `linkPatterns()` function are also available in the [identifyAndAnnotateClusters()](#Identify) and [groupClusters()](#Group) functions.  
   
 ~[Back to Context](#Context)~  
   
 \pagebreak
 
 # Identify and Annotate Clusters {#Identify}
-The `identifyAndAnnotateClusters()` function searches for clusters by looking per sample per chromosome if there are mutations within the range of the maximum distance. It also applies [linkPatterns()](#Match) to every clustered mutation row of the sent table. Beside those functions, it will also add the distance towards the nearest mutations and columns with <abbr title = "Datatype that is either TRUE or FALSE">Booleans</abbr> whether or not the function it referring to gave results.  
+To start the analysis directly from a list of mutations, use the function `identifyAndAnnotateClusters()`. It looks for clusters by scanning per sample per chromosome if the mutations are closer to each other than the maximum distance. It also applies [linkPatterns()](#Match) to every clustered mutation row of the supplied table. Beside those functions, it will also add the distance towards the nearest mutations and columns with <abbr title = "Datatype that is either TRUE or FALSE">Booleans</abbr>. These columns tells whether or not the function were able to put to mutation in a cluster (the `is.clustered` column) and if this mutation could be linked to a mutation pattern (the `is.linked` column`).  
 ```{r echo = TRUE, results = 'hide'}
 results <- identifyAndAnnotateClusters(dataTable   = testDataSet, 
                                        maxDistance = 20000,
@@ -223,9 +216,10 @@ head(results[results$is.linked, ])
 knitr::kable(head(results[results$is.linked, ]), align = 'c')
 ```
   
-Please make sure that the <abbr title = 'The values that are already filled in for the function's arguments. See the usage section at the function's help page to see these values.'>default arguments</abbr> for column names (`chromHeader`, `sampleIdHeader`, `positionHeader`, `refHeader`, `altHeader` and `contextHeader`) correspond with the column headers of the sent table or change it if needed. The presence of other columns should not be a problem but make sure that there are no duplicate column names that are used in the arguments.  For an example of the input for the `dataTable` argument see the `testDataSet` table or use the [createRandomMutations()](#Create) function.   
+Please make sure that the <abbr title = 'The values that are already filled in for the function's arguments. See the usage section at the function's help page to see these values.'>default arguments</abbr> for column names (`chromHeader`, `sampleIdHeader`, `positionHeader`, `refHeader`, `altHeader` and `contextHeader`) correspond with the column headers of the supplied table or change it if needed. The presence of other columns should not be a problem but make sure that there are no column names duplicating the ones in  the arguments.  
+For an example of the input for the `dataTable` argument see the `testDataSet` table or use the [createRandomMutations()](#Create) function.   
   
-When using your own search pattern table with column names or others arguments that do not match with the default, please make sure to change the corresponding `search...` arguments.
+When using your own search pattern table with column names or others arguments that do not match with the default, please make sure to change the corresponding `search*` arguments.
 ```{r echo = TRUE, results = "hide"}
 # Example of using you own search pattern table:
 
@@ -242,18 +236,18 @@ knitr::kable(testPatterns, align = 'c')
 ```
 ```{r echo = TRUE, results = "hide"}
 # Using the table on the function:
-results2 <- identifyAndAnnotateClusters(dataTable              = testDataSet, 
-                                       maxDistance             = 20000,
-                                       asTibble                = FALSE,
-                                       linkPatterns            = TRUE,
-                                       searchPatterns          = testPatterns,
-                                       searchIdHeader          = "id",
-                                       searchRefHeader         = "reference",
-                                       searchAltHeader         = "alternative",
-                                       searchDistanceHeader    = "dist",
-                                       searchContextHeader     = "sur",
-                                       searchMutationSymbol    = "-",
-                                       searchReverseComplement = FALSE)
+results2 <- identifyAndAnnotateClusters(dataTable               = testDataSet, 
+                                        maxDistance             = 20000,
+                                        asTibble                = FALSE,
+                                        linkPatterns            = TRUE,
+                                        searchPatterns          = testPatterns,
+                                        searchIdHeader          = "id",
+                                        searchRefHeader         = "reference",
+                                        searchAltHeader         = "alternative",
+                                        searchDistanceHeader    = "dist",
+                                        searchContextHeader     = "sur",
+                                        searchMutationSymbol    = "-",
+                                        searchReverseComplement = FALSE)
 tail(results2[results2$is.linked,])
 ```
 ```{r echo = FALSE}
@@ -270,7 +264,7 @@ cat(comment(results))
 \pagebreak
 
 # Group Clusters and Find Cluster Patterns {#Group}
-The `groupClusters()` function will group the data based on the cluster IDs and shows a summary of each cluster. It also adds a column with the intersection (overlap) of the patterns per cluster and found cluster patterns (See the [Default mutation patterns](#Default) chapter above for more information about cluster patterns). The `groupClusters()` function is best used as a followup function for [identifyAndAnnotateClusters()](#Identify).  
+To group and summarize the data by mutation clusters, there is a function `groupClusters()`. It also adds a column with the intersection (overlap) of the patterns per cluster and found cluster patterns (See the [Default mutation patterns](#Default) chapter above for more information about cluster patterns). The input for the `groupClusters()` function is the result of the [identifyAndAnnotateClusters()](#Identify) function  
 ```{r echo = TRUE, results = 'hide'}
 results <- identifyAndAnnotateClusters(dataTable    = testDataSet, 
                                        maxDistance  = 20000)
@@ -284,9 +278,7 @@ head(groups[groups$has.clusterPatterns |
 knitr::kable(groups[groups$has.clusterPatterns | groups$has.intersect, -which(names(groups) == "cMuts")], align =  'c')
 ```
   
-The same arguments that have been used in the [linkPatterns()](#Match) function about reverse complement are also present in the `groupClusters()` function and are relevant when `searchClusterPatterns = TRUE`. See the [linkPatterns()](#Match) paragraph for more information about what each argument does.  
-  
-Please note that if `renameReverse = TRUE` is used when using the [identifyAndAnnotateClusters()](#Identify) function the `groupClusters()` function will find no intersection if the cluster contains e.g. row 1 = "MMR" and row 2 = "MMR [Rev.Com.]". This can come in handy if you wish to find patterns located on the same strand but still want to search in both the minus and the plus strand.
+The handling of mutation patterns' reverse compliments can be adapted using the arguments lined out in the [linkPatterns()](#Match) paragraph. This allows for fine-graded control of the patterns to be adapted. To give an example, if the goal of the analysis is to identify mutation patterns that lie on the same strand, regardless of this is the plus-strand or the minus-strand, use the `renameReverse = TRUE` argument. This spares out the detection of patterns that are on different strands.
 ```{r include = TRUE}
 results2 <- identifyAndAnnotateClusters(dataTable    = testDataSet, 
                                        maxDistance   = 20000,
@@ -310,8 +302,8 @@ cat(comment(groups))
 # Summarize the Found Patterns {#Summarize}
 To summarize the clusters that are given out by [groupClusters()](#Group), the function getSummaryPatterns() gives the number of clustered mutations affected by each mutation pattern. The `unidentified` row contains the information about the clusters that didn't have a linked pattern.
 ```{r echo = TRUE, results='hide'}
-results <- identifyAndAnnotateClusters(dataTable    = testDataSet, 
-                                       maxDistance  = 20000)
+results <- identifyAndAnnotateClusters(dataTable   = testDataSet, 
+                                       maxDistance = 20000)
 
 groups <- groupClusters(dataTable = results)
 
@@ -321,7 +313,7 @@ getSummaryPatterns(groupedClusters = groups)
 knitr::kable(getSummaryPatterns(groups), align = 'c')
 ```
   
-If the `groupedClusters` table contains patterns that are not present in the `searchPatterns` table, then it will be marked as unidentified together with clusters without patterns.
+Make sure to use the same `searchPatterns` table that you used in previous functions. Otherwise if the `groupedClusters` table contains patterns that are not present in the current `searchPatterns` table, then it will be marked as unidentified together with clusters without patterns.
 ```{r echo = TRUE, results = 'hide'}
 example <- getSearchPatterns()[1, ] # Default search table with only the first row
 example
@@ -337,7 +329,7 @@ getSummaryPatterns(groupedClusters = groups,
 knitr::kable(getSummaryPatterns(groups, searchPatterns = example), align = 'c')
 ```
   
-Please note that if you used `renameReverse = TRUE` in [identifyAndAnnotateClusters()](#Identify) and/or [groupClusters()](#Group) functions than also use it in the `getSummaryPatterns()` function. Otherwise the reverse complement patterns will end up in the "Unidentified" row.
+Please note that if you used `renameReverse = TRUE` in [identifyAndAnnotateClusters()](#Identify) and/or [groupClusters()](#Group) functions then also use it in the `getSummaryPatterns()` function. Otherwise the reverse complement patterns will end up in the "Unidentified" row.
 ```{r echo = TRUE, results='hide'}
 getSummaryPatterns(groupedClusters = groups2,
                    renameReverse   = TRUE)
@@ -357,10 +349,10 @@ knitr::kable(getSummaryPatterns(groups2), align = 'c')
   
 \pagebreak
 
-# Determine the Enrichment {#Determine}
-In order to tell if the found results from the [getSummaryPatterns()](#Summarize) function are truly enriched or happen by chance alone, a shuffle function is needed to validate the enrichment. The `shuffleMutations()` is able to shuffle the reference, alternative and surrounding nucleotides at random. Then it execute the [identifyAndAnnotateClusters()](#Identify) and [groupCluster()](#Group) function. Finally it will keep track on how many times the patterns are found which might give a hint of reliability of the results of the real data. With the `nBootstrap` argument it is possible to choose the number of repeats this function has to make. Make sure to use only the mutations that are clustered in the real data for a proper indication.  
-  
-To save time, you can use the `no.cores` argument to enable parallelization. It takes the number of cores that are used for the computations. The default is the maximum number of cores available to your system.
+# Determine the Enrichment of a Mutation Pattern {#Determine}
+Clusters might be affected by mutation patterns either because they were caused by mutator that causes the pattern, or alternatively, they might because of chance. In the scenario that these mutation clusters are caused by chance, we would expect only a limited number of affected clusters, while if the mutator is active, there should be an over enrichment of the mutation pattern in the data. In order to distinguish these two possibilities, cMut can estimate whether there is an over enrichment.
+
+For this, the function `shuffleMutations()` shuffles the reference, alternative and surrounding nucleotides of the observed clustered mutations and analyzes the shuffled data sets. For each reshuffling, the number of simulated mutations within the clusters affected by the mutation patterns are recorded. By comparing the number of mutations within the clusters affected in the resampled data sets to the original, observed data, we get an estimate of the over enrichment. To save time, you can use the `no.cores` argument to enable parallelization. It takes the number of cores that are used for the computations. The default is the maximum number of cores available to your system.
 ```{r echo = TRUE, results = 'hide', message=FALSE}
 clusteredMut <- results[results$is.clustered == TRUE,]
 shuffle <- shuffleMutations(dataTable  = clusteredMut,
@@ -398,11 +390,8 @@ knitr::kable(shuffle)
 ```
 The row with "total" as ID, represent the number of mutation rows that were clustered. Can be used to calculate the percentages as shown in the result table when `returnEachBootstrap = FALSE`.  
   
-  
-~[Back to Context](#Context)~  
-  
-# Interpretation of Results {#Interpretation}
-The following code will shows and example of how to use all the main function properly and how to interpret the results.
+## Interpretation of Results
+The following code will show an example of how to use all the main functions properly and how to compare it with the `shuffleMutations()` functions' results.
 ```{R eval=FALSE}
 # Example data to work with:
 data <- testDataSet
@@ -416,7 +405,7 @@ resultsPerCluster <- groupClusters(dataTable = resultsPerMutation)
 # Summarize the pattern results
 summary <- getSummaryPatterns(groupedClusters = resultsPerCluster)
 
-# Validate the enrichment:
+# Estimate the enrichment:
 
 # Best to only sent clustered mutations to the shuffle function
 shuffleData <- resultsPerMutation[resultsPerMutation$is.clustered, ]
@@ -427,19 +416,35 @@ shuffleResults <- shuffleMutations(dataTable           = shuffleData,
                                    nBootstrap          = 1000,
                                    returnEachBootstrap = TRUE)
 ```
-After using these functions we can build a plot with the shuffle results and compare it with the found results from the testDataSet. Because building a plot can be done in many different ways we'll leave that up to you. 
-In the following plots, the black bars represent the distribution of the randomness of finding a pattern with that corresponding percentage (x-axis). The red vertical line represent the percentage that we found in the testDataset.  
+After using these functions we can build a plot with the shuffle results and compare it with the found results from the testDataSet.
+```{r eval = FALSE}
+# The first 2 out of the 1000 bootstrap results:
+shuffleResults[1:2]
+```
+```{r include=TRUE}
+knitr::kable(readRDS("firstTwoShuffleResults.rds"))
+
+```
+Building a plot with these results can be done with your favorite method.
+  
+In the following plots, the black bars represent the distribution of the percentage of clusters with a mutation pattern. The red vertical line represent the percentage that we observed in the testDataset.  
 In the following image you can see an example when a pattern is enriched:
   
 ![](ExamplePlotEnriched.png)
-As you can see, the red line is far outside the contribution of randomness and therefore indicate that the pattern is enriched.  
+As you can see, the red line is far outside the distribution of reshuffled events and therefore indicate that the pattern is enriched.  
   
 And in the following plot you see an example when it's not enriched:
   
 ![](ExamplePlotNotEnriched.png)  
-In the plot you can see that the red line is within the contribution of randomness an is therefore not enriched.
+In the plot you can see that the red line is within the distribution of reshuffled events an is therefore not enriched.
   
-Of course there are many other ways aswell to interpreted the results. For example you can look at the distances between mutations that share the same pattern or look in which chromosome the pattern is the most frequent. We'll leave this interpretation up to you but hopefully this package makes the analysis a bit easier.
+You can also determine the P-value to have a more statistical clue. You could use the following formula: `1 - (below / nBootstrap)`. In this formula the `below` part represent the number of bootstraps that found the pattern less than the observed value and the `nBootstrap` part represent the total number of bootstraps.  
+So in the plot examples above the AID pattern has 0.00 and the A1/A3G pattern 0.66 as P value.
+Don't forget to correct for the multiple testing problem as well.  
+  
+	
+# Ways to adapt cMut for your analysis {#Ways}
+The mutation patterns are completely customizable and can be adapted by the user. The definition of mutation clusters depends on a threshold for a maximum distance between the mutations, this threshold can also be adapted. For each mutation pattern to investigate, an additional maximal distance can also be set.
   
 ### Bugs, questions, suggestions?
 Feel free to the contact the creator! (^__^)  

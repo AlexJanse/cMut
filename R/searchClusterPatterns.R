@@ -70,7 +70,7 @@ searchClusterPatterns <- function(groupedClusters,
 
       # Check if the data from the search table match with the data
       #   in the sent data row:
-      if ((refPat == rowRefs | refPat == "") & altPat == rowAlts) {
+      if (compareNucs(rowRefs, refPat) & compareNucs(rowAlts, altPat)) {
         clusterDistance <- max(row$distance[[1]])
 
         if (clusterDistance <= maxDistance) {
@@ -125,4 +125,31 @@ searchClusterPatterns <- function(groupedClusters,
   return(groupedClusters)
 }
 
+#' compareNucs
+#' @description A function to compare if two sequences are a match.
+compareNucs <- function(find,search) {
+  dnaAlphabet <- tibble::as.tibble(dnaAlphabet)
+  if (nchar(find) == nchar(search)){
+
+    foundCounter <- 0
+    for (index in 1:nchar(find)){
+      possibleSymbols <- getAlphaMatches(substr(find,index,index),dnaAlphabet)[[1]]
+
+      if (any(substr(search,index,index) == possibleSymbols)){
+        foundCounter <- foundCounter + 1
+      }
+    }
+
+    if (foundCounter == nchar(find)){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+
+  } else if (nchar(search) == 0){
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
 

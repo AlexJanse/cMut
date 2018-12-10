@@ -7,5 +7,5 @@
 getAlphaMatches(nuc, alphabet)
 }
 \description{
-A function the symbols that contains the nucleotide
+A function to find the symbols that contains the nucleotide
 }

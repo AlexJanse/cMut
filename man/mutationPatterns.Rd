@@ -40,5 +40,7 @@ As seen in the table, there are two kinds of patterns:
   distance of the mutations within a cluster. These patterns will be called
   cluster patterns in the documentation of this package.
 }
+For both pattern types it is possible to use DNA symbols. See
+\code{\link{dnaAlphabet}} for more information.
 }
 \keyword{datasets}

@@ -32,13 +32,18 @@ createSummaryPatterns <- function(clusterTable,
     # Look for the patterns if the row meets the condition
     if(condition[index]){
 
+      nrowCounter  <- 0
+      nothingFound <- TRUE
+      patterns     <- clusterTable[index,"foundPatterns"][[1]]
       # Loop over the found patterns of the specific row:
-      for(pattern in clusterTable[index,"foundPatterns"][[1]]) {
+      for(pattern in patterns) {
+        nrowCounter <- nrowCounter + 1
 
         addFreq <- nrow(clusterTable[index,"cMuts"][[1]])
 
         if(any(pattern == dplyr::pull(searchPatterns,
                                       searchIdHeader))){
+          nothingFound <- FALSE
           # Get the current frequency in the result pattern table:
           frequency <- searchPatterns[dplyr::pull(searchPatterns,
                                                   searchIdHeader) == pattern,
@@ -49,10 +54,13 @@ createSummaryPatterns <- function(clusterTable,
                                                              frequency + addFreq
 
         } else {
-          # Add the frequency to the unidentified if the found pattern
-          #   didn't match with the patterns result table:
-          nonIntersectFreq <- nonIntersectFreq + nrow(clusterTable[index,
-                                                                   "cMuts"][[1]])
+          if(nrowCounter == length(patterns) & nothingFound){
+            # Add the frequency to the unidentified if the found pattern
+            #   didn't match with the patterns result table and the cluster
+            #   didn't had any other found patterns.
+            nonIntersectFreq <- nonIntersectFreq + nrow(clusterTable[index,
+                                                                     "cMuts"][[1]])
+          }
         }
       }
 
