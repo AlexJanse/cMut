@@ -178,7 +178,7 @@ getRef <- function(x,lenChrom, refGenomeHg19) {
 #' @param table A table containing the mutation information
 #' @return A string with the surrounding and mutated position reference
 #'   nucleotides of a mutation. Each part separated with "-"
-#' @inherit getRef
+#' @inheritParams getRef
 getRefData <- function(chr,pos,sizeSur,lenChrom, refGenomeHg19) {
 
   # Prepare parameters ------------------------------------------------------

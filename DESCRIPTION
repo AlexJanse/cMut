@@ -1,12 +1,14 @@
 Package: cMut
 Type: Package
-Title: Identify and annotate clustered mutations and link to patterns
+Title: Identify clustered single nucleotide mutations and link to patterns
 Version: 0.1.0
 Authors@R: person("Alex", "Janse", email = "alex.janse@radboudumc.nl", role = c("aut", "cre"))
-Description: cMut is capable to find clusters and link them to mutation patterns. 
-             It also provide a stimulation function to determine the reliability 
-             of the found pattern results.
-License: What license is it under?
+Description: cMut is capable to find clustered single nucleotide variants and 
+             link them to mutation patterns. 
+             It also provide a stimulation function to determine the enrichment 
+             of the found pattern results. Please, read the vignette and help 
+             pages for more information.
+License: GPL-3
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1

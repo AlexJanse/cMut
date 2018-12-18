@@ -148,7 +148,7 @@ addLinkPatterns <- function(table,                refHeader,
                             searchMutationSymbol, checkHeader,
                             searchDistanceHeader, linkClustersOnly,
                             renameReverse) {
-
+  globalVariables()
 
   # Get deafault table if nothing is sent -----------------------------------
   # We do this before calling linkPatterns to save time:

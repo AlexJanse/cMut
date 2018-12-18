@@ -15,15 +15,15 @@ test_that("Check if the patterns match with the expected results",{
             156/2
           )
           expect_equal(
-            nrow(validationGroups[grepl("MMR",validationGroups$foundPatterns),]),
+            nrow(validationGroups[grepl("PolEta",validationGroups$foundPatterns),]),
             8/2
           )
           expect_equal(
-            nrow(validationGroups[grepl("A1/A3G",validationGroups$foundPatterns),]),
+            nrow(validationGroups[grepl("A1/A3F",validationGroups$foundPatterns),]),
             44/2
           )
           expect_equal(
-            nrow(validationGroups[grepl("A3F",validationGroups$foundPatterns),]),
+            nrow(validationGroups[grepl("A3G",validationGroups$foundPatterns),]),
             12/2
           )
           expect_equal(
@@ -106,6 +106,6 @@ testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000
 
 test_that("Check if renameReverse works",
           expect_equal(nrow(testGroupClusters[grepl("\\[Rev\\.Com\\.\\]",testGroupClusters$foundPatterns),]),
-                       4)
+                       8)
           )
 

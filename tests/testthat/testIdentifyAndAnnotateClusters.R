@@ -14,15 +14,15 @@ test_that("Check if the linked patterns are as expected",{
     156
   )
   expect_equal(
-    nrow(validationResults[grepl("MMR",validationResults$linkedPatterns),]),
+    nrow(validationResults[grepl("PolEta",validationResults$linkedPatterns),]),
     8
   )
   expect_equal(
-    nrow(validationResults[grepl("A1/A3G",validationResults$linkedPatterns),]),
+    nrow(validationResults[grepl("A1/A3F",validationResults$linkedPatterns),]),
     44
   )
   expect_equal(
-    nrow(validationResults[grepl("A3F",validationResults$linkedPatterns),]),
+    nrow(validationResults[grepl("A3G",validationResults$linkedPatterns),]),
     12
   )
   expect_equal(

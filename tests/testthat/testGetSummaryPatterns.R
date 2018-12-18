@@ -11,9 +11,9 @@ test_that("Check if the results match with the expectation",{
                TRUE)
   expect_equal(testSummary[testSummary$process == "AID","frequency"][[1]],
                28)
-  expect_equal(testSummary[testSummary$process == "A3F","frequency"][[1]],
+  expect_equal(testSummary[testSummary$process == "A3G","frequency"][[1]],
                2)
-  expect_equal(testSummary[testSummary$process == "MMR","frequency"][[1]],
+  expect_equal(testSummary[testSummary$process == "PolEta","frequency"][[1]],
                2)
   expect_equal(testSummary[testSummary$process == "PolZeta","frequency"][[1]],
                6)

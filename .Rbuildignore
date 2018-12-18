@@ -2,5 +2,5 @@
 ^doc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-^\dataAnalyse$
+^dataAnalyse$
 README.txt
