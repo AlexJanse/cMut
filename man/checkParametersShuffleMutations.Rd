@@ -11,6 +11,80 @@ checkParametersShuffleMutations(dataTable, chromHeader, positionHeader,
   searchDistanceHeader, searchReverseComplement, asTibble,
   returnEachBootstrap, searchClusterPatterns, no.cores, linkPatterns)
 }
+\arguments{
+\item{dataTable}{A table with the reference, alternative and surrounding
+nucleotides. The best data to use is the output of the
+\code{\link{identifyClusters}} where \code{is.clustered} is
+TRUE.}
+
+\item{chromHeader}{A string with the name of the column with the chromosome
+name. (So the data in the column needs to be notated as e.g. "chr2")}
+
+\item{positionHeader}{A string with the name of the column with the position
+of the mutation. (The data in the column needs to be nummeric.)}
+
+\item{refHeader}{A string with the column header of the reference nucleotide.}
+
+\item{altHeader}{A string with the column header of the alternative
+nucleotide.}
+
+\item{contextHeader}{A string with the column header of the context
+nucleotides.}
+
+\item{sampleIdHeader}{A string with the name of the column with the sample
+ID.}
+
+\item{nBootstrap}{A number with the amount of bootstraps there need to be
+executed.}
+
+\item{maxDistance}{A number with the maximum distance between DNA mutations
+that are defined as being in a cluster.}
+
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
+\code{context} needed to be searched with the reverse complement. Irrelevant
+if \code{searchReverseComplement = TRUE}.}
+
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+\code{\link{mutationPatterns}} is the default search table.}
+
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
+
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
+
+\item{searchContextHeader}{A string with the column name of the one with the
+context nucleotide in the searchPatterns table.}
+
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
+
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
+
+\item{asTibble}{A Boolean if the returned results needs to be a tibble. It
+will return a data.frame otherwise. Irrelevant if \code{returnEachBootstrap
+== TRUE}}
+
+\item{returnEachBootstrap}{A Boolean if the summaries per bootstrap are
+needed to be returned. If TRUE then the return value will be a list with a
+summary of each bootstrap.}
+
+\item{searchClusterPatterns}{A Boolean if it's needed to search to cluster
+patterns (e.g. GA > TT).}
+
+\item{no.cores}{A number with the amount of clusters that is allowed to use
+during shuffle. Default is maximum amount of cores present on the system.}
+
+\item{linkPatterns}{A Boolean to tell if it's necessary to try and link the
+mutations to patterns. If FALSE then the \code{search...} parameters and
+the \code{linkClustersOnly} parameter are irrelevant. For more information
+see \code{\link{linkPatterns}}.}
+}
 \description{
 A function to check if the parameters are correct of the
   \code{\link{shuffleMutations}} function

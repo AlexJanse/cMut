@@ -17,6 +17,10 @@ known mutation context for linkPatterns function.}
 (e.g. "." for C.G)}
 
 \item{alphabet}{A tibble with the nucleotides and their symbols}
+
+\item{searchMutationSymbol}{A string with symbol that stands for the mutated
+nucleotide location in the column of the \code{searchContextHeader}. (e.g.
+"." in "G.C")}
 }
 \value{
 Boolean if the contexts match or not

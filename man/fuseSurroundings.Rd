@@ -6,6 +6,15 @@
 \usage{
 fuseSurroundings(surroundings, mutationSymbol, showWarning)
 }
+\arguments{
+\item{surroundings}{The list with the surrounding nucleotides found in a
+cluster}
+
+\item{mutationSymbol}{A string with the symbol that stands for the mutated
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
+
+\item{showWarning}{A Boolean if there need to be a warning if nrow is 0.}
+}
 \description{
 A function to combine surroundings by using nucleotide symbols.
   See \code{\link{dnaAlphabet}} for an explanation what these symbols are.

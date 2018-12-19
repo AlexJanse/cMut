@@ -1,8 +1,8 @@
 context("Group clusters and show mutation symbols")
 
-testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T),
+testGroupClusters <- groupClusters(identifyClusters(testDataSet,20000,linkPatterns = T),
                                    patternIntersect = T)
-validationGroups <- groupClusters(identifyAndAnnotateClusters(validationTable,20000,
+validationGroups <- groupClusters(identifyClusters(validationTable,20000,
                                                               sampleIdHeader = "id",
                                                               linkPatterns = T),
                                   patternIntersect = T)
@@ -45,27 +45,27 @@ names(x) <- c("chr","pos","endPos","reference","variant","id","sur")
 x$sur <- gsub("\\.","-",x$sur)
 testPatterns <- mutationPatterns
 names(testPatterns) <- c("id","refer","alternative","sur","dist","reference")
-data <- identifyAndAnnotateClusters(dataTable = x,
-                                    chromHeader = "chr",
-                                    positionHeader = "pos",
-                                    refHeader = "reference",
-                                    altHeader = "variant",
-                                    sampleIdHeader = "id",
-                                    contextHeader = "sur",
-                                    mutationSymbol = "-",
-                                    maxDistance = 20000,
-                                    asTibble = F,
-                                    linkPatterns = T,
-                                    reverseComplement = F,
-                                    searchPatterns = testPatterns,
-                                    searchAltHeader = "alternative",
-                                    searchContextHeader = "sur",
-                                    searchRefHeader = "refer",
-                                    searchIdHeader = "id",
-                                    searchDistanceHeader = "dist",
-                                    searchMutationSymbol = ".",
-                                    searchReverseComplement = T,
-                                    linkClustersOnly = T)
+data <- identifyClusters(dataTable = x,
+                        chromHeader = "chr",
+                        positionHeader = "pos",
+                        refHeader = "reference",
+                        altHeader = "variant",
+                        sampleIdHeader = "id",
+                        contextHeader = "sur",
+                        mutationSymbol = "-",
+                        maxDistance = 20000,
+                        asTibble = F,
+                        linkPatterns = T,
+                        reverseComplement = F,
+                        searchPatterns = testPatterns,
+                        searchAltHeader = "alternative",
+                        searchContextHeader = "sur",
+                        searchRefHeader = "refer",
+                        searchIdHeader = "id",
+                        searchDistanceHeader = "dist",
+                        searchMutationSymbol = ".",
+                        searchReverseComplement = T,
+                        linkClustersOnly = T)
 names(data)[8] <- "clId"
 testGroupClusters2 <- groupClusters(data,
                                    clusterIdHeader = "clId",
@@ -82,7 +82,7 @@ testGroupClusters2 <- groupClusters(data,
                                    searchDistanceHeader = "dist",
                                    searchReverseComplement = T,
                                    patternIntersect = T)
-testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T),
+testGroupClusters <- groupClusters(identifyClusters(testDataSet,20000,linkPatterns = T),
                                    patternIntersect = T,
                                    searchClusterPatterns = T,
                                    asTibble = F)
@@ -98,7 +98,7 @@ test_that("check if changing the default parameters gives the same result",{
                        0)
 })
 
-testGroupClusters <- groupClusters(identifyAndAnnotateClusters(testDataSet,20000,linkPatterns = T,renameReverse = T),
+testGroupClusters <- groupClusters(identifyClusters(testDataSet,20000,linkPatterns = T,renameReverse = T),
                                    patternIntersect = T,
                                    searchClusterPatterns = T,
                                    asTibble = F,

@@ -6,6 +6,11 @@
 \usage{
 compareNucs(find, search)
 }
+\arguments{
+\item{find}{The nucleotides to be found}
+
+\item{search}{The nucleotides that needs to be matched with}
+}
 \description{
 A function to compare if two sequences are a match.
 }

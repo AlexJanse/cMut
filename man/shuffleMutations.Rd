@@ -19,7 +19,7 @@ shuffleMutations(dataTable, chromHeader = "chrom",
 \arguments{
 \item{dataTable}{A table with the reference, alternative and surrounding
 nucleotides. The best data to use is the output of the
-\code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
+\code{\link{identifyClusters}} where \code{is.clustered} is
 TRUE.}
 
 \item{chromHeader}{A string with the name of the column with the chromosome
@@ -97,14 +97,14 @@ during shuffle. Default is maximum amount of cores present on the system.}
 }
 \description{
 A function to shuffle the reference, alternative and surrounding
-  nucleotides. Then it will use the \code{\link{identifyAndAnnotateClusters}}
+  nucleotides. Then it will use the \code{\link{identifyClusters}}
   and \code{\link{groupClusters}} functions and returns a summary of the
   frequency of found patterns.
 }
 \examples{
-identResults <- identifyAndAnnotateClusters(dataTable    = testDataSet,
-                                            maxDistance  = 20000,
-                                            linkPatterns = TRUE)
+identResults <- identifyClusters(dataTable    = cMut::testDataSet,
+                                 maxDistance  = 20000,
+                                 linkPatterns = TRUE)
 
 # If only the mutation patterns are needed searched:
 clusteredMutations <- identResults[identResults$is.clustered, ]

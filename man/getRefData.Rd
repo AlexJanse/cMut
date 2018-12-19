@@ -16,7 +16,8 @@ around the mutation.}
 
 \item{lenChrom}{A vector with chromosomes length}
 
-\item{table}{A table containing the mutation information}
+\item{refGenomeHg19}{A Boolean to tell if the preferred reference genome has
+to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}
 }
 \value{
 A string with the surrounding and mutated position reference

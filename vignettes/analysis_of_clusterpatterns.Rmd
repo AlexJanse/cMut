@@ -83,7 +83,7 @@ In this table, there are two kinds of patterns:
 knitr::kable(mutationPatterns[1:9,], algin = 'c')
 ```  
   
-Patterns with 1 reference, 1 alternative, with surrounding nucleotides and a maximum distance with a number or NA. These are used in the [identifyAndAnnotateClusters()](#Identify) and [linkPatterns()](#Match) functions. These patterns will be called 'mutation patterns' in the documentation of this package.
+Patterns with 1 reference, 1 alternative, with surrounding nucleotides and a maximum distance with a number or NA. These are used in the [identifyClusters()](#Identify) and [linkPatterns()](#Match) functions. These patterns will be called 'mutation patterns' in the documentation of this package.
 
 ### Cluster Patterns
 ```{r echo = FALSE}
@@ -198,18 +198,18 @@ linkPatterns(ref                     = "A",
              searchReverseComplement = TRUE,
              renameReverse           = FALSE)
 ```
-Apart from  the arguments `ref`, `alt` and `context`, all arguments for `linkPatterns()` function are also available in the [identifyAndAnnotateClusters()](#Identify) and [groupClusters()](#Group) functions.  
+Apart from  the arguments `ref`, `alt` and `context`, all arguments for `linkPatterns()` function are also available in the [identifyClusters()](#Identify) and [groupClusters()](#Group) functions.  
   
 ~[Back to Context](#Context)~  
   
 \pagebreak
 
 # Identify and Annotate Clusters {#Identify}
-To start the analysis directly from a list of mutations, use the function `identifyAndAnnotateClusters()`. It looks for clusters by scanning per sample per chromosome if the mutations are closer to each other than the maximum distance. It also applies [linkPatterns()](#Match) to every clustered mutation row of the supplied table. Beside those functions, it will also add the distance towards the nearest mutations and columns with <abbr title = "Datatype that is either TRUE or FALSE">Booleans</abbr>. These columns tells whether or not the function were able to put to mutation in a cluster (the `is.clustered` column) and if this mutation could be linked to a mutation pattern (the `is.linked` column`).  
+To start the analysis directly from a list of mutations, use the function `identifyClusters()`. It looks for clusters by scanning per sample per chromosome if the mutations are closer to each other than the maximum distance. It also applies [linkPatterns()](#Match) to every clustered mutation row of the supplied table. Beside those functions, it will also add the distance towards the nearest mutations and columns with <abbr title = "Datatype that is either TRUE or FALSE">Booleans</abbr>. These columns tells whether or not the function were able to put to mutation in a cluster (the `is.clustered` column) and if this mutation could be linked to a mutation pattern (the `is.linked` column`).  
 ```{r echo = TRUE, results = 'hide'}
-results <- identifyAndAnnotateClusters(dataTable   = testDataSet, 
-                                       maxDistance = 20000,
-                                       asTibble    = FALSE)
+results <- identifyClusters(dataTable   = testDataSet, 
+                            maxDistance = 20000,
+                            asTibble    = FALSE)
 head(results[results$is.linked, ])
 ```
 ```{r echo=FALSE}
@@ -236,18 +236,18 @@ knitr::kable(testPatterns, align = 'c')
 ```
 ```{r echo = TRUE, results = "hide"}
 # Using the table on the function:
-results2 <- identifyAndAnnotateClusters(dataTable               = testDataSet, 
-                                        maxDistance             = 20000,
-                                        asTibble                = FALSE,
-                                        linkPatterns            = TRUE,
-                                        searchPatterns          = testPatterns,
-                                        searchIdHeader          = "id",
-                                        searchRefHeader         = "reference",
-                                        searchAltHeader         = "alternative",
-                                        searchDistanceHeader    = "dist",
-                                        searchContextHeader     = "sur",
-                                        searchMutationSymbol    = "-",
-                                        searchReverseComplement = FALSE)
+results2 <- identifyClusters(dataTable               = testDataSet, 
+                             maxDistance             = 20000,
+                             asTibble                = FALSE,
+                             linkPatterns            = TRUE,
+                             searchPatterns          = testPatterns,
+                             searchIdHeader          = "id",
+                             searchRefHeader         = "reference",
+                             searchAltHeader         = "alternative",
+                             searchDistanceHeader    = "dist",
+                             searchContextHeader     = "sur",
+                             searchMutationSymbol    = "-",
+                             searchReverseComplement = FALSE)
 tail(results2[results2$is.linked,])
 ```
 ```{r echo = FALSE}
@@ -264,10 +264,10 @@ cat(comment(results))
 \pagebreak
 
 # Group Clusters and Find Cluster Patterns {#Group}
-To group and summarize the data by mutation clusters, there is a function `groupClusters()`. It also adds a column with the intersection (overlap) of the patterns per cluster and found cluster patterns (See the [Default mutation patterns](#Default) chapter above for more information about cluster patterns). The input for the `groupClusters()` function is the result of the [identifyAndAnnotateClusters()](#Identify) function  
+To group and summarize the data by mutation clusters, there is a function `groupClusters()`. It also adds a column with the intersection (overlap) of the patterns per cluster and found cluster patterns (See the [Default mutation patterns](#Default) chapter above for more information about cluster patterns). The input for the `groupClusters()` function is the result of the [identifyClusters()](#Identify) function  
 ```{r echo = TRUE, results = 'hide'}
-results <- identifyAndAnnotateClusters(dataTable    = testDataSet, 
-                                       maxDistance  = 20000)
+results <- identifyClusters(dataTable    = testDataSet, 
+                            maxDistance  = 20000)
 
 groups <- groupClusters(dataTable = results)
 
@@ -280,9 +280,9 @@ knitr::kable(groups[groups$has.clusterPatterns | groups$has.intersect, -which(na
   
 The handling of mutation patterns' reverse compliments can be adapted using the arguments lined out in the [linkPatterns()](#Match) paragraph. This allows for fine-graded control of the patterns to be adapted. To give an example, if the goal of the analysis is to identify mutation patterns that lie on the same strand, regardless of this is the plus-strand or the minus-strand, use the `renameReverse = TRUE` argument. This spares out the detection of patterns that are on different strands.
 ```{r include = TRUE}
-results2 <- identifyAndAnnotateClusters(dataTable    = testDataSet, 
-                                       maxDistance   = 20000,
-                                       renameReverse = TRUE)
+results2 <- identifyClusters(dataTable    = testDataSet, 
+                             maxDistance   = 20000,
+                             renameReverse = TRUE)
 
 groups2 <- groupClusters(dataTable     = results,
                          renameReverse = TRUE)
@@ -302,8 +302,8 @@ cat(comment(groups))
 # Summarize the Found Patterns {#Summarize}
 To summarize the clusters that are given out by [groupClusters()](#Group), the function getSummaryPatterns() gives the number of clustered mutations affected by each mutation pattern. The `unidentified` row contains the information about the clusters that didn't have a linked pattern.
 ```{r echo = TRUE, results='hide'}
-results <- identifyAndAnnotateClusters(dataTable   = testDataSet, 
-                                       maxDistance = 20000)
+results <- identifyClusters(dataTable   = testDataSet, 
+                            maxDistance = 20000)
 
 groups <- groupClusters(dataTable = results)
 
@@ -329,7 +329,7 @@ getSummaryPatterns(groupedClusters = groups,
 knitr::kable(getSummaryPatterns(groups, searchPatterns = example), align = 'c')
 ```
   
-Please note that if you used `renameReverse = TRUE` in [identifyAndAnnotateClusters()](#Identify) and/or [groupClusters()](#Group) functions then also use it in the `getSummaryPatterns()` function. Otherwise the reverse complement patterns will end up in the "Unidentified" row.
+Please note that if you used `renameReverse = TRUE` in [identifyClusters()](#Identify) and/or [groupClusters()](#Group) functions then also use it in the `getSummaryPatterns()` function. Otherwise the reverse complement patterns will end up in the "Unidentified" row.
 ```{r echo = TRUE, results='hide'}
 getSummaryPatterns(groupedClusters = groups2,
                    renameReverse   = TRUE)
@@ -397,8 +397,8 @@ The following code will show an example of how to use all the main functions pro
 data <- testDataSet
 
 # Identify and Annotate clusters:
-resultsPerMutation <- identifyAndAnnotateClusters(dataTable   = data,
-                                                  maxDistance = 20000)
+resultsPerMutation <- identifyClusters(dataTable   = data,
+                                       maxDistance = 20000)
 # Group the clusters
 resultsPerCluster <- groupClusters(dataTable = resultsPerMutation)
 

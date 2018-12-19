@@ -7,6 +7,29 @@
 getRevComTable(table, refHeader, altHeader, contextHeader = NULL,
   idHeader, renameReverse)
 }
+\arguments{
+\item{table}{Table were the reverse complement is needed}
+
+\item{refHeader}{Contains the name of the column with the reference
+nucleotides.}
+
+\item{altHeader}{Contains the name of the column with the alternative
+nucleotides.}
+
+\item{contextHeader}{A string with the name of the column with the context.
+The data inside this column is e.g. "C.G" hereby stands the "." for the
+location of the mutation. What symbol is used to describe this location is
+arbitrary but be sure to adjust the \code{mutationSymbol} accordingly when
+searching for patterns. The \code{contextHeader} is irrelevant if
+\code{linkPatterns} is FALSE.}
+
+\item{idHeader}{name of the column with the mutation IDs}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
+}
 \description{
 A function to get the reverse complement of the sent pattern
   table

@@ -15,9 +15,10 @@ groupClusters(dataTable, clusterIdHeader = "clusterId",
   renameReverse = FALSE, reverseComplement = FALSE)
 }
 \arguments{
-\item{dataTable}{A data.frame or tibble that contains at least chromosome
-name, sample ID and position information. The data cannot contain any NA.
-For an example use \code{\link{testDataSet}}.}
+\item{dataTable}{A table with columns containing cluster IDs, reference and
+alternative nucleotide. See the output of the
+\code{\link{identifyClusters}} function for more information
+about the table.}
 
 \item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
 
@@ -47,7 +48,7 @@ needed to be processed as well.}
 patterns (e.g. GA > TT).}
 
 \item{patternHeader}{A string with the column name of the column with the
-found patterns from the \code{\link{identifyAndAnnotateClusters}}. Only in
+found patterns from the \code{\link{identifyClusters}}. Only in
 use when patternIntersect is TRUE.}
 
 \item{showWarning}{A Boolean if there need to be a warning if nrow is 0.}
@@ -80,11 +81,6 @@ will irrelevant if \code{searchReverseComplement} is FALSE.}
 needs to be searched with the reverse complement. Irrelevant if
 \code{searchClusterPatterns = FALSE} or \code{searchReverseComplement =
 TRUE}.}
-
-\item{table}{A table with columns containing cluster IDs, reference and
-alternative nucleotide. See the output of the
-\code{\link{identifyAndAnnotateClusters}} function for more information
-about the table.}
 }
 \description{
 A function that will group the clusters and if wanted find the
@@ -94,15 +90,15 @@ A function that will group the clusters and if wanted find the
 \examples{
 # Example of a table containing the right columns and data for the
 # identifiAndAnnotateClusters function:
-test <- testDataSet
+test <- cMut::testDataSet
 
 # Example of using this function with data that contain patterns:
-mutations <- identifyAndAnnotateClusters(dataTable      = test,
-                                         maxDistance    = 20000,
-                                         chromHeader    = "chrom",
-                                         sampleIdHeader = "sampleIDs",
-                                         positionHeader = "start",
-                                         linkPatterns   = TRUE)
+mutations <- identifyClusters(dataTable      = test,
+                              maxDistance    = 20000,
+                              chromHeader    = "chrom",
+                              sampleIdHeader = "sampleIDs",
+                              positionHeader = "start",
+                              linkPatterns   = TRUE)
 clusters <- groupClusters(dataTable             = mutations,
                           patternIntersect      = TRUE,
                           searchClusterPatterns = FALSE)

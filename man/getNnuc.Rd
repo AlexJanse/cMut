@@ -6,6 +6,11 @@
 \usage{
 getNnuc(context1, context2)
 }
+\arguments{
+\item{context1}{surrounding nucleotides of the unknown mutation}
+
+\item{context2}{surrounding nucleotides from the searchPattern table}
+}
 \value{
 Returns a number with amount of nucleotides that has to be compared
 }

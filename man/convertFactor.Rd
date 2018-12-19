@@ -6,6 +6,10 @@
 \usage{
 convertFactor(x)
 }
+\arguments{
+\item{x}{data frame were the columns with string need to converted to
+character}
+}
 \description{
 A function to convert factor columns to character
 }

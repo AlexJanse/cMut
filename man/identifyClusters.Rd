@@ -4,8 +4,16 @@
 \alias{identifyClusters}
 \title{identifyClusters}
 \usage{
-identifyClusters(dataTable, maxDistance, chromHeader = "Chr",
-  sampleIdHeader = "sampleID", positionHeader = "Pos")
+identifyClusters(dataTable, maxDistance, chromHeader = "chrom",
+  sampleIdHeader = "sampleIDs", positionHeader = "start",
+  refHeader = "ref", altHeader = "alt",
+  contextHeader = "surrounding", mutationSymbol = ".",
+  linkPatterns = TRUE, reverseComplement = FALSE,
+  searchPatterns = NULL, searchRefHeader = "ref",
+  searchAltHeader = "alt", searchContextHeader = "surrounding",
+  searchIdHeader = "process", searchDistanceHeader = "maxDistance",
+  searchMutationSymbol = ".", searchReverseComplement = TRUE,
+  linkClustersOnly = TRUE, renameReverse = FALSE, asTibble = TRUE)
 }
 \arguments{
 \item{dataTable}{A data.frame or tibble that contains at least chromosome
@@ -23,13 +31,104 @@ ID.}
 
 \item{positionHeader}{A string with the name of the column with the position
 of the mutation. (The data in the column needs to be nummeric.)}
+
+\item{refHeader}{Contains the name of the column with the reference
+nucleotides.}
+
+\item{altHeader}{Contains the name of the column with the alternative
+nucleotides.}
+
+\item{contextHeader}{A string with the name of the column with the context.
+The data inside this column is e.g. "C.G" hereby stands the "." for the
+location of the mutation. What symbol is used to describe this location is
+arbitrary but be sure to adjust the \code{mutationSymbol} accordingly when
+searching for patterns. The \code{contextHeader} is irrelevant if
+\code{linkPatterns} is FALSE.}
+
+\item{mutationSymbol}{A string with the symbol that stands for the mutated
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
+
+\item{linkPatterns}{A Boolean to tell if it's necessary to try and link the
+mutations to patterns. If FALSE then the \code{search...} parameters and
+the \code{linkClustersOnly} parameter are irrelevant. For more information
+see \code{\link{linkPatterns}}.}
+
+\item{reverseComplement}{A Boolean to tell if the \code{ref}, \code{alt} and
+\code{context} needed to be searched with the reverse complement. Irrelevant
+if \code{searchReverseComplement = TRUE}.}
+
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+\code{\link{mutationPatterns}} is the default search table.}
+
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
+
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
+
+\item{searchContextHeader}{A string with the column name of the one with the
+context nucleotide in the searchPatterns table.}
+
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
+
+\item{searchMutationSymbol}{A string with symbol that stands for the mutated
+nucleotide location in the column of the \code{searchContextHeader}. (e.g.
+"." in "G.C")}
+
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
+
+\item{linkClustersOnly}{A boolean to tell if only the clustered mutations are
+needed to be linked with the patterns in the \code{searchPatterns} table.
+When it is FALSE all the mutations will be used.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
+
+\item{asTibble}{A boolean to tell if the result table has to be a tibble.
+When it is FALSE it will return data.frame}
 }
 \value{
-A atomic character vector; contains per index the chromosome nr,
-  sample name and any cluster ID's. For example: Chr1 testSample 1
+The tibble that was sent as an argument for this function with extra
+  columns: clusterId, is.clustered and distance till nearest mutation below
+  the maximum distance.
 }
 \description{
-A function that is able to search for clusters in DNA mutation
-  table (as explained by argument dataTable) in a single chromosome for a single
-  sample.
+A function that finds and annotate clusters in a genomic data
+  tibble.
+}
+\examples{
+# Example data set:
+data <- cMut::testDataSet
+
+# Example for just clustering:
+results <- identifyClusters(dataTable   = data,
+                            maxDistance = 20000,
+                            linkPatterns = FALSE)
+
+# Example for clustering and linking patterns with the default searchPattern table:
+results <- identifyClusters(dataTable    = data,
+                            maxDistance  = 20000,
+                            linkPatterns = TRUE)
+
+# For more information about the added columns, use:
+cat(comment(results))
+
+# See the vignette for detailed examples using:
+# vignette("analysis_of_clusterpattterns",package = "cMut")
+}
+\seealso{
+\itemize{ \item \code{\link{testDataSet}} for an example of data as
+  input for parameter \code{dataTable} \item \code{\link{mutationPatterns}}
+  for looking at the default pattern search table \item Use the following
+  code to access the vignette with detailed examples of how to use the
+  functions of cMut: vignette("analysis_of_clusterpattterns",package =
+  "cMut") }
 }

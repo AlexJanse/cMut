@@ -14,8 +14,6 @@ createSummaryPatterns(clusterTable, searchPatterns, searchIdHeader)
 
 \item{searchIdHeader}{A string with the column name of the one with the
 pattern IDs.}
-
-\item{grouped}{A Boolean to tell if the data is grouped or not}
 }
 \description{
 A function to create a table with frequencies of patterns.

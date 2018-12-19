@@ -6,6 +6,11 @@
 \usage{
 setdiff.data.frame(x, y)
 }
+\arguments{
+\item{x}{data frame that is used to return the differences from y}
+
+\item{y}{data frame that is used to compare with x}
+}
 \description{
 Quick function to apply \code{\link{setdiff}} on dataframes
 }

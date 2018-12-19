@@ -87,7 +87,7 @@ linkPatterns <- function(ref,                                     alt,
   }
 
 
-  dnaSymbols <- tibble::as.tibble(dnaAlphabet)
+  dnaSymbols <- tibble::as.tibble(cMut::dnaAlphabet)
 
   ref        <- casefold(ref, upper = TRUE)
   refSymbols <- getAlphaMatches(ref,dnaSymbols)
@@ -171,6 +171,7 @@ compare <- function(nucleotide, symbols){
 #' @param mutationSymbol A character that stands for the mutation nucleotide
 #'   (e.g. "." for C.G)
 #' @param alphabet A tibble with the nucleotides and their symbols
+#' @inheritParams linkPatterns
 #' @return Boolean if the contexts match or not
 compareContext <- function(searchContext,  findContext,
                            mutationSymbol, alphabet,
@@ -231,6 +232,8 @@ compareContext <- function(searchContext,  findContext,
 
 #' getNnuc
 #' @description A function to determine how many nucleotides has to be compared
+#' @param context1 surrounding nucleotides of the unknown mutation
+#' @param context2 surrounding nucleotides from the searchPattern table
 #' @return Returns a number with amount of nucleotides that has to be compared
 getNnuc <- function(context1,context2){
   if(is.na(context2)){
@@ -254,18 +257,22 @@ getNnuc <- function(context1,context2){
 
 #' getAlphaMatches
 #' @description A function to find the symbols that contains the nucleotide
+#' @param nuc string with the nucleotide that is needed to be found
+#' @param alphabet data frame with nucleotide symbols
 getAlphaMatches <- function(nuc, alphabet){
   return(alphabet[grepl(nuc,alphabet$represents),1])
 }
 
 #' getReverseComplement
 #' @description A function to get the reverse complement of a sequence
+#' @param x nucleotides that need to be converted to reverse complement
 getReverseComplement <- function(x) {
   return(as.character(Biostrings::reverseComplement(Biostrings::DNAString(x))))
 }
 
 #' checkLinkPatternsParameters
 #' @description A function to check the parameters of linkPatterns
+#' @inheritParams linkPatterns
 checkLinkPatternsParameters <- function(ref,                  alt,
                                         context,              distance,
                                         mutationSymbol,       reverseComplement,

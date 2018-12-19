@@ -3,4 +3,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^dataAnalyse$
+^\.drake$
 README.txt
+

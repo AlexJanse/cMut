@@ -6,6 +6,9 @@
 \usage{
 getReverseComplement(x)
 }
+\arguments{
+\item{x}{nucleotides that need to be converted to reverse complement}
+}
 \description{
 A function to get the reverse complement of a sequence
 }

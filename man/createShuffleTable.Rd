@@ -10,7 +10,7 @@ createShuffleTable(dataTable, chromHeader, positionHeader, refHeader,
 \arguments{
 \item{dataTable}{A table with the reference, alternative and surrounding
 nucleotides. The best data to use is the output of the
-\code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
+\code{\link{identifyClusters}} where \code{is.clustered} is
 TRUE.}
 
 \item{chromHeader}{A string with the name of the column with the chromosome

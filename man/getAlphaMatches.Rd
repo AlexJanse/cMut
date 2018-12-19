@@ -6,6 +6,11 @@
 \usage{
 getAlphaMatches(nuc, alphabet)
 }
+\arguments{
+\item{nuc}{string with the nucleotide that is needed to be found}
+
+\item{alphabet}{data frame with nucleotide symbols}
+}
 \description{
 A function to find the symbols that contains the nucleotide
 }

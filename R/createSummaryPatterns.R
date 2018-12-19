@@ -1,7 +1,6 @@
 #' createSummaryPatterns
 #' @description A function to create a table with frequencies of patterns.
 #' @param clusterTable Table with cluster information
-#' @param grouped A Boolean to tell if the data is grouped or not
 #' @inheritParams shuffleMutations
 #' @import magrittr
 #' @import foreach
@@ -86,6 +85,8 @@ createSummaryPatterns <- function(clusterTable,
 
 #' convertFactor
 #' @description A function to convert factor columns to character
+#' @param x data frame were the columns with string need to converted to
+#'   character
 convertFactor <- function(x){
   x[sapply(x, is.factor)] <- lapply(x[sapply(x, is.factor)], as.character)
   return(x)

@@ -45,6 +45,10 @@ getSearchPatterns <- function(reverse       = TRUE,
 #' getRevComTable
 #' @description A function to get the reverse complement of the sent pattern
 #'   table
+#' @inheritParams identifyClusters
+#' @param table Table were the reverse complement is needed
+#' @param idHeader name of the column with the mutation IDs
+#' @importFrom rlang :=
 getRevComTable <- function(table,
                            refHeader,
                            altHeader,
@@ -105,6 +109,8 @@ getRevComTable <- function(table,
 
 #' setdiff.data.frame
 #' @description Quick function to apply \code{\link{setdiff}} on dataframes
+#' @param x data frame that is used to return the differences from y
+#' @param y data frame that is used to compare with x
 setdiff.data.frame <- function(x, y) {
   x[!duplicated(rbind(y, x))[-seq_len(nrow(y))], ]
 }

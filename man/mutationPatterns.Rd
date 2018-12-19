@@ -30,7 +30,7 @@ As seen in the table, there are two kinds of patterns:
 \itemize{
   \item Patterns with 1 reference, 1 alternative, with surrounding
   nucleotides and a maximum distance with a number or NA. These are used in
-  the \code{\link{identifyAndAnnotateClusters}} and \code{\link{linkPatterns}}
+  the \code{\link{identifyClusters}} and \code{\link{linkPatterns}}
   functions. These patterns will be called mutation patterns in the
   documentation of this package.
   \item Patterns with more than 1 or no reference, more than 1 alternative,

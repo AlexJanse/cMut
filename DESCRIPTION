@@ -13,22 +13,32 @@ Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Depends: R (>= 3.5)
-Imports: igraph ,
-         tidyverse ,
-         foreach ,
+Imports: AnnotationHub ,
+         Biostrings ,
+         BSgenome ,
+         BSgenome.Hsapiens.UCSC.hg19 ,
+         BSgenome.Hsapiens.UCSC.hg38 ,
          data.table ,
          doParallel ,
-         magrittr ,
-         stringr ,
+         doRNG ,
          doSNOW ,
-         doRNG
+         dplyr ,
+         foreach ,
+         GenomicRanges ,
+         igraph ,
+         IRanges ,
+         iterators ,
+         magrittr ,
+         purrr ,
+         rlang ,
+         S4Vectors ,
+         stringr ,
+         tibble ,
+         tidyr ,
+         tidyverse ,
+         VariantAnnotation 
 Suggests: testthat,
           knitr,
           rmarkdown
-BiocViews: AnnotationHub ,
-           GenomicRanges ,
-           BSgenome.Hsapiens.UCSC.hg19 ,
-           BSgenome.Hsapiens.UCSC.hg38 ,
-           BSgenome ,
-           VariantAnnotation
+BiocViews: 
 VignetteBuilder: knitr

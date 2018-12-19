@@ -1,11 +1,11 @@
 #' shuffleMutations
 #' @description A function to shuffle the reference, alternative and surrounding
-#'   nucleotides. Then it will use the \code{\link{identifyAndAnnotateClusters}}
+#'   nucleotides. Then it will use the \code{\link{identifyClusters}}
 #'   and \code{\link{groupClusters}} functions and returns a summary of the
 #'   frequency of found patterns.
 #' @param dataTable A table with the reference, alternative and surrounding
 #'   nucleotides. The best data to use is the output of the
-#'   \code{\link{identifyAndAnnotateClusters}} where \code{is.clustered} is
+#'   \code{\link{identifyClusters}} where \code{is.clustered} is
 #'   TRUE.
 #' @param refHeader A string with the column header of the reference nucleotide.
 #' @param altHeader A string with the column header of the alternative
@@ -15,7 +15,7 @@
 #' @param nBootstrap A number with the amount of bootstraps there need to be
 #'   executed.
 #' @inheritParams linkPatterns
-#' @inheritParams identifyAndAnnotateClusters
+#' @inheritParams identifyClusters
 #' @inheritParams groupClusters
 #' @param asTibble A Boolean if the returned results needs to be a tibble. It
 #'   will return a data.frame otherwise. Irrelevant if \code{returnEachBootstrap
@@ -25,16 +25,17 @@
 #'   summary of each bootstrap.
 #' @param no.cores A number with the amount of clusters that is allowed to use
 #'   during shuffle. Default is maximum amount of cores present on the system.
-#' @import magrittr
+#' @importFrom magrittr %>%
 #' @import foreach
 #' @import doParallel
 #' @import compiler
 #' @import doSNOW
+#' @importFrom rlang :=
 #' @export
 #' @examples
-#' identResults <- identifyAndAnnotateClusters(dataTable    = testDataSet,
-#'                                             maxDistance  = 20000,
-#'                                             linkPatterns = TRUE)
+#' identResults <- identifyClusters(dataTable    = cMut::testDataSet,
+#'                                  maxDistance  = 20000,
+#'                                  linkPatterns = TRUE)
 #'
 #' # If only the mutation patterns are needed searched:
 #' clusteredMutations <- identResults[identResults$is.clustered, ]
@@ -262,6 +263,7 @@ createShuffleTable <-  function(dataTable,      chromHeader,
 #' checkParametersShuffleMutations
 #' @description A function to check if the parameters are correct of the
 #'   \code{\link{shuffleMutations}} function
+#' @inheritParams shuffleMutations
 #' @import doRNG
 checkParametersShuffleMutations <- function(dataTable,               chromHeader,
                                             positionHeader,          refHeader,
@@ -319,6 +321,8 @@ checkParametersShuffleMutations <- function(dataTable,               chromHeader
 
 #' shuffleParallel
 #' @description Function to preform the shuffling and annotating in parallel
+#' @inheritParams shuffleMutations
+#' @param resultTable A dataframe were the results of each bootstrap is put into
 shuffleParallel <- function(dataTable,               chromHeader,
                             positionHeader,          refHeader,
                             altHeader,               contextHeader,
@@ -334,9 +338,9 @@ shuffleParallel <- function(dataTable,               chromHeader,
   # Prepare for parallel loop -----------------------------------------------
   clusters <- parallel::makeCluster(no.cores)
   doSNOW::registerDoSNOW(clusters)
-  bar      <- txtProgressBar(max = nBootstrap, style = 3)
+  bar      <- utils::txtProgressBar(max = nBootstrap, style = 3)
   progress <- function(x) {
-                setTxtProgressBar(bar, x)
+                utils::setTxtProgressBar(bar, x)
               }
   opts     <- list(progress = progress)
 
@@ -354,12 +358,12 @@ shuffleParallel <- function(dataTable,               chromHeader,
                                                                         sampleIdHeader = sampleIdHeader)
 
                                      # Identify, annotate and group clustered mutations --------------------------
-                                     clusterTablePerMut <- identifyAndAnnotateClusters(dataTable               = shuffleTable,    maxDistance          = maxDistance,
-                                                                                       positionHeader          = "pos",           linkPatterns         = linkPatterns,
-                                                                                       searchPatterns          = searchPatterns,  searchRefHeader      = searchRefHeader,
-                                                                                       searchAltHeader         = searchAltHeader, searchContextHeader  = searchContextHeader,
-                                                                                       searchIdHeader          = searchIdHeader,  searchDistanceHeader = searchDistanceHeader,
-                                                                                       searchReverseComplement = FALSE)
+                                     clusterTablePerMut <- identifyClusters(dataTable               = shuffleTable,    maxDistance          = maxDistance,
+                                                                            positionHeader          = "pos",           linkPatterns         = linkPatterns,
+                                                                            searchPatterns          = searchPatterns,  searchRefHeader      = searchRefHeader,
+                                                                            searchAltHeader         = searchAltHeader, searchContextHeader  = searchContextHeader,
+                                                                            searchIdHeader          = searchIdHeader,  searchDistanceHeader = searchDistanceHeader,
+                                                                            searchReverseComplement = FALSE)
 
                                      clusterTable <- groupClusters(dataTable               = clusterTablePerMut, patternIntersect      = TRUE,
                                                                    showWarning             = FALSE,              searchClusterPatterns = searchClusterPatterns,
@@ -389,9 +393,12 @@ shuffleParallel <- function(dataTable,               chromHeader,
 
 #' summarizeBootstrap
 #' @description A function to summarize the bootstrap results
+#' @inheritParams shuffleMutations
+#' @inheritParams shuffleParallel
+#' @param resultTables List with all the results of the bootstrap
+#' @importFrom rlang :=
 summarizeBootstrap <- function(resultTable,  resultTables,
                                searchIdHeader) {
-
 
   # Prepare for calculating the frequencies ---------------------------------
   total       <- list("total",0)
@@ -413,7 +420,7 @@ summarizeBootstrap <- function(resultTable,  resultTables,
   # Calculate the percentage of the frequecies -----------------------------------
   if(total != 0){
     return(dplyr::mutate(resultTable,
-                         percentage = purrr::map_dbl(frequency,
+                         percentage = purrr::map_dbl(.data$frequency,
                                                      function(x) {
                                                        x / total * 100
                                                      })))
@@ -427,6 +434,8 @@ summarizeBootstrap <- function(resultTable,  resultTables,
 
 #' addShuffleMutationComment
 #' @description A function to add comment about the result table.
+#' @param results The results from the shuffleMutation function
+#' @param searchIdHeader Name of the the column with mutation processes
 addShuffleMutationComment <- function(results, searchIdHeader) {
   comment(results) <-
     paste0("

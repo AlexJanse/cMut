@@ -6,6 +6,11 @@
 \usage{
 addShuffleMutationComment(results, searchIdHeader)
 }
+\arguments{
+\item{results}{The results from the shuffleMutation function}
+
+\item{searchIdHeader}{Name of the the column with mutation processes}
+}
 \description{
 A function to add comment about the result table.
 }

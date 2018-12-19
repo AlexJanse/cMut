@@ -6,6 +6,11 @@
 \usage{
 nucToSymbol(nuc, mutationSymbol)
 }
+\arguments{
+\item{nuc}{vector with the nucleotides}
+
+\item{mutationSymbol}{symbol that represent the mutation site}
+}
 \description{
 Function to convert a vector nucleotides to a single symbol
 }

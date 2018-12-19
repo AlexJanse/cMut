@@ -5,6 +5,7 @@
 #'   function.
 #' @inheritParams groupClusters
 #' @import magrittr
+#' @importFrom rlang .data
 searchClusterPatterns <- function(groupedClusters,
                                   searchPatterns       = mutationPatterns,
                                   searchRefHeader      = "ref",
@@ -99,7 +100,7 @@ searchClusterPatterns <- function(groupedClusters,
 
   # Fuse the found mutation patterns with the found cluster patterns:
   groupedClusters <- dplyr::mutate(groupedClusters,
-                                   foundPatterns = purrr::map2(foundPatterns,
+                                   foundPatterns = purrr::map2(.data$foundPatterns,
                                                                clusterPatterns,
                                                                function(x,y) {
                                                                  ifelse(x == "",
@@ -111,7 +112,7 @@ searchClusterPatterns <- function(groupedClusters,
 
   # Unlist foundPatterns column:
   groupedClusters <- dplyr::mutate(groupedClusters,
-                                   foundPatterns = purrr::map(foundPatterns,
+                                   foundPatterns = purrr::map(.data$foundPatterns,
                                                               function(x) {
                                                                 x[[1]]
                                                               }))
@@ -127,6 +128,8 @@ searchClusterPatterns <- function(groupedClusters,
 
 #' compareNucs
 #' @description A function to compare if two sequences are a match.
+#' @param find The nucleotides to be found
+#' @param search The nucleotides that needs to be matched with
 compareNucs <- function(find,search) {
   dnaAlphabet <- tibble::as.tibble(dnaAlphabet)
   if (nchar(find) == nchar(search)){

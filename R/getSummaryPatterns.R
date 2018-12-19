@@ -16,12 +16,12 @@
 #'   \code{Unidentified} together with clusters without patterns.
 #' @examples
 #' # Example dataset
-#' data <- testDataSet
+#' data <- cMut::testDataSet
 #'
 #' # Use the following functions to get the necessary table
-#' results <- identifyAndAnnotateClusters(dataTable    = data,
-#'                                        maxDistance  = 20000,
-#'                                        linkPatterns = TRUE)
+#' results <- identifyClusters(dataTable    = data,
+#'                             maxDistance  = 20000,
+#'                             linkPatterns = TRUE)
 #' groupResults <- groupClusters(dataTable             = results,
 #'                               searchClusterPatterns = TRUE,
 #'                               patternIntersect      = TRUE)
@@ -32,12 +32,12 @@
 #'
 #' # For more information about the columns use:
 #' cat(comment(summary))
+#' @importFrom rlang .data
 getSummaryPatterns <- function(groupedClusters,
                                searchPatterns = NULL,
                                searchIdHeader = "process",
                                renameReverse  = FALSE,
                                asTibble       = TRUE) {
-
 
   # Get or check the searchPatterns table -----------------------------------
   if (is.null(searchPatterns)) {
@@ -58,7 +58,7 @@ getSummaryPatterns <- function(groupedClusters,
   if (renameReverse) {
     searchPatterns <- dplyr::bind_rows(searchPatterns,
                                        dplyr::mutate(searchPatterns,
-                                                     process = paste0(process,
+                                                     process = paste0(.data$process,
                                                                       " [Rev.Com.]")))
   }
 
@@ -87,7 +87,7 @@ getSummaryPatterns <- function(groupedClusters,
                                                 times = nrow(table)))
   } else {
     table <- dplyr::mutate(table,
-                           percentage = purrr::map_dbl(frequency,
+                           percentage = purrr::map_dbl(.data$frequency,
                                                        function(x){
                                                          x / total * 100
                                                          }))

@@ -7,6 +7,32 @@
 createGroupTable(table, clusterIdHeader, refHeader, altHeader,
   contextHeader, mutationSymbol, showWarning)
 }
+\arguments{
+\item{table}{A table with columns containing cluster IDs, reference and
+alternative nucleotide. See the output of the
+\code{\link{identifyClusters}} function for more information
+about the table.}
+
+\item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
+
+\item{refHeader}{Contains the name of the column with the reference
+nucleotides.}
+
+\item{altHeader}{Contains the name of the column with the alternative
+nucleotides.}
+
+\item{contextHeader}{A string with the name of the column with the context.
+The data inside this column is e.g. "C.G" hereby stands the "." for the
+location of the mutation. What symbol is used to describe this location is
+arbitrary but be sure to adjust the \code{mutationSymbol} accordingly when
+searching for patterns. The \code{contextHeader} is irrelevant if
+\code{linkPatterns} is FALSE.}
+
+\item{mutationSymbol}{A string with the symbol that stands for the mutated
+nucleotide location in the \code{context}. (e.g. "." in "G.C")}
+
+\item{showWarning}{A Boolean if there need to be a warning if nrow is 0.}
+}
 \description{
 A function to group the table by the cluster IDs and add
   annotation to it

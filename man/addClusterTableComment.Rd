@@ -7,6 +7,20 @@
 addClusterTableComment(table, patternIntersect, clusterIdHeader,
   searchClusterPatterns)
 }
+\arguments{
+\item{table}{A table with columns containing cluster IDs, reference and
+alternative nucleotide. See the output of the
+\code{\link{identifyClusters}} function for more information
+about the table.}
+
+\item{patternIntersect}{A Boolean if the table contains patterns and these
+needed to be processed as well.}
+
+\item{clusterIdHeader}{Contains the name of the column with the cluster IDs.}
+
+\item{searchClusterPatterns}{A Boolean if it's needed to search to cluster
+patterns (e.g. GA > TT).}
+}
 \description{
 Adds explanation to the table about the columns
 }

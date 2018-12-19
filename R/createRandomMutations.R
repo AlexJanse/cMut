@@ -138,6 +138,7 @@ ifelse(refGenomeHg19,"Hg19","Hg38"),".","
 #' @param x A string that contains the chromosome name, start and stop location
 #'   and is separated by "-".
 #' @param lenChrom A vector with chromosomes length
+#' @inheritParams createRandomMutations
 #' @return A string with the reference nucleotides.
 getRef <- function(x,lenChrom, refGenomeHg19) {
 
@@ -175,7 +176,7 @@ getRef <- function(x,lenChrom, refGenomeHg19) {
 #' @param pos A number with the mutation location.
 #' @param sizeSur A number with the amount of nucleotides there has to be
 #'   around the mutation.
-#' @param table A table containing the mutation information
+#' @inheritParams createRandomMutations
 #' @return A string with the surrounding and mutated position reference
 #'   nucleotides of a mutation. Each part separated with "-"
 #' @inheritParams getRef
@@ -231,8 +232,10 @@ getRefData <- function(chr,pos,sizeSur,lenChrom, refGenomeHg19) {
 #' createRandomTable
 #' @description Function to build the random mutation table and call supporting
 #'   functions.
+#' @param lenChrom vector with the length of the chromosomes
 #' @inheritParams createRandomMutations
 #' @return A table with random mutations
+#' @importFrom rlang .data
 createRandomTable <- function(nMut,
                               sampleName,
                               sizeSur,
@@ -261,16 +264,16 @@ createRandomTable <- function(nMut,
                                         stringsAsFactors = FALSE)
 
   # Add information about the chromosome maximum size:
-  randomTable <- dplyr::mutate(randomTable, chromLen = lenChrom[chrom])
+  randomTable <- dplyr::mutate(randomTable, chromLen = lenChrom[.data$chrom])
 
   # Take a random number with the range of the chromosome:
-  randomTable <- dplyr::mutate(randomTable, start = purrr::map_int(chromLen,
+  randomTable <- dplyr::mutate(randomTable, start = purrr::map_int(.data$chromLen,
                                                                    ~sample(., 1)))
   # Stop is the same as start because thease are single mutations only:
-  randomTable <- dplyr::mutate(randomTable, stop = start)
+  randomTable <- dplyr::mutate(randomTable, stop = .data$start)
 
   # Create a column with the necessary data for the getRefData function:
-  randomTable <- dplyr::mutate(randomTable, irange = paste(chrom, start,
+  randomTable <- dplyr::mutate(randomTable, irange = paste(.data$chrom, .data$start,
                                                            stop, sep = "-"))
 
   # Create a column with the sample name:
@@ -278,7 +281,7 @@ createRandomTable <- function(nMut,
 
   # Create a column with the information needed from the reference genome:
   randomTable <- dplyr::mutate(randomTable,
-                               refdata = purrr::map2_chr(chrom,start,
+                               refdata = purrr::map2_chr(.data$chrom,.data$start,
                                                          function(x,y){
                                                            getRefData(chr = x,
                                                                       pos = y,
@@ -289,21 +292,21 @@ createRandomTable <- function(nMut,
 
   # Create a column with the surrounding nucleotides from the refData column:
   randomTable <- dplyr::mutate(randomTable,
-                               surrounding = purrr::map_chr(refdata,
+                               surrounding = purrr::map_chr(.data$refdata,
                                                             function(x){
                                                               strsplit(x,
                                                                        "-")[[1]][1]
                                                             }))
 
   # Create a column with the reference nucleotide from the refData column:
-  randomTable <- dplyr::mutate(randomTable, ref = purrr::map_chr(refdata,
+  randomTable <- dplyr::mutate(randomTable, ref = purrr::map_chr(.data$refdata,
                                                                  function(x){
                                                                    strsplit(x,
                                                                             "-")[[1]][2]
                                                                  }))
 
   # Create a column with the variant nucleotide:
-  randomTable <- dplyr::mutate(randomTable, alt = purrr::map_chr(ref,
+  randomTable <- dplyr::mutate(randomTable, alt = purrr::map_chr(.data$ref,
                                                                  ~sample(setdiff(nucleotides,
                                                                                  c(.)),1)))
 

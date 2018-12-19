@@ -2,9 +2,9 @@
 #' @description A function that will group the clusters and if wanted find the
 #'   intersection of patterns between the mutations within a cluster. And is
 #'   also able to search for cluster patterns.
-#' @param table A table with columns containing cluster IDs, reference and
+#' @param dataTable A table with columns containing cluster IDs, reference and
 #'   alternative nucleotide. See the output of the
-#'   \code{\link{identifyAndAnnotateClusters}} function for more information
+#'   \code{\link{identifyClusters}} function for more information
 #'   about the table.
 #' @param clusterIdHeader Contains the name of the column with the cluster IDs.
 #' @param refHeader Contains the name of the column with the reference
@@ -14,12 +14,12 @@
 #' @param patternIntersect A Boolean if the table contains patterns and these
 #'   needed to be processed as well.
 #' @param patternHeader A string with the column name of the column with the
-#'   found patterns from the \code{\link{identifyAndAnnotateClusters}}. Only in
+#'   found patterns from the \code{\link{identifyClusters}}. Only in
 #'   use when patternIntersect is TRUE.
 #' @param showWarning A Boolean if there need to be a warning if nrow is 0.
 #' @param searchClusterPatterns A Boolean if it's needed to search to cluster
 #'   patterns (e.g. GA > TT).
-#' @inheritParams identifyAndAnnotateClusters
+#' @inheritParams identifyClusters
 #' @inheritParams linkPatterns
 #' @param reverseComplement A Boolean to tell if the \code{ref}, \code{alt}
 #'   needs to be searched with the reverse complement. Irrelevant if
@@ -33,15 +33,15 @@
 #' @examples
 #' # Example of a table containing the right columns and data for the
 #' # identifiAndAnnotateClusters function:
-#' test <- testDataSet
+#' test <- cMut::testDataSet
 #'
 #' # Example of using this function with data that contain patterns:
-#' mutations <- identifyAndAnnotateClusters(dataTable      = test,
-#'                                          maxDistance    = 20000,
-#'                                          chromHeader    = "chrom",
-#'                                          sampleIdHeader = "sampleIDs",
-#'                                          positionHeader = "start",
-#'                                          linkPatterns   = TRUE)
+#' mutations <- identifyClusters(dataTable      = test,
+#'                               maxDistance    = 20000,
+#'                               chromHeader    = "chrom",
+#'                               sampleIdHeader = "sampleIDs",
+#'                               positionHeader = "start",
+#'                               linkPatterns   = TRUE)
 #' clusters <- groupClusters(dataTable             = mutations,
 #'                           patternIntersect      = TRUE,
 #'                           searchClusterPatterns = FALSE)
@@ -95,12 +95,12 @@ groupClusters <- function(dataTable,                               clusterIdHead
 
   # Find the pattern intersect if asked -------------------------------------
   if (patternIntersect) {
-    table <- dplyr::mutate(table, foundPatterns = purrr::map(cMuts,
+    table <- dplyr::mutate(table, foundPatterns = purrr::map(.data$cMuts,
                                                              getPatternIntersect,
                                                              patternHeader))
 
     # Add column to confirm if patterns are found during the intersection:
-    table <- dplyr::mutate(table, has.intersect = purrr::map_lgl(foundPatterns,
+    table <- dplyr::mutate(table, has.intersect = purrr::map_lgl(.data$foundPatterns,
                                                                  function(x) {
                                                                    length(x) > 0 & x[[1]] != ""
                                                                    }))
@@ -135,6 +135,12 @@ groupClusters <- function(dataTable,                               clusterIdHead
 #' createGroupTable
 #' @description A function to group the table by the cluster IDs and add
 #'   annotation to it
+#' @inheritParams groupClusters
+#' @param table A table with columns containing cluster IDs, reference and
+#'   alternative nucleotide. See the output of the
+#'   \code{\link{identifyClusters}} function for more information
+#'   about the table.
+#' @importFrom rlang .data
 createGroupTable <- function(table,         clusterIdHeader,
                              refHeader,     altHeader,
                              contextHeader, mutationSymbol,
@@ -155,54 +161,54 @@ createGroupTable <- function(table,         clusterIdHeader,
 
   # Extract the reference, alternative and surrounding nucleotides from the subtables:
   table <- dplyr::mutate(table,
-                         refs         = purrr::map(cMuts,
+                         refs         = purrr::map(.data$cMuts,
                                                    ~as.character(dplyr::pull(.,
                                                                              refHeader))),
-                         alts         = purrr::map(cMuts,
+                         alts         = purrr::map(.data$cMuts,
                                                    ~as.character(dplyr::pull(.,
                                                                              altHeader))),
-                         surroundings = purrr::map(cMuts,
+                         surroundings = purrr::map(.data$cMuts,
                                                    ~as.character(dplyr::pull(.,
                                                                              contextHeader))))
 
   # Collapse or fuse the data to go from a vector to a single string
   table <- dplyr::mutate(table,
-                         refs = purrr::map_chr(refs,
+                         refs = purrr::map_chr(.data$refs,
                                                function(x) {
                                                  paste0(x, collapse = "")
                                                }),
-                         alts = purrr::map_chr(alts,
+                         alts = purrr::map_chr(.data$alts,
                                                function(x) {
                                                  paste0(x,collapse = "")
                                                }))
   table <- dplyr::mutate(table,
-                         surroundings = purrr::map_chr(surroundings,
+                         surroundings = purrr::map_chr(.data$surroundings,
                                                        fuseSurroundings,
                                                        mutationSymbol,
                                                        showWarning))
 
   # Create a column with the mutation type of all mutations within the cluster:
   table <- dplyr::mutate(table,
-                         plusStrand = purrr::map2_chr(refs,
-                                                      alts,
+                         plusStrand = purrr::map2_chr(.data$refs,
+                                                      .data$alts,
                                                       formatClusterMutations),
-                         minusStrand = purrr::map2_chr(refs,
-                                                       alts,
+                         minusStrand = purrr::map2_chr(.data$refs,
+                                                       .data$alts,
                                                        formatClusterMutations,
                                                        convert = TRUE))
   # Create a column with the normalised mutation type:
   table <- dplyr::mutate(table,
-                         clusterType = purrr::map2_chr(plusStrand,
-                                                       minusStrand,
+                         clusterType = purrr::map2_chr(.data$plusStrand,
+                                                       .data$minusStrand,
                                                        getClusterType))
 
   # Create a column with all distances within the cluster
   #  (necessary for the searchClusterPatterns function):
-  table <- dplyr::mutate(table, distance = purrr::map(cMuts,
+  table <- dplyr::mutate(table, distance = purrr::map(.data$cMuts,
                                                       function(x) {
                                                         list(x$distance)
                                                       }))
-  table <- dplyr::mutate(table, distance = purrr::map(distance,
+  table <- dplyr::mutate(table, distance = purrr::map(.data$distance,
                                                       function(x) {
                                                         x[[1]]
                                                       }))
@@ -220,6 +226,9 @@ createGroupTable <- function(table,         clusterIdHeader,
 #' fuseSurroundings
 #' @description A function to combine surroundings by using nucleotide symbols.
 #'   See \code{\link{dnaAlphabet}} for an explanation what these symbols are.
+#' @inheritParams groupClusters
+#' @param surroundings The list with the surrounding nucleotides found in a
+#'   cluster
 fuseSurroundings <- function(surroundings, mutationSymbol,showWarning) {
 
   # Check surroundings length:
@@ -250,6 +259,8 @@ fuseSurroundings <- function(surroundings, mutationSymbol,showWarning) {
 
 #' nucToSymbol
 #' @description Function to convert a vector nucleotides to a single symbol
+#' @param nuc vector with the nucleotides
+#' @param mutationSymbol symbol that represent the mutation site
 nucToSymbol <- function(nuc, mutationSymbol){
 
   # Check if the nucleotides are not only the mutation symbol:
@@ -258,9 +269,10 @@ nucToSymbol <- function(nuc, mutationSymbol){
   }
 
   # Find the symbol that match with all the nucleotides:
-  for (rowIndex in 1:nrow(dnaAlphabet)) {
-    if (length(setdiff(nuc,strsplit(dnaAlphabet[rowIndex,]$represent,",")[[1]])) == 0) {
-      return(dnaAlphabet[rowIndex,]$symbol)
+  for (rowIndex in 1:nrow(cMut::dnaAlphabet)) {
+    if (length(setdiff(nuc,
+                       strsplit(cMut::dnaAlphabet[rowIndex,]$represent,",")[[1]])) == 0) {
+      return(cMut::dnaAlphabet[rowIndex,]$symbol)
     }
   }
 
@@ -304,7 +316,7 @@ formatClusterMutations <- function(refs, alts, convert=FALSE) {
 #' getClusterType
 #' @description Function to sort and create a cluster type (e.g. C>G C>G / G>C
 #'   G>C).
-#' @param plusstrand A string with the plusStrand mutation description.
+#' @param plusStrand A string with the plusStrand mutation description.
 #' @param minusStrand A string with the minusStrand mutation description.
 getClusterType <- function(plusStrand, minusStrand) {
   s <- sort(c(plusStrand, minusStrand))
@@ -339,6 +351,8 @@ getPatternIntersect <- function(clusterList,patternHeader){
 #' @description A function to add and change columns of the groupClusters
 #'   function with the results of the \code{\link{searchClusterPatterns}}
 #'   function.
+#' @inheritParams groupClusters
+#' @inheritParams createGroupTable
 callSearchclusterPatterns <- function(table,                patternIntersect,
                                       searchPatterns,       searchRefHeader,
                                       searchAltHeader,      searchIdHeader,
@@ -382,6 +396,8 @@ callSearchclusterPatterns <- function(table,                patternIntersect,
 
 #' addClusterTableComment
 #' @description Adds explanation to the table about the columns
+#' @inheritParams groupClusters
+#' @inheritParams createGroupTable
 addClusterTableComment <- function(table,           patternIntersect,
                                    clusterIdHeader, searchClusterPatterns) {
   comment(table) <-

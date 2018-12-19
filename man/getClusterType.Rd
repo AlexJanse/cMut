@@ -7,9 +7,9 @@
 getClusterType(plusStrand, minusStrand)
 }
 \arguments{
-\item{minusStrand}{A string with the minusStrand mutation description.}
+\item{plusStrand}{A string with the plusStrand mutation description.}
 
-\item{plusstrand}{A string with the plusStrand mutation description.}
+\item{minusStrand}{A string with the minusStrand mutation description.}
 }
 \description{
 Function to sort and create a cluster type (e.g. C>G C>G / G>C

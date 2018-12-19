@@ -20,6 +20,8 @@ to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}
 
 \item{useChrom}{A vector with the chromosomes that are used. Make sure that
 the names are notated as e.g. "chr1".}
+
+\item{lenChrom}{vector with the length of the chromosomes}
 }
 \value{
 A table with random mutations

@@ -8,6 +8,39 @@ callSearchclusterPatterns(table, patternIntersect, searchPatterns,
   searchRefHeader, searchAltHeader, searchIdHeader, searchDistanceHeader,
   searchReverseComplement, renameReverse)
 }
+\arguments{
+\item{table}{A table with columns containing cluster IDs, reference and
+alternative nucleotide. See the output of the
+\code{\link{identifyClusters}} function for more information
+about the table.}
+
+\item{patternIntersect}{A Boolean if the table contains patterns and these
+needed to be processed as well.}
+
+\item{searchPatterns}{A tibble with the known mutation patterns. The
+\code{\link{mutationPatterns}} is the default search table.}
+
+\item{searchRefHeader}{A string with the column name of the one with the
+reference nucleotide in the searchPatterns table.}
+
+\item{searchAltHeader}{A string with the column name of the one with the
+alternative nucleotide in the searchPatterns table.}
+
+\item{searchIdHeader}{A string with the column name of the one with the
+pattern IDs.}
+
+\item{searchDistanceHeader}{A string with the column name of the one with the
+maximum distance between clustered mutations. Not needed if the distance
+parameter is NULL. NA's within this column are allowed.}
+
+\item{searchReverseComplement}{A boolean to also search the patterns in the
+reverse complement of the searchPatterns tibble.}
+
+\item{renameReverse}{A Boolean if the id of the process needs to be renamed.
+This has the effect on the cMut functions that it will no longer treat the
+reverse complement and non reverse complement as the same. This parameter
+will irrelevant if \code{searchReverseComplement} is FALSE.}
+}
 \description{
 A function to add and change columns of the groupClusters
   function with the results of the \code{\link{searchClusterPatterns}}

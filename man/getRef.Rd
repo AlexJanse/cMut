@@ -11,6 +11,9 @@ getRef(x, lenChrom, refGenomeHg19)
 and is separated by "-".}
 
 \item{lenChrom}{A vector with chromosomes length}
+
+\item{refGenomeHg19}{A Boolean to tell if the preferred reference genome has
+to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}
 }
 \value{
 A string with the reference nucleotides.

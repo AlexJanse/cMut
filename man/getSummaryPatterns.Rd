@@ -36,12 +36,12 @@ If the \code{groupedClusters} table contains patterns that are not
 }
 \examples{
 # Example dataset
-data <- testDataSet
+data <- cMut::testDataSet
 
 # Use the following functions to get the necessary table
-results <- identifyAndAnnotateClusters(dataTable    = data,
-                                       maxDistance  = 20000,
-                                       linkPatterns = TRUE)
+results <- identifyClusters(dataTable    = data,
+                            maxDistance  = 20000,
+                            linkPatterns = TRUE)
 groupResults <- groupClusters(dataTable             = results,
                               searchClusterPatterns = TRUE,
                               patternIntersect      = TRUE)
