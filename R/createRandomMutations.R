@@ -135,37 +135,25 @@ ifelse(refGenomeHg19,"Hg19","Hg38"),".","
 
 #' getRef
 #' @description A function to get the reference nucleotide.
-#' @param x A string that contains the chromosome name, start and stop location
-#'   and is separated by "-".
-#' @param lenChrom A vector with chromosomes length
+#' @param posTable a table with chromosome, start and stop position information
 #' @inheritParams createRandomMutations
 #' @return A string with the reference nucleotides.
-getRef <- function(x,lenChrom, refGenomeHg19) {
+getRef <- function(posTable, refGenomeHg19) {
 
-
-  # Prepare parameters ------------------------------------------------------
-  data  <- unlist(strsplit(x,"\\-"))
-  chr   <- as.character(data[1])
-  start <- as.numeric(data[2])
-  stop  <- as.numeric(data[3])
-
-
-  # Check if the start and stop positions are not outside the range ---------
-  if (start < 1 | stop > lenChrom[chr]) {
-    return("")
-  }
 
 
   # Create Range object and return the reference nucleotide ------------------
-  range <- GenomicRanges::GRanges(chr,IRanges::IRanges(start,stop))
+  ranges <- GenomicRanges::GRanges(posTable$chrom,
+                                   IRanges::IRanges(posTable$start,
+                                                    posTable$stop))
   if (refGenomeHg19) {
     return(as.character(BSgenome::getSeq(
                           BSgenome.Hsapiens.UCSC.hg19::BSgenome.Hsapiens.UCSC.hg19,
-                          range)))
+                          ranges)))
   } else {
     return(as.character(BSgenome::getSeq(
                           BSgenome.Hsapiens.UCSC.hg38::BSgenome.Hsapiens.UCSC.hg38,
-                          range)))
+                          ranges)))
   }
 }
 
@@ -180,52 +168,68 @@ getRef <- function(x,lenChrom, refGenomeHg19) {
 #' @return A string with the surrounding and mutated position reference
 #'   nucleotides of a mutation. Each part separated with "-"
 #' @inheritParams getRef
-getRefData <- function(chr,pos,sizeSur,lenChrom, refGenomeHg19) {
+getRefData <- function(data,sizeSur,lenChrom, refGenomeHg19) {
 
-  # Prepare parameters ------------------------------------------------------
-  lenChrom <- rlang::get_expr(lenChrom)
-  sizeSur  <- rlang::get_expr(sizeSur)
-  maxPos   <- lenChrom[chr][[1]]
-  start    <- pos-sizeSur
-  stop     <- pos+sizeSur
-
-
-  # Adjust the start stop parameters if it outside the range ----------------
-  if (start < 1) {
-    start <- 1
-  }
-  if (stop > maxPos) {
-    stop <- maxPos
-  }
+  posTable <- data.frame(chrom  = data$chrom,
+                         maxPos = as.vector(lenChrom[data$chrom]),
+                         pos    = data$start,
+                         start  = data$start-sizeSur,
+                         stop   = data$start+sizeSur) %>%
+              dplyr::mutate(start = purrr::map_dbl(start,
+                                                   function(x) {
+                                                     ifelse(x < 1, 1, x)}),
+                            stop  = purrr::map2_dbl(stop,
+                                                    maxPos,
+                                                    function(x, y) {
+                                                      ifelse(x > y, y, x)}))
 
 
   # Get the reference nucleotides -------------------------------------------
-  context <- getRef(paste(chr,start,stop,sep = "-"),lenChrom,refGenomeHg19)
+  context <- getRef(posTable,refGenomeHg19)
 
 
   # Determine the location of the mutated nucleotide ------------------------
-  if(pos == start){
-    mutPos <- 1
-  } else if(pos == maxPos){
-    mutpos <- nchar(context)
-  } else{
-    mutpos <- pos-start+1
-  }
+  posTable <- dplyr::mutate(posTable,
+                            context = context) %>%
+              dplyr::mutate(mutPos = purrr::pmap_dbl(list(pos,
+                                                     start,
+                                                     maxPos,
+                                                     context),
+                                                     function(pos, start, maxPos, context){
+                                                       if(pos == start){
+                                                         return(1)
+                                                       } else if(pos == maxPos){
+                                                         return(nchar(context))
+                                                       } else{
+                                                         return(pos - start + 1)
+                                                       }
+                                                     }))
+
 
 
   # Create reference symbol and return it ----------------------------------
-  refData <- paste(paste(substr(x     = context,
-                                start = 1,
-                                stop  = mutpos-1),
-                         substr(x     = context,
-                                start = mutpos+1,
-                                stop  = nchar(context)),
-                         sep = "."),
-                   substr(x     = context,
-                          start = mutpos,
-                          stop  = mutpos),
-                   sep = "-")
-  return(refData)
+  posTable <- dplyr::mutate(posTable,
+                            refData = purrr::pmap_chr(list(context,
+                                                           start,
+                                                           stop,
+                                                           mutPos),
+                                                      function(context,
+                                                               start,
+                                                               stop,
+                                                               mutPos){
+                                                        paste(paste(substr(x     = context,
+                                                                           start = 1,
+                                                                           stop  = mutPos-1),
+                                                                    substr(x     = context,
+                                                                           start = mutPos+1,
+                                                                           stop  = nchar(context)),
+                                                                    sep = "."),
+                                                              substr(x     = context,
+                                                                     start = mutPos,
+                                                                     stop  = mutPos),
+                                                              sep = "-")
+                                                      }))
+  return(posTable$refData)
 }
 
 
@@ -245,9 +249,7 @@ createRandomTable <- function(nMut,
 
   # Prepare parameters ------------------------------------------------------
   probability   <- lenChrom[useChrom]/sum(lenChrom[useChrom])*100
-  lenChromEnquo <- dplyr::enquo(lenChrom)
   sizeSur       <- as.numeric(sizeSur)
-  sizeSur       <- dplyr::enquo(sizeSur)
 
 
   # Nucleotides to choose from ----------------------------------------------
@@ -280,15 +282,10 @@ createRandomTable <- function(nMut,
   randomTable <- dplyr::mutate(randomTable, sampleIDs = sampleName)
 
   # Create a column with the information needed from the reference genome:
-  randomTable <- dplyr::mutate(randomTable,
-                               refdata = purrr::map2_chr(.data$chrom,.data$start,
-                                                         function(x,y){
-                                                           getRefData(chr = x,
-                                                                      pos = y,
-                                                                      sizeSur = sizeSur,
-                                                                      lenChrom = !!lenChromEnquo,
-                                                                      refGenomeHg19 = refGenomeHg19)
-                                                         }))
+  randomTable$refdata <- getRefData(randomTable,
+                                    sizeSur       = sizeSur,
+                                    lenChrom      = lenChrom,
+                                    refGenomeHg19 = refGenomeHg19)
 
   # Create a column with the surrounding nucleotides from the refData column:
   randomTable <- dplyr::mutate(randomTable,
