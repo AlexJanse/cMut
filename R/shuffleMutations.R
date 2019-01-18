@@ -289,7 +289,14 @@ checkParametersShuffleMutations <- function(dataTable,               chromHeader
              stop ("Please check if the column names in the parameters match with the dataTable columns.")
            }
          })
-
+  if(nrow(dataTable[is.na(dplyr::pull(dataTable,chromHeader)) &
+                    is.na(dplyr::pull(dataTable,refHeader)) &
+                    is.na(dplyr::pull(dataTable,altHeader)) &
+                    is.na(dplyr::pull(dataTable,contextHeader)) &
+                    is.na(dplyr::pull(dataTable,positionHeader)) &
+                    is.na(dplyr::pull(dataTable,sampleIdHeader)) ,]) > 0){
+    stop("Error: NA's were found in the sent data.")
+  }
   sapply(c(searchAltHeader,
            searchRefHeader,
            searchContextHeader,

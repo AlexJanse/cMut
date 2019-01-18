@@ -36,7 +36,7 @@ If the \code{groupedClusters} table contains patterns that are not
 }
 \examples{
 # Example dataset
-data <- cMut::testDataSet
+data <- testDataSet
 
 # Use the following functions to get the necessary table
 results <- identifyClusters(dataTable    = data,

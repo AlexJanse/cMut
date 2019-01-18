@@ -1,11 +1,11 @@
 Package: cMut
 Type: Package
-Title: Identify clustered single nucleotide mutations and link to patterns
-Version: 0.1.0
-Authors@R: person("Alex", "Janse", email = "alex.janse@radboudumc.nl", role = c("aut", "cre"))
+Title: Identify clustered single nucleotide mutations and link to mutational patterns
+Version: 1.0.0
+Authors@R: person("Alex", "Janse", email = "alex.janse.nl@hotmail.com", role = c("aut", "cre"))
 Description: cMut is capable to find clustered single nucleotide variants and 
              link them to mutation patterns. 
-             It also provide a stimulation function to determine the enrichment 
+             It also provide a stimulation function to help determine the enrichment 
              of the found pattern results. Please, read the vignette and help 
              pages for more information.
 License: GPL-3

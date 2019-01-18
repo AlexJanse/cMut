@@ -90,7 +90,7 @@ A function that will group the clusters and if wanted find the
 \examples{
 # Example of a table containing the right columns and data for the
 # identifiAndAnnotateClusters function:
-test <- cMut::testDataSet
+test <- testDataSet
 
 # Example of using this function with data that contain patterns:
 mutations <- identifyClusters(dataTable      = test,

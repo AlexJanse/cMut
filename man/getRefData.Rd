@@ -4,17 +4,15 @@
 \alias{getRefData}
 \title{getRefData}
 \usage{
-getRefData(chr, pos, sizeSur, lenChrom, refGenomeHg19)
+getRefData(data, sizeSur, lenChrom, refGenomeHg19)
 }
 \arguments{
-\item{chr}{A string with the chromosome name.}
-
-\item{pos}{A number with the mutation location.}
+\item{data}{Table with the chromosome, start information}
 
 \item{sizeSur}{A number with the amount of nucleotides there has to be
 around the mutation.}
 
-\item{lenChrom}{A vector with chromosomes length}
+\item{lenChrom}{vector with the different size of the chromosomes}
 
 \item{refGenomeHg19}{A Boolean to tell if the preferred reference genome has
 to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}

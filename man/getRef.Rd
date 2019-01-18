@@ -4,13 +4,10 @@
 \alias{getRef}
 \title{getRef}
 \usage{
-getRef(x, lenChrom, refGenomeHg19)
+getRef(posTable, refGenomeHg19)
 }
 \arguments{
-\item{x}{A string that contains the chromosome name, start and stop location
-and is separated by "-".}
-
-\item{lenChrom}{A vector with chromosomes length}
+\item{posTable}{a table with chromosome, start and stop position information}
 
 \item{refGenomeHg19}{A Boolean to tell if the preferred reference genome has
 to be Hg19. Hg38 will be used when \code{refGenome = FALSE}.}

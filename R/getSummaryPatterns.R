@@ -16,7 +16,7 @@
 #'   \code{Unidentified} together with clusters without patterns.
 #' @examples
 #' # Example dataset
-#' data <- cMut::testDataSet
+#' data <- testDataSet
 #'
 #' # Use the following functions to get the necessary table
 #' results <- identifyClusters(dataTable    = data,

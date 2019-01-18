@@ -106,7 +106,7 @@ A function that finds and annotate clusters in a genomic data
 }
 \examples{
 # Example data set:
-data <- cMut::testDataSet
+data <- testDataSet
 
 # Example for just clustering:
 results <- identifyClusters(dataTable   = data,
@@ -121,8 +121,6 @@ results <- identifyClusters(dataTable    = data,
 # For more information about the added columns, use:
 cat(comment(results))
 
-# See the vignette for detailed examples using:
-# vignette("analysis_of_clusterpattterns",package = "cMut")
 }
 \seealso{
 \itemize{ \item \code{\link{testDataSet}} for an example of data as

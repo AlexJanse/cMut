@@ -36,7 +36,7 @@
 #' @import magrittr
 #' @examples
 #' # Example data set:
-#' data <- cMut::testDataSet
+#' data <- testDataSet
 #'
 #' # Example for just clustering:
 #' results <- identifyClusters(dataTable   = data,
@@ -51,8 +51,6 @@
 #' # For more information about the added columns, use:
 #' cat(comment(results))
 #'
-#' # See the vignette for detailed examples using:
-#' # vignette("analysis_of_clusterpattterns",package = "cMut")
 #' @seealso \itemize{ \item \code{\link{testDataSet}} for an example of data as
 #'   input for parameter \code{dataTable} \item \code{\link{mutationPatterns}}
 #'   for looking at the default pattern search table \item Use the following

@@ -28,6 +28,7 @@
 #'
 #' # See explanation of table columns
 #' cat(comment(x))
+#' @importFrom rlang .data
 createRandomMutations <- function(nMut,
                                   sampleName = "testSample",
                                   asTibble = TRUE,
@@ -160,15 +161,25 @@ getRef <- function(posTable, refGenomeHg19) {
 
 #' getRefData
 #' @description Function to get the reference nucleotides of a mutation.
-#' @param chr A string with the chromosome name.
-#' @param pos A number with the mutation location.
+#' @param data Table with the chromosome, start information
+#' @param lenChrom vector with the different size of the chromosomes
 #' @param sizeSur A number with the amount of nucleotides there has to be
 #'   around the mutation.
 #' @inheritParams createRandomMutations
 #' @return A string with the surrounding and mutated position reference
 #'   nucleotides of a mutation. Each part separated with "-"
 #' @inheritParams getRef
+#' @importFrom rlang .data
 getRefData <- function(data,sizeSur,lenChrom, refGenomeHg19) {
+
+  # For some reason @importFrom rlang .data does not solve the unbound
+  #  global variable warning in this function.
+  #  Therefore the following variables are created:
+  pos    <- NULL
+  start  <- NULL
+  maxPos <- NULL
+  mutPos <- NULL
+
 
   posTable <- data.frame(chrom  = data$chrom,
                          maxPos = as.vector(lenChrom[data$chrom]),
