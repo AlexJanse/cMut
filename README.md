@@ -36,3 +36,6 @@ Please also checkout the Vignette for intructions how to use this package:
 ```
 vignette("analysis_of_clusterpattterns",package = "cMut")
 ```
+
+
+Please let me know if you find buggs or have any questions!
