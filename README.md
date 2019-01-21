@@ -1,6 +1,6 @@
 # cMut
 cMut (clustered mutations) is an R package that allows you to find clustered mutations, find mutational  
-patterns you're looking for and validate the results.
+patterns you're looking for and helps validate the enrichment of the patterns.
 
 ## Purpose of cMut
 A subset of the mutations that happen in the human genome occur very close to each other. 
