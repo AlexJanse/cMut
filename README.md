@@ -27,7 +27,8 @@ Highly recommended extra software:
 [RStudio](https://www.rstudio.com/)
 
 ### Install
-Start R (or RStudio) and use the following command:
+(WARNING: following code is not yet applicable!)
+Start R (or RStudio) and use the following command: 
 ```
 install.packages("cMut")
 ```
