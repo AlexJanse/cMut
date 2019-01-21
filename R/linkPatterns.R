@@ -1,6 +1,6 @@
 #' linkPatterns
 #' @description A function that is able to find matches between a submitted
-#'   unkown mutation and a known mutation pattern table.
+#'   unknown mutation and a known mutation pattern table.
 #' @param ref A string containing the reference nucleotide. (e.g. "C")
 #' @param alt A string containing the alternative nucleotide. (e.g. "T")
 #' @param context A string containing the surrounding nucleotides. (e.g. "G.C")
@@ -240,15 +240,15 @@ getNnuc <- function(context1,context2){
     return(0)                   # Because the known mutation doesn't have a nucleotide so nothing can be compared
   } else if(is.na(context1)){
     return(-1)                  # Because the known mutation does have nucleotides
-                                #  but the unkown muation doesn't it can't be compared
+                                #  but the unknown muation doesn't it can't be compared
                                 #  and will need to be treated as a mismatch because
-                                #  the unkown muation only have non nucleotides if the
+                                #  the unknown muation only have non nucleotides if the
                                 #  mutation has reach the end or the beginning of a
                                 #  chromosoom so match can't be possible
   } else if (nchar(context2) <= nchar(context1)){
     return(nchar(context2))
   } else {
-    return(-1)                  # If the kown muation is bigger than the unkown
+    return(-1)                  # If the kown muation is bigger than the unknown
                                 #  muation it is not possible to succesfully compair
                                 #  the two as you would need to cut down the known
                                 #  mutation which could lead to false positives

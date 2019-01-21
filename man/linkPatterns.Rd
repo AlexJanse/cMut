@@ -70,7 +70,7 @@ list with the matched patterns. If nothing's found, return an empty
 }
 \description{
 A function that is able to find matches between a submitted
-  unkown mutation and a known mutation pattern table.
+  unknown mutation and a known mutation pattern table.
 }
 \examples{
 results <- linkPatterns(ref     = "C",
