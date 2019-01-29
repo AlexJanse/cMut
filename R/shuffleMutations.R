@@ -29,27 +29,24 @@
 #' @import foreach
 #' @import doParallel
 #' @import compiler
-#' @import doSNOW
 #' @importFrom rlang :=
 #' @export
 #' @examples
-#' # Please note that the examples of this function are commented out.
-#' # This is done because CRAN cannot test parralel functions during the check.
 #' identResults <- identifyClusters(dataTable    = cMut::testDataSet,
 #'                                  maxDistance  = 20000,
 #'                                  linkPatterns = TRUE)
+#' clusteredMutations <- identResults[identResults$is.clustered, ]
 #'
 #' # If only the mutation patterns are needed searched:
-#' clusteredMutations <- identResults[identResults$is.clustered, ]
-#' # shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
-#' #                                    nBootstrap            = 5,
-#' #                                    searchClusterPatterns = FALSE,
-#' #                                    no.cores              = 2)
+#' \dontrun{shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
+#'                                    nBootstrap            = 5,
+#'                                    searchClusterPatterns = FALSE,
+#'                                    no.cores              = 2)}
 #'
 #' # If also the cluster patterns are needed to be added:
-#' # shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
-#' #                                    nBootstrap = 5,
-#' #                                    no.cores   = 2)
+#' \dontrun{shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
+#'                                     nBootstrap = 5,
+#'                                     no.cores   = 2)}
 shuffleMutations <- function(dataTable,                             chromHeader             = "chrom",
                              positionHeader        = "start",       refHeader               = "ref",
                              altHeader             = "alt",         contextHeader           = "surrounding",
@@ -345,19 +342,13 @@ shuffleParallel <- function(dataTable,               chromHeader,
 
   # Prepare for parallel loop -----------------------------------------------
   clusters <- parallel::makeCluster(no.cores)
-  doSNOW::registerDoSNOW(clusters)
-  bar      <- utils::txtProgressBar(max = nBootstrap, style = 3)
-  progress <- function(x) {
-                utils::setTxtProgressBar(bar, x)
-              }
-  opts     <- list(progress = progress)
+  doParallel::registerDoParallel(clusters)
 
   # Preform bootstrap --------------------------------------------------------
   resultTables <- foreach::foreach(i = iterators::icount(nBootstrap),
                                    .verbose      = TRUE,
                                    .packages     = c("magrittr", "cMut"),
-                                   .export       = c("createShuffleTable"),
-                                   .options.snow = opts) %dorng% {
+                                   .export       = c("createShuffleTable")) %dorng% {
 
                                      # Create a table with shuffled mutations and contexts ------------------------
                                      shuffleTable <- createShuffleTable(dataTable      = dataTable,      chromHeader   = chromHeader,

@@ -21,7 +21,6 @@ Imports: AnnotationHub ,
          data.table ,
          doParallel ,
          doRNG ,
-         doSNOW ,
          dplyr ,
          foreach ,
          GenomicRanges ,
@@ -40,5 +39,4 @@ Imports: AnnotationHub ,
 Suggests: testthat,
           knitr,
           rmarkdown
-BiocViews: 
 VignetteBuilder: knitr

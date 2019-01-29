@@ -102,21 +102,19 @@ A function to shuffle the reference, alternative and surrounding
   frequency of found patterns.
 }
 \examples{
-# Please note that the examples of this function are commented out.
-# This is done because CRAN cannot test parralel functions during the check.
 identResults <- identifyClusters(dataTable    = cMut::testDataSet,
                                  maxDistance  = 20000,
                                  linkPatterns = TRUE)
+clusteredMutations <- identResults[identResults$is.clustered, ]
 
 # If only the mutation patterns are needed searched:
-clusteredMutations <- identResults[identResults$is.clustered, ]
-# shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
-#                                    nBootstrap            = 5,
-#                                    searchClusterPatterns = FALSE,
-#                                    no.cores              = 2)
+\dontrun{shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
+                                   nBootstrap            = 5,
+                                   searchClusterPatterns = FALSE,
+                                   no.cores              = 2)}
 
 # If also the cluster patterns are needed to be added:
-# shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
-#                                    nBootstrap = 5,
-#                                    no.cores   = 2)
+\dontrun{shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
+                                    nBootstrap = 5,
+                                    no.cores   = 2)}
 }

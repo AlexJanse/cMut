@@ -34,18 +34,18 @@ A tibble or data.frame with random mutation data.
 Function to generate random mutation data.
 }
 \examples{
-x <- createRandomMutations(nMut       = 100,
+\dontrun{x <- createRandomMutations(nMut       = 100,
                            sampleName = "test",
-                           sizeSur    = 3)
+                           sizeSur    = 3)}
 
 # Proper way of using all the parameters:
-createRandomMutations(nMut          = 10,
+\dontrun{createRandomMutations(nMut          = 10,
                       sampleName    = "name",
                       asTibble      = FALSE,
                       sizeSur       = 4,
                       refGenomeHg19 = FALSE,
-                      useChrom      = c("chr1", "chr2"))
+                      useChrom      = c("chr1", "chr2"))}
 
 # See explanation of table columns
-cat(comment(x))
+\dontrun{cat(comment(x))}
 }
