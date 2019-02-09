@@ -6,8 +6,7 @@ Authors@R: person("Alex", "Janse", email = "alex.janse.nl@hotmail.com", role = c
 Description: To find clustered single nucleotide variants and 
              link them to mutation patterns, 'cMut' was created. 
              It also provide a simulation function to help determine the enrichment 
-             of the found pattern results. Please, read the vignette and help 
-             pages for more information.
+             of the found pattern results.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -40,3 +39,5 @@ Suggests: testthat,
           knitr,
           rmarkdown
 VignetteBuilder: knitr
+BugReports: https://github.com/AlexJanse/cMut/issues
+URL: https://github.com/AlexJanse/cMut
