@@ -14,12 +14,12 @@
 #' @export
 #' @import magrittr
 #' @examples
-#' \dontrun{x <- createRandomMutations(nMut       = 100,
+#' \donttest{x <- createRandomMutations(nMut       = 100,
 #'                            sampleName = "test",
 #'                            sizeSur    = 3)}
 #'
 #' # Proper way of using all the parameters:
-#' \dontrun{createRandomMutations(nMut          = 10,
+#' \donttest{createRandomMutations(nMut          = 10,
 #'                       sampleName    = "name",
 #'                       asTibble      = FALSE,
 #'                       sizeSur       = 4,
@@ -27,7 +27,7 @@
 #'                       useChrom      = c("chr1", "chr2"))}
 #'
 #' # See explanation of table columns
-#' \dontrun{cat(comment(x))}
+#' \donttest{cat(comment(x))}
 #' @importFrom rlang .data
 createRandomMutations <- function(nMut,
                                   sampleName = "testSample",

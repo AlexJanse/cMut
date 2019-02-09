@@ -108,13 +108,11 @@ identResults <- identifyClusters(dataTable    = cMut::testDataSet,
 clusteredMutations <- identResults[identResults$is.clustered, ]
 
 # If only the mutation patterns are needed searched:
-\dontrun{shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
-                                   nBootstrap            = 5,
+\donttest{shuffleResults <- shuffleMutations(dataTable             = clusteredMutations,
                                    searchClusterPatterns = FALSE,
                                    no.cores              = 2)}
 
 # If also the cluster patterns are needed to be added:
-\dontrun{shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
-                                    nBootstrap = 5,
+\donttest{shuffleResults <- shuffleMutations(dataTable  = identResults[identResults$is.clustered,],
                                     no.cores   = 2)}
 }

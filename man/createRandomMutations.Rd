@@ -34,12 +34,12 @@ A tibble or data.frame with random mutation data.
 Function to generate random mutation data.
 }
 \examples{
-\dontrun{x <- createRandomMutations(nMut       = 100,
+\donttest{x <- createRandomMutations(nMut       = 100,
                            sampleName = "test",
                            sizeSur    = 3)}
 
 # Proper way of using all the parameters:
-\dontrun{createRandomMutations(nMut          = 10,
+\donttest{createRandomMutations(nMut          = 10,
                       sampleName    = "name",
                       asTibble      = FALSE,
                       sizeSur       = 4,
@@ -47,5 +47,5 @@ Function to generate random mutation data.
                       useChrom      = c("chr1", "chr2"))}
 
 # See explanation of table columns
-\dontrun{cat(comment(x))}
+\donttest{cat(comment(x))}
 }
